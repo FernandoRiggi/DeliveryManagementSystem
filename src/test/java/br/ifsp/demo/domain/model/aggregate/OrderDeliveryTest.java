@@ -3,6 +3,10 @@ package br.ifsp.demo.domain.model.aggregate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.Optional;
+
+import static io.restassured.RestAssured.when;
 import static org.assertj.core.api.Assertions.*;
 
 public class OrderDeliveryTest {
@@ -44,7 +48,7 @@ public class OrderDeliveryTest {
     }
 
     @Test
-    @DisplayName("[#16]Given that an order is canceled," +
+    @DisplayName("[#16] Given that an order is canceled," +
             " the system should generate a CANCELLATION EventDelivery and record it in the Order Status.")
     void ShouldReturnCancellationEventDelivery() {
         order.cancel();
@@ -52,6 +56,4 @@ public class OrderDeliveryTest {
                 .anyMatch(event -> event.getType() == EventType.CANCELLATION);
         assertThat(hasCanceledEvent).isTrue();
     }
-
-
 }
