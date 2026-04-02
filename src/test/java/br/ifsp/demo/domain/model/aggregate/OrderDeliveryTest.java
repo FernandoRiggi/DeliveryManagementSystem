@@ -1,14 +1,21 @@
 package br.ifsp.demo.domain.model.aggregate;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.*;
 
 public class OrderDeliveryTest {
+    private OrderDelivery order;
+
+    @BeforeEach
+    void SetUp(){
+        order = new OrderDelivery(StatusOrder.CREATED);
+    }
+
     @Test
     @DisplayName("[#13] Given that an order has been created, when canceled, the status should be canceled.")
     void ShouldReturnStatusCanceledWhenCanceled() {
-        OrderDelivery order = new OrderDelivery(StatusOrder.CREATED);
         order.cancel();
         assertThat(order.getStatus()).isEqualTo(StatusOrder.CANCELED);
     }
@@ -16,7 +23,6 @@ public class OrderDeliveryTest {
     @Test
     @DisplayName("[#14] Given that an order has StatusOrder DISPATCHED, when canceled, the status should be canceled")
     void ShouldReturnStatusCanceledWhenCanceledOrderDispatched() {
-        OrderDelivery order = new OrderDelivery(StatusOrder.CREATED);
         order.setStatusOrder(StatusOrder.DISPATCHED);
         order.cancel();
         assertThat(order.getStatus()).isEqualTo(StatusOrder.CANCELED);
@@ -26,14 +32,12 @@ public class OrderDeliveryTest {
     @DisplayName("[#15] Given that an order has StatusOrder CONCLUDED, when canceled," +
             " must throw an exception of type IllegalStateException.")
     void ShouldThrowIllegalStateExceptionWhenCanceledOrderConcluded() {
-        OrderDelivery order = new OrderDelivery(StatusOrder.CREATED);
         order.setStatusOrder(StatusOrder.CONCLUDED);
         assertThatIllegalStateException().isThrownBy(order::cancel);
     }
     @Test
     @DisplayName("[#47 Given that an order has StatusOrder EN_ROUTE, when canceled, the status should be canceled ]")
     void ShouldReturnStatusCanceledWhenCanceledOrderEnRoute() {
-        OrderDelivery order = new OrderDelivery(StatusOrder.CREATED);
         order.setStatusOrder(StatusOrder.EN_ROUTE);
         order.cancel();
         assertThat(order.getStatus()).isEqualTo(StatusOrder.CANCELED);
