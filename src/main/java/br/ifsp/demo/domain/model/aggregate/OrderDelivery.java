@@ -15,4 +15,8 @@ public class OrderDelivery {
     public StatusOrder getStatus() {
         return statusOrder;
     }
+
+    public void setStatusOrder(StatusOrder statusOrder) {
+        this.statusOrder = statusOrder;
+    }
 }
