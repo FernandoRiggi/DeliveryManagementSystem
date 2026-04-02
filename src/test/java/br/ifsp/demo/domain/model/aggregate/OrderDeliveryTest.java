@@ -10,8 +10,8 @@ public class OrderDeliveryTest {
     @Test
     @DisplayName("Given that an order has been created, when canceled, the status should be canceled.")
     void ShouldReturnStatusCanceledWhenCanceled() {
-        OrderDelivery order = new OrderDelivery();
-        order.canceled();
+        OrderDelivery order = new OrderDelivery(StatusOrder.CREATED);
+        order.cancel();
         assertThat(order.getStatus()).isEqualTo(StatusOrder.CANCELED);
     }
 }
