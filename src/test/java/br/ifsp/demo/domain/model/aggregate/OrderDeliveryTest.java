@@ -2,8 +2,6 @@ package br.ifsp.demo.domain.model.aggregate;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.remote.tracing.Status;
-
 import static org.assertj.core.api.Assertions.*;
 
 public class OrderDeliveryTest {
@@ -30,8 +28,6 @@ public class OrderDeliveryTest {
     void ShouldThrowIllegalStateExceptionWhenCanceledOrderConcluded() {
         OrderDelivery order = new OrderDelivery(StatusOrder.CREATED);
         order.setStatusOrder(StatusOrder.CONCLUDED);
-        order.cancel();
         assertThatIllegalStateException().isThrownBy(order::cancel);
-
     }
 }

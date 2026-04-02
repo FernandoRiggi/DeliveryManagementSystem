@@ -9,6 +9,7 @@ public class OrderDelivery {
 
 
     public void cancel() {
+        if(this.statusOrder == StatusOrder.CONCLUDED) throw new IllegalStateException("[Order already concluded]");
         this.statusOrder = StatusOrder.CANCELED;
     }
 
