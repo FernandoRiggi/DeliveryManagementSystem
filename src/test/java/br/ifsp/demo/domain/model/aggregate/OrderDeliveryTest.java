@@ -30,4 +30,12 @@ public class OrderDeliveryTest {
         order.setStatusOrder(StatusOrder.CONCLUDED);
         assertThatIllegalStateException().isThrownBy(order::cancel);
     }
+    @Test
+    @DisplayName("[#47 Given that an order has StatusOrder EN_ROUTE, when canceled, the status should be canceled ]")
+    void ShouldReturnStatusCanceledWhenCanceledOrderEnRoute() {
+        OrderDelivery order = new OrderDelivery(StatusOrder.CREATED);
+        order.setStatusOrder(StatusOrder.EN_ROUTE);
+        order.cancel();
+        assertThat(order.getStatus()).isEqualTo(StatusOrder.CANCELED);
+    }
 }
