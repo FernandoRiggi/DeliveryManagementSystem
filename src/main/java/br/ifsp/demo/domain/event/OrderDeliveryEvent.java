@@ -1,4 +1,4 @@
-package br.ifsp.demo.domain.model.aggregate;
+package br.ifsp.demo.domain.event;
 
 import java.time.LocalDateTime;
 

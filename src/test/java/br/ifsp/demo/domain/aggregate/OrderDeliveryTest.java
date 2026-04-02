@@ -1,12 +1,10 @@
-package br.ifsp.demo.domain.model.aggregate;
+package br.ifsp.demo.domain.aggregate;
 
+import br.ifsp.demo.domain.event.EventType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.Optional;
-
-import static io.restassured.RestAssured.when;
 import static org.assertj.core.api.Assertions.*;
 
 public class OrderDeliveryTest {

@@ -1,4 +1,7 @@
-package br.ifsp.demo.domain.model.aggregate;
+package br.ifsp.demo.domain.aggregate;
+
+import br.ifsp.demo.domain.event.EventType;
+import br.ifsp.demo.domain.event.OrderDeliveryEvent;
 
 import java.util.ArrayList;
 import java.util.Collections;
