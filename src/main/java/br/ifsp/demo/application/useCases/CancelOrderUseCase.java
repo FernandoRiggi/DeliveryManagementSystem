@@ -17,5 +17,7 @@ public class CancelOrderUseCase {
     public void cancelOrderDelivery(UUID OrderId) {
         Optional<OrderDelivery> order = Optional.ofNullable(repo.findById(OrderId)
                 .orElseThrow(() -> new OrderNotFoundException("[OrderDelivery Not Found]")));
+
+        order.ifPresent(OrderDelivery::cancel);
     }
 }

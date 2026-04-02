@@ -11,8 +11,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 import java.util.UUID;
-import static org.mockito.Mockito.when;
+
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.Mockito.*;
 
 @TDD
 @ExtendWith(MockitoExtension.class)
@@ -31,5 +32,6 @@ public class CancelOrderUseCaseTest {
 
         assertThatExceptionOfType(OrderNotFoundException.class)
                 .isThrownBy(()-> sut.cancelOrderDelivery(idNotFound));
+        verifyNoInteractions(repo);
     }
 }
