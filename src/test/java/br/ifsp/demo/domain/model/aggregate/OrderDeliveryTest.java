@@ -44,13 +44,14 @@ public class OrderDeliveryTest {
     }
 
     @Test
-    @DisplayName("Given that an order is canceled," +
+    @DisplayName("[#16]Given that an order is canceled," +
             " the system should generate a CANCELLATION EventDelivery and record it in the Order Status.")
     void ShouldReturnCancellationEventDelivery() {
         order.cancel();
         boolean hasCanceledEvent = order.getEvents().stream()
-                .anyMatch(event -> event.getType() == EvenType.CANCELED);
+                .anyMatch(event -> event.getType() == EventType.CANCELLATION);
         assertThat(hasCanceledEvent).isTrue();
-
     }
+
+
 }
