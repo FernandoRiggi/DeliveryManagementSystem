@@ -19,6 +19,9 @@ public class OrderDelivery {
 
     public void cancel() {
         if(this.statusOrder == StatusOrder.CONCLUDED) throw new IllegalStateException("[Order already concluded]");
+        boolean hasCancellationEvent = OrderEvents.stream().anyMatch(event -> event.getType() == EventType.CANCELLATION);
+        if(hasCancellationEvent) throw new IllegalStateException("[Order already cancelled]");
+
         this.statusOrder = StatusOrder.CANCELED;
         OrderEvents.add(new OrderDeliveryEvent(EventType.CANCELLATION));
     }
