@@ -38,14 +38,6 @@ public class OrderDeliveryTest {
         assertThatIllegalStateException().isThrownBy(order::cancel);
     }
     @Test
-    @DisplayName("[#47 Given that an order has StatusOrder EN_ROUTE, when canceled, the status should be canceled ]")
-    void ShouldReturnStatusCanceledWhenCanceledOrderEnRoute() {
-        order.setStatusOrder(StatusOrder.EN_ROUTE);
-        order.cancel();
-        assertThat(order.getStatus()).isEqualTo(StatusOrder.CANCELED);
-    }
-
-    @Test
     @DisplayName("[#16] Given that an order is canceled," +
             " the system should generate a CANCELLATION EventDelivery and record it in the Order Status.")
     void ShouldReturnCancellationEventDelivery() {
@@ -53,5 +45,21 @@ public class OrderDeliveryTest {
         boolean hasCanceledEvent = order.getEvents().stream()
                 .anyMatch(event -> event.getType() == EventType.CANCELLATION);
         assertThat(hasCanceledEvent).isTrue();
+    }
+
+    @Test
+    @DisplayName("[#46] Canceling an order that has a cancellation event" +
+            " should return an error and not change anything.")
+    void  ShouldReturnIllegalStateExceptionWhenOrderHasCancellationEvent() {
+        order.cancel();
+        assertThatIllegalStateException().isThrownBy(order::cancel);
+    }
+
+    @Test
+    @DisplayName("[#47 Given that an order has StatusOrder EN_ROUTE, when canceled, the status should be canceled ]")
+    void ShouldReturnStatusCanceledWhenCanceledOrderEnRoute() {
+        order.setStatusOrder(StatusOrder.EN_ROUTE);
+        order.cancel();
+        assertThat(order.getStatus()).isEqualTo(StatusOrder.CANCELED);
     }
 }
