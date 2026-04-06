@@ -9,11 +9,13 @@ import static org.assertj.core.api.Assertions.*;
 
 public class OrderDeliveryTest {
     private OrderDelivery order;
+    private Deliveryman deliveryMan;
 
 
     @BeforeEach
     void SetUp(){
         order = new OrderDelivery(StatusOrder.CREATED);
+        deliveryMan = new Deliveryman("John Doe", 10);
     }
 
     //Como cliente
@@ -77,13 +79,20 @@ public class OrderDeliveryTest {
     @Test
     @DisplayName("[#18] Given order CREATED and deliveryman, when dispatch, then status should be DISPATCHED")
     void shouldChangeStatusToDispatchedWhenDeliverymanAssociated() {
-        Deliveryman deliveryman = new Deliveryman("John", 10);
-
-        order.dispatch(deliveryman);
+        order.dispatch(deliveryMan);
 
         assertThat(order.getStatus()).isEqualTo(StatusOrder.DISPATCHED);
-        assertThat(order.getDeliveryman()).isEqualTo(deliveryman);
+        assertThat(order.getDeliveryman()).isEqualTo(deliveryMan);
     }
+
+    @TDD
+    @Test
+    @DisplayName("[#19] Given order CANCELED, when dispatch, then should throw IllegalStateException")
+    void ShouldThrowIllegalStateExceptionWhenDispatchCanceledOrder() {
+        order.cancel();
+        assertThatIllegalStateException().isThrownBy(()-> order.dispatch(deliveryMan));
+    }
+
 
 
 }
