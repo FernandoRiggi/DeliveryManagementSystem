@@ -93,4 +93,11 @@ public class OrderDeliveryTest {
         assertThatIllegalStateException().isThrownBy(()-> order.dispatch(deliveryMan));
     }
 
+    @TDD
+    @Test
+    @DisplayName("[#20] Given deliveryman without sufficient capacity, when dispatch, then should throw IllegalStateException")
+    void shouldThrowIllegalStateExceptionWhenDeliverymanHasInsufficientCapacity() {
+        deliveryMan.setCapacity(0);
+        assertThatIllegalStateException().isThrownBy(() -> order.dispatch(deliveryMan));
+    }
 }
