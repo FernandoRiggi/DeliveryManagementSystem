@@ -9,6 +9,7 @@ import java.util.List;
 
 public class OrderDelivery {
     private StatusOrder statusOrder;
+    private Deliveryman deliveryMan;
     private final List<OrderDeliveryEvent> OrderEvents;
 
     public OrderDelivery(StatusOrder statusOrder) {
@@ -37,5 +38,14 @@ public class OrderDelivery {
 
     public List<OrderDeliveryEvent> getEvents() {
         return Collections.unmodifiableList(OrderEvents);
+    }
+
+    public void dispatch(Deliveryman deliveryman) {
+        this.statusOrder = StatusOrder.DISPATCHED;
+        this.deliveryMan = deliveryman;
+    }
+
+    public Deliveryman getDeliveryman() {
+        return deliveryMan;
     }
 }

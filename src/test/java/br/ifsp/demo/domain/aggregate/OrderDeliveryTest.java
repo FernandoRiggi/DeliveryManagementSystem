@@ -77,7 +77,7 @@ public class OrderDeliveryTest {
     @Test
     @DisplayName("[#18] Given order CREATED and deliveryman, when dispatch, then status should be DISPATCHED")
     void shouldChangeStatusToDispatchedWhenDeliverymanAssociated() {
-        Deliveryman deliveryman = new Deliveryman("John", 10.0);
+        Deliveryman deliveryman = new Deliveryman("John", 10);
 
         order.dispatch(deliveryman);
 
