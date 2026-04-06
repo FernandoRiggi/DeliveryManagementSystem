@@ -5,6 +5,7 @@ import br.ifsp.demo.domain.aggregate.StatusOrder;
 import br.ifsp.demo.domain.repository.DeliveryManRepository;
 import br.ifsp.demo.domain.repository.OrderDeliveryRepository;
 import br.ifsp.demo.exception.DeliveryManNotFoundException;
+import br.ifsp.demo.exception.OrderNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -49,5 +50,18 @@ public class DispatchOrderUseCaseTest {
 
         assertThatExceptionOfType(DeliveryManNotFoundException.class)
                 .isThrownBy(() -> useCase.dispatch(orderId, deliverymanId));
+    }
+
+    @TDD
+    @Test
+    @DisplayName("[#43] Given non-existent order, when dispatch, then should throw OrderNotFoundException")
+    void shouldThrowOrderNotFoundExceptionWhenOrderNotFound() {
+        UUID orderId = UUID.randomUUID();
+        UUID deliverymanId = UUID.randomUUID();
+        when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
+
+        assertThatExceptionOfType(OrderNotFoundException.class)
+                .isThrownBy(() -> useCase.dispatch(orderId, deliverymanId));
+
     }
 }
