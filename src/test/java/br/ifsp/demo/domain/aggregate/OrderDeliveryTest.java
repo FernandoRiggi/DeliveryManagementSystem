@@ -9,13 +9,13 @@ import static org.assertj.core.api.Assertions.*;
 
 public class OrderDeliveryTest {
     private OrderDelivery order;
-    private Deliveryman deliveryMan;
+    private DeliveryMan deliveryMan;
 
 
     @BeforeEach
     void SetUp(){
         order = new OrderDelivery(StatusOrder.CREATED);
-        deliveryMan = new Deliveryman("John Doe", 10);
+        deliveryMan = new DeliveryMan("John Doe", 10);
     }
 
     //Como cliente

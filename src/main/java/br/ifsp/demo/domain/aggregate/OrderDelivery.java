@@ -9,7 +9,7 @@ import java.util.List;
 
 public class OrderDelivery {
     private StatusOrder statusOrder;
-    private Deliveryman deliveryMan;
+    private DeliveryMan deliveryMan;
     private final List<OrderDeliveryEvent> OrderEvents;
 
     public OrderDelivery(StatusOrder statusOrder) {
@@ -40,7 +40,7 @@ public class OrderDelivery {
         return Collections.unmodifiableList(OrderEvents);
     }
 
-    public void dispatch(Deliveryman deliveryMan) {
+    public void dispatch(DeliveryMan deliveryMan) {
         if(deliveryMan == null) throw new IllegalStateException("[Deliveryman null]");
         if(this.statusOrder == StatusOrder.CANCELED) throw new IllegalStateException("[Order already cancelled]");
         if(this.statusOrder == StatusOrder.DISPATCHED)  throw new IllegalStateException("[Order already dispatched]");
@@ -54,7 +54,7 @@ public class OrderDelivery {
         OrderEvents.add(new OrderDeliveryEvent(EventType.DISPATCHED));
     }
 
-    public Deliveryman getDeliveryman() {
+    public DeliveryMan getDeliveryman() {
         return deliveryMan;
     }
 }

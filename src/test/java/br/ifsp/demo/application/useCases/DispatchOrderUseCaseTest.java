@@ -4,12 +4,14 @@ import br.ifsp.demo.domain.aggregate.OrderDelivery;
 import br.ifsp.demo.domain.aggregate.StatusOrder;
 import br.ifsp.demo.domain.repository.DeliveryManRepository;
 import br.ifsp.demo.domain.repository.OrderDeliveryRepository;
+import br.ifsp.demo.exception.DeliveryManNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import static org.assertj.core.api.Assertions.*;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -30,7 +32,7 @@ public class DispatchOrderUseCaseTest {
 
     @BeforeEach
     void setUp() {
-        useCase = new DispatchOrderUseCase(orderRepository, deliverymanRepository);
+       useCase = new DispatchOrderUseCase(deliverymanRepository, orderRepository);
     }
 
     @TDD
@@ -45,6 +47,7 @@ public class DispatchOrderUseCaseTest {
         when(deliverymanRepository.findById(deliverymanId))
                 .thenReturn(Optional.empty());
 
-        assertThatDeliveryManNotFoundException().isThrownBy(()-> useCase.dispatch(orderId, deliverymanId));
+        assertThatExceptionOfType(DeliveryManNotFoundException.class)
+                .isThrownBy(() -> useCase.dispatch(orderId, deliverymanId));
     }
 }

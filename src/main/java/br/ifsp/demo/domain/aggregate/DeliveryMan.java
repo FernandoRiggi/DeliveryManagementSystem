@@ -1,10 +1,10 @@
 package br.ifsp.demo.domain.aggregate;
 
-public class Deliveryman {
+public class DeliveryMan {
     private String name;
     private int capacity;
 
-    public Deliveryman(String name, int capacity) {
+    public DeliveryMan(String name, int capacity) {
         this.name = name;
         this.capacity = capacity;
     }
