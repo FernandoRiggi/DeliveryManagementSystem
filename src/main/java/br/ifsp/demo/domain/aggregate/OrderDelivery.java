@@ -41,6 +41,8 @@ public class OrderDelivery {
     }
 
     public void dispatch(Deliveryman deliveryman) {
+        if(this.statusOrder == StatusOrder.CANCELED) throw new IllegalStateException("[Order already cancelled]");
+
         this.statusOrder = StatusOrder.DISPATCHED;
         this.deliveryMan = deliveryman;
     }

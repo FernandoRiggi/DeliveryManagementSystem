@@ -93,6 +93,4 @@ public class OrderDeliveryTest {
         assertThatIllegalStateException().isThrownBy(()-> order.dispatch(deliveryMan));
     }
 
-
-
 }
