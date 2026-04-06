@@ -40,11 +40,12 @@ public class OrderDelivery {
         return Collections.unmodifiableList(OrderEvents);
     }
 
-    public void dispatch(Deliveryman deliveryman) {
+    public void dispatch(Deliveryman deliveryMan) {
         if(this.statusOrder == StatusOrder.CANCELED) throw new IllegalStateException("[Order already cancelled]");
-
+        if(deliveryMan.getCapacity() <= 0)
+            throw new IllegalStateException(String.format("[%s] is not enough capacity", deliveryMan.getName()));
         this.statusOrder = StatusOrder.DISPATCHED;
-        this.deliveryMan = deliveryman;
+        this.deliveryMan = deliveryMan;
     }
 
     public Deliveryman getDeliveryman() {

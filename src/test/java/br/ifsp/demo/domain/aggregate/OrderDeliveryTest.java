@@ -100,4 +100,5 @@ public class OrderDeliveryTest {
         deliveryMan.setCapacity(0);
         assertThatIllegalStateException().isThrownBy(() -> order.dispatch(deliveryMan));
     }
+
 }

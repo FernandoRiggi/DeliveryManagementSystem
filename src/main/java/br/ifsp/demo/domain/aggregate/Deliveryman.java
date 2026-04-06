@@ -16,4 +16,12 @@ public class Deliveryman {
     public void setName(String name) {
         this.name = name;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
 }
