@@ -131,5 +131,12 @@ public class OrderDeliveryTest {
         assertThatIllegalStateException().isThrownBy(() -> order.dispatch(deliveryMan));
     }
 
+    @TDD
+    @Test
+    @DisplayName("[#41] Given order CREATED and no deliveryman available, when dispatch, then should throw IllegalStateException")
+    void shouldThrowIllegalStateExceptionWhenNoDeliverymanAvailable() {
+        assertThatIllegalStateException().isThrownBy(() -> order.dispatch(null));
+    }
+
 
 }
