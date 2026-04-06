@@ -113,5 +113,14 @@ public class OrderDeliveryTest {
         assertThat(hasDispatchedEvent).isTrue();
     }
 
+    @TDD
+    @Test
+    @DisplayName("[#39] Given order DISPATCHED, when dispatch again, then should throw IllegalStateException")
+    void shouldThrowIllegalStateExceptionWhenDispatchAlreadyDispatchedOrder() {
+        order.dispatch(deliveryMan);
+
+        assertThatIllegalStateException().isThrownBy(() -> order.dispatch(deliveryMan));
+    }
+
 
 }
