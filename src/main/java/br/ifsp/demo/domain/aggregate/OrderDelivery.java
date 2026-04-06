@@ -30,6 +30,7 @@ public class OrderDelivery {
         return statusOrder;
     }
 
+    //Refatorar o código, cada status deve ter sua função, setStatus nao deve existir
     public void setStatusOrder(StatusOrder statusOrder) {
         this.statusOrder = statusOrder;
     }

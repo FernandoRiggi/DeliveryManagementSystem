@@ -1,20 +1,23 @@
 package br.ifsp.demo.domain.aggregate;
 
+import br.ifsp.demo.annotation.TDD;
 import br.ifsp.demo.domain.event.EventType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.Assertions.*;
 
 public class OrderDeliveryTest {
     private OrderDelivery order;
+
 
     @BeforeEach
     void SetUp(){
         order = new OrderDelivery(StatusOrder.CREATED);
     }
 
+    //Como cliente
+    @TDD
     @Test
     @DisplayName("[#13] Given that an order has been created, when canceled, the status should be canceled.")
     void ShouldReturnStatusCanceledWhenCanceled() {
@@ -22,6 +25,7 @@ public class OrderDeliveryTest {
         assertThat(order.getStatus()).isEqualTo(StatusOrder.CANCELED);
     }
 
+    @TDD
     @Test
     @DisplayName("[#14] Given that an order has StatusOrder DISPATCHED, when canceled, the status should be canceled")
     void ShouldReturnStatusCanceledWhenCanceledOrderDispatched() {
@@ -30,6 +34,7 @@ public class OrderDeliveryTest {
         assertThat(order.getStatus()).isEqualTo(StatusOrder.CANCELED);
     }
 
+    @TDD
     @Test
     @DisplayName("[#15] Given that an order has StatusOrder CONCLUDED, when canceled," +
             " must throw an exception of type IllegalStateException.")
@@ -37,6 +42,8 @@ public class OrderDeliveryTest {
         order.setStatusOrder(StatusOrder.CONCLUDED);
         assertThatIllegalStateException().isThrownBy(order::cancel);
     }
+
+    @TDD
     @Test
     @DisplayName("[#16] Given that an order is canceled," +
             " the system should generate a CANCELLATION EventDelivery and record it in the Order Status.")
@@ -47,6 +54,7 @@ public class OrderDeliveryTest {
         assertThat(hasCanceledEvent).isTrue();
     }
 
+    @TDD
     @Test
     @DisplayName("[#46] Canceling an order that has a cancellation event" +
             " should return an error and not change anything.")
@@ -55,6 +63,7 @@ public class OrderDeliveryTest {
         assertThatIllegalStateException().isThrownBy(order::cancel);
     }
 
+    @TDD
     @Test
     @DisplayName("[#47 Given that an order has StatusOrder EN_ROUTE, when canceled, the status should be canceled ]")
     void ShouldReturnStatusCanceledWhenCanceledOrderEnRoute() {
@@ -62,4 +71,19 @@ public class OrderDeliveryTest {
         order.cancel();
         assertThat(order.getStatus()).isEqualTo(StatusOrder.CANCELED);
     }
+
+    //Como operador
+    @TDD
+    @Test
+    @DisplayName("[#18] Given order CREATED and deliveryman, when dispatch, then status should be DISPATCHED")
+    void shouldChangeStatusToDispatchedWhenDeliverymanAssociated() {
+        Deliveryman deliveryman = new Deliveryman("John", 10.0);
+
+        order.dispatch(deliveryman);
+
+        assertThat(order.getStatus()).isEqualTo(StatusOrder.DISPATCHED);
+        assertThat(order.getDeliveryman()).isEqualTo(deliveryman);
+    }
+
+
 }
