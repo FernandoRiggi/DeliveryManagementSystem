@@ -95,10 +95,23 @@ public class OrderDeliveryTest {
 
     @TDD
     @Test
-    @DisplayName("[#20] Given deliveryman without sufficient capacity, when dispatch, then should throw IllegalStateException")
+    @DisplayName("[#20] Given deliveryman without sufficient capacity, when dispatch," +
+            " then should throw IllegalStateException")
     void shouldThrowIllegalStateExceptionWhenDeliverymanHasInsufficientCapacity() {
         deliveryMan.setCapacity(0);
         assertThatIllegalStateException().isThrownBy(() -> order.dispatch(deliveryMan));
     }
+
+    @TDD
+    @Test
+    @DisplayName("[#21] Given order dispatched successfully, then should generate DISPATCHED event")
+    void ShouldGenerateDispatchedEventWhenOrderDispatched() {
+        order.dispatch(deliveryMan);
+
+        boolean hasDispatchedEvent = order.getEvents().stream()
+                .anyMatch(event -> event.getType() == EventType.DISPATCHED);
+        assertThat(hasDispatchedEvent).isTrue();
+    }
+
 
 }
