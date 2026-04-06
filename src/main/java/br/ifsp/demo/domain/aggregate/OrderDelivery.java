@@ -46,6 +46,8 @@ public class OrderDelivery {
             throw new IllegalStateException(String.format("[%s] is not enough capacity", deliveryMan.getName()));
         this.statusOrder = StatusOrder.DISPATCHED;
         this.deliveryMan = deliveryMan;
+
+        OrderEvents.add(new OrderDeliveryEvent(EventType.DISPATCHED));
     }
 
     public Deliveryman getDeliveryman() {
