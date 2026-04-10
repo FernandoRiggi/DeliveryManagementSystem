@@ -150,5 +150,16 @@ public class OrderDeliveryTest {
                 .containsExactly(EventType.CREATED, EventType.CANCELLATION);
     }
 
+    @Functional
+    @Test
+    @DisplayName("[VL] Order must have maximum 4 events: CREATED, CANCELLATION, DISPATCHED AND EN_ROUTE")
+    void MustContainMaximumOfFourEventsInAnOrder(){
+        order.dispatch(deliveryMan);
+        order.startRoute();
+        order.cancel();
 
+        assertThat(order.getEvents().size()).isEqualTo(2);
+        assertThat(order.getEvents()).extracting(OrderDeliveryEvent::getType)
+                .containsExactly(EventType.CREATED, EventType.DISPATCHED, EventType.EN_ROUTE, EventType.CONCLUDED);
+    }
 }
