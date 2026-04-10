@@ -1,7 +1,9 @@
 package br.ifsp.demo.domain.aggregate;
 
+import br.ifsp.demo.annotation.Functional;
 import br.ifsp.demo.annotation.TDD;
 import br.ifsp.demo.domain.event.EventType;
+import br.ifsp.demo.domain.event.OrderDeliveryEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -136,6 +138,16 @@ public class OrderDeliveryTest {
     @DisplayName("[#41] Given order CREATED and no deliveryman available, when dispatch, then should throw IllegalStateException")
     void shouldThrowIllegalStateExceptionWhenNoDeliverymanAvailable() {
         assertThatIllegalStateException().isThrownBy(() -> order.dispatch(null));
+    }
+
+    @Functional
+    @Test
+    @DisplayName("[VL] Canceled order must have at minimum 2 events: CREATED and CANCELLATION")
+    void canceledOrderMustHaveMinimumTwoEvents() {
+        order.cancel();
+        assertThat(order.getEvents().size()).isEqualTo(2);
+        assertThat(order.getEvents()).extracting(OrderDeliveryEvent::getType)
+                .containsExactly(EventType.CREATED, EventType.CANCELLATION);
     }
 
 
