@@ -6,4 +6,5 @@ import java.util.UUID;
 
 public interface OrderDeliveryRepository {
     Optional<OrderDelivery> findById(UUID orderId);
+    void save(OrderDelivery orderDelivery);
 }

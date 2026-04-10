@@ -31,6 +31,6 @@ public class CancelOrderUseCaseTest {
 
         assertThatExceptionOfType(OrderNotFoundException.class)
                 .isThrownBy(()-> sut.cancelOrderDelivery(idNotFound));
-        verifyNoInteractions(repo);
+        verify(repo, never()).save(any());
     }
 }
