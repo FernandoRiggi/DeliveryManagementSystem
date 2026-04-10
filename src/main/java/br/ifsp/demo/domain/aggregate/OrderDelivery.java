@@ -12,9 +12,10 @@ public class OrderDelivery {
     private DeliveryMan deliveryMan;
     private final List<OrderDeliveryEvent> OrderEvents;
 
-    public OrderDelivery(StatusOrder statusOrder) {
-        this.statusOrder = statusOrder;
+    public OrderDelivery() {
+        this.statusOrder = StatusOrder.CREATED;
         OrderEvents = new ArrayList<>();
+        OrderEvents.add(new OrderDeliveryEvent(EventType.CREATED));
     }
 
 
@@ -32,12 +33,19 @@ public class OrderDelivery {
     }
 
     //Refatorar o código, cada status deve ter sua função, setStatus nao deve existir
-    public void setStatusOrder(StatusOrder statusOrder) {
-        this.statusOrder = statusOrder;
-    }
+    //public void setStatusOrder(StatusOrder statusOrder) {
+    //    this.statusOrder = statusOrder;}
 
     public List<OrderDeliveryEvent> getEvents() {
         return Collections.unmodifiableList(OrderEvents);
+    }
+
+    public void concluded(){
+        this.statusOrder = StatusOrder.CONCLUDED;
+    }
+
+    public void startRoute(){
+        this.statusOrder = StatusOrder.EN_ROUTE;
     }
 
     public void dispatch(DeliveryMan deliveryMan) {

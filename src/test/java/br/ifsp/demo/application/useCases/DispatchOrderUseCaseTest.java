@@ -16,8 +16,6 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.util.Optional;
 import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,7 +42,7 @@ public class DispatchOrderUseCaseTest {
         UUID deliverymanId = UUID.randomUUID();
 
         when(orderRepository.findById(orderId))
-                .thenReturn(Optional.of(new OrderDelivery(StatusOrder.CREATED)));
+                .thenReturn(Optional.of(new OrderDelivery()));
         when(deliverymanRepository.findById(deliverymanId))
                 .thenReturn(Optional.empty());
 

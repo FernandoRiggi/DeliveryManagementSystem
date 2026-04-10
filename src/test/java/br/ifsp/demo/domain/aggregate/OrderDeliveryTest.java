@@ -14,7 +14,7 @@ public class OrderDeliveryTest {
 
     @BeforeEach
     void SetUp(){
-        order = new OrderDelivery(StatusOrder.CREATED);
+        order = new OrderDelivery();
         deliveryMan = new DeliveryMan("John Doe", 10);
     }
 
@@ -31,7 +31,7 @@ public class OrderDeliveryTest {
     @Test
     @DisplayName("[#14] Given that an order has StatusOrder DISPATCHED, when canceled, the status should be canceled")
     void ShouldReturnStatusCanceledWhenCanceledOrderDispatched() {
-        order.setStatusOrder(StatusOrder.DISPATCHED);
+        order.dispatch(deliveryMan);
         order.cancel();
         assertThat(order.getStatus()).isEqualTo(StatusOrder.CANCELED);
     }
@@ -41,7 +41,7 @@ public class OrderDeliveryTest {
     @DisplayName("[#15] Given that an order has StatusOrder CONCLUDED, when canceled," +
             " must throw an exception of type IllegalStateException.")
     void ShouldThrowIllegalStateExceptionWhenCanceledOrderConcluded() {
-        order.setStatusOrder(StatusOrder.CONCLUDED);
+        order.concluded();
         assertThatIllegalStateException().isThrownBy(order::cancel);
     }
 
@@ -69,7 +69,7 @@ public class OrderDeliveryTest {
     @Test
     @DisplayName("[#47 Given that an order has StatusOrder EN_ROUTE, when canceled, the status should be canceled ]")
     void ShouldReturnStatusCanceledWhenCanceledOrderEnRoute() {
-        order.setStatusOrder(StatusOrder.EN_ROUTE);
+        order.startRoute();
         order.cancel();
         assertThat(order.getStatus()).isEqualTo(StatusOrder.CANCELED);
     }
@@ -126,7 +126,7 @@ public class OrderDeliveryTest {
     @Test
     @DisplayName("[#40] Given order CONCLUDED, when dispatch, then should throw IllegalStateException")
     void shouldThrowIllegalStateExceptionWhenDispatchConcludedOrder() {
-        order.setStatusOrder(StatusOrder.CONCLUDED);
+        order.concluded();
 
         assertThatIllegalStateException().isThrownBy(() -> order.dispatch(deliveryMan));
     }
