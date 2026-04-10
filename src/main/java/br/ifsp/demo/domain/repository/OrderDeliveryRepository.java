@@ -5,5 +5,5 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface OrderDeliveryRepository {
-    Optional<OrderDelivery> findById(UUID idNotFound);
+    Optional<OrderDelivery> findById(UUID orderId);
 }
