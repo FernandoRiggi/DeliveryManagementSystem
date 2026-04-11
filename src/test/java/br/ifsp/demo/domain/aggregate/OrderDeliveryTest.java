@@ -7,6 +7,10 @@ import br.ifsp.demo.domain.event.OrderDeliveryEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static org.assertj.core.api.Assertions.*;
 
 public class OrderDeliveryTest {
@@ -152,14 +156,31 @@ public class OrderDeliveryTest {
 
     @Functional
     @Test
-    @DisplayName("[VL] Order must have maximum 4 events: CREATED, CANCELLATION, DISPATCHED AND EN_ROUTE")
+    @DisplayName("[VL] Order must have maximum 4 events: CREATED, DISPATCHED, EN_ROUTE and CONCLUDED or" +
+            " CREATED, DISPATCHED, EN_ROUTE AND CANCELLATION")
     void MustContainMaximumOfFourEventsInAnOrder(){
         order.dispatch(deliveryMan);
         order.startRoute();
         order.cancel();
 
-        assertThat(order.getEvents().size()).isEqualTo(2);
-        assertThat(order.getEvents()).extracting(OrderDeliveryEvent::getType)
-                .containsExactly(EventType.CREATED, EventType.DISPATCHED, EventType.EN_ROUTE, EventType.CONCLUDED);
+        List<EventType> eventsTypes = order.getEvents()
+                .stream()
+                .map(OrderDeliveryEvent::type)
+                .toList();
+
+        assertThat(eventsTypes.size()).isEqualTo(4);
+
+        boolean sequenceValid = eventsTypes.equals(List.of(
+                EventType.CREATED,
+                EventType.DISPATCHED,
+                EventType.EN_ROUTE,
+                EventType.CONCLUDED)
+        ) || eventsTypes.equals(List.of(
+                EventType.CREATED,
+                EventType.DISPATCHED,
+                EventType.EN_ROUTE,
+                EventType.CANCELLATION));
+
+        assertThat(sequenceValid).isTrue();
     }
 }
