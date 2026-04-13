@@ -25,6 +25,10 @@ public class OrderDelivery {
             throw new NullPointerException("Customer cannot be null");
         }
 
+        if (pickupAddress == null) {
+            throw new NullPointerException("PickupAddress cannot be null");
+        }
+
         this.customer = customer;
         this.pickupAddress = pickupAddress;
         this.deliveryAddress = deliveryAddress;
