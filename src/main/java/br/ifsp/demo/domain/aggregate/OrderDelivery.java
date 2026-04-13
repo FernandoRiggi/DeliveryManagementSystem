@@ -2,6 +2,8 @@ package br.ifsp.demo.domain.aggregate;
 
 import br.ifsp.demo.domain.event.EventType;
 import br.ifsp.demo.domain.event.OrderDeliveryEvent;
+import br.ifsp.demo.domain.valueObject.Address;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,9 +12,15 @@ import java.util.List;
 public class OrderDelivery {
     private StatusOrder statusOrder;
     private DeliveryMan deliveryMan;
+    @Getter
+    private final Address pickupAddress;
+    @Getter
+    private final Address deliveryAddress;
     private final List<OrderDeliveryEvent> OrderEvents;
 
-    public OrderDelivery() {
+    public OrderDelivery(Address pickupAddress, Address deliveryAddress) {
+        this.pickupAddress = pickupAddress;
+        this.deliveryAddress = deliveryAddress;
         this.statusOrder = StatusOrder.CREATED;
         OrderEvents = new ArrayList<>();
         OrderEvents.add(new OrderDeliveryEvent(EventType.CREATED));
