@@ -30,8 +30,8 @@ public class OrderDeliveryTest {
         void shouldCreateOrderDeliveryWithPickupAndDeliveryAddresses(){
             Address pickupAddress = new Address("Street A", "10", "Center", "São Carlos", "SP", "Brasil", new Cep("13500-000"));
             Address deliveryAddress = new Address("Street B", "11", "Center", "Araraquara", "SP", "Brasil", new Cep("13400-000"));
-
-            OrderDelivery sut = new OrderDelivery(pickupAddress, deliveryAddress);
+            Customer customer = new Customer("John Doe", CustomerType.REGULAR);
+            OrderDelivery sut = new OrderDelivery(customer, pickupAddress, deliveryAddress);
 
             assertThat(sut.getPickupAddress()).isEqualTo(pickupAddress);
             assertThat(sut.getDeliveryAddress()).isEqualTo(deliveryAddress);
