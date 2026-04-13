@@ -19,6 +19,21 @@ public class OrderDeliveryTest {
     }
 
     //Como cliente
+
+    @TDD
+    @Test
+    @DisplayName("[#1]Should create order delivery with pickup and delivery addresses")
+    void shouldCreateOrderDeliveryWithPickupAndDeliveryAddresses(){
+        Address pickupAddress = new Address("Street A", "10", "Center", "São Carlos", "SP", "Brasil", "13500-000");
+        Address deliveryAddress = new Address("Street B", "11", "Center", "Araraquara", "SP", "Brasil", "13400-000");
+
+        OrderDelivery sut = new OrderDelivery(pickupAddress, deliveryAddress);
+
+        assertThat(sut.getPickupAddress()).isEqualTo(pickupAddress);
+        assertThat(sut.getDeliveryAddress()).isEqualTo(deliveryAddress);
+        assertThat(sut.getStatus()).isEqualTo(StatusOrder.CREATED);
+    }
+
     @TDD
     @Test
     @DisplayName("[#13] Given that an order has been created, when canceled, the status should be canceled.")
