@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
@@ -37,6 +38,20 @@ public class OrderDeliveryTest {
             assertThat(sut.getPickupAddress()).isEqualTo(pickupAddress);
             assertThat(sut.getDeliveryAddress()).isEqualTo(deliveryAddress);
             assertThat(sut.getStatus()).isEqualTo(StatusOrder.CREATED);
+        }
+
+        @TDD
+        @ParameterizedTest
+        @MethodSource("invalidCustomers")
+        @DisplayName("Should throw exception when customer is invalid")
+        void shouldThrowExceptionWhenCustomerIsInvalid(String name, CustomerType type){
+            Address pickupAddress = createValidPickupAddress();
+            Address deliveryAddress = createValidDeliveryAddress();
+
+            assertThatThrownBy(() -> {
+                Customer sut = new Customer(name, type);
+                new OrderDelivery(sut, pickupAddress, deliveryAddress);
+            }).isInstanceOf(IllegalArgumentException.class);
         }
 
         @TDD
@@ -90,6 +105,16 @@ public class OrderDeliveryTest {
                     arguments("Street B", "10", "Center", "São Carlos", "SP", "Brasil", null),
                     arguments("Street B", "10", "Center", "São Carlos", "SP", "Brasil", ""),
                     arguments("Street B", "10", "Center", "São Carlos", "SP", "Brasil", "cep-invalido")
+            );
+        }
+
+        private static Stream<Arguments> invalidCustomers() {
+            return Stream.of(
+                    arguments(null, CustomerType.REGULAR),
+                    arguments("", CustomerType.REGULAR),
+                    arguments(" ", CustomerType.REGULAR),
+                    arguments("   ", CustomerType.REGULAR),
+                    arguments("John Doe", null)
             );
         }
     }
@@ -240,5 +265,13 @@ public class OrderDeliveryTest {
 
     private Customer createValidCustomer(){
         return new Customer("John Doe", CustomerType.REGULAR);
+    }
+
+    private Address createValidPickupAddress() {
+        return new Address("Street A", "10", "Center", "São Carlos", "SP", "Brasil", new Cep("13500-000"));
+    }
+
+    private Address createValidDeliveryAddress() {
+        return new Address("Street B", "11", "Center", "Araraquara", "SP", "Brasil", new Cep("13400-000"));
     }
 }
