@@ -69,6 +69,15 @@ public class OrderDeliveryTest {
         }
 
         @TDD
+        @Test
+        @DisplayName("Should throw null pointer exception when pickup address is null")
+        void shouldThrowNullPointerExceptionWhenPickupAddressIsNull(){
+            assertThatNullPointerException().isThrownBy(() -> {
+                new OrderDelivery(createValidCustomer(), null, createValidDeliveryAddress());
+            });
+        }
+
+        @TDD
         @ParameterizedTest
         @MethodSource("invalidAddresses")
         @DisplayName("[#3] Should throw exception when pickup address is invalid")
