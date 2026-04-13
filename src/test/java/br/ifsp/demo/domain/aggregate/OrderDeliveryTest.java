@@ -4,6 +4,7 @@ import br.ifsp.demo.annotation.TDD;
 import br.ifsp.demo.domain.event.EventType;
 import br.ifsp.demo.domain.valueObject.Address;
 import br.ifsp.demo.domain.valueObject.Cep;
+import br.ifsp.demo.domain.valueObject.CustomerType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -48,7 +49,7 @@ public class OrderDeliveryTest {
             assertThatThrownBy(() -> {
                 Cep cep = cepValue == null ? null : new Cep(cepValue);
                 Address pickupAddress = new Address(street, number, neighborhood, city, state, country, cep);
-                new OrderDelivery(pickupAddress, deliveryAddress);
+                new OrderDelivery(createValidCustomer() ,pickupAddress, deliveryAddress);
             }).isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -62,7 +63,7 @@ public class OrderDeliveryTest {
             assertThatThrownBy(() -> {
                 Cep cep = cepValue == null ? null : new Cep(cepValue);
                 Address deliveryAddress = new Address(street, number, neighborhood, city, state, country, cep);
-                new OrderDelivery(pickupAddress, deliveryAddress);
+                new OrderDelivery(createValidCustomer(), pickupAddress, deliveryAddress);
             }).isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -229,11 +230,15 @@ public class OrderDeliveryTest {
     private OrderDelivery createValidOrder(){
         Address pickupAddress = new Address("Street A", "10", "Center", "São Carlos", "SP", "Brasil", new Cep("13500-000"));
         Address deliveryAddress = new Address("Street B", "11", "Center", "Araraquara", "SP", "Brasil", new Cep("13400-000"));
-
-        return new OrderDelivery(pickupAddress, deliveryAddress);
+        Customer customer = new Customer("John Doe", CustomerType.REGULAR);
+        return new OrderDelivery(customer, pickupAddress, deliveryAddress);
     }
 
     private DeliveryMan createValidDeliveryMan(){
         return new DeliveryMan("John Doe", 10);
+    }
+
+    private Customer createValidCustomer(){
+        return new Customer("John Doe", CustomerType.REGULAR);
     }
 }
