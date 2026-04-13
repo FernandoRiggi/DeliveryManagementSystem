@@ -13,6 +13,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullSource;
 
 import java.util.stream.Stream;
 
@@ -52,6 +53,19 @@ public class OrderDeliveryTest {
                 Customer sut = new Customer(name, type);
                 new OrderDelivery(sut, pickupAddress, deliveryAddress);
             }).isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @TDD
+        @ParameterizedTest
+        @NullSource
+        @DisplayName("Should throw null pointer exception when customer is null")
+        void shouldThrowNullPointerExceptionWhenCustomerIsNull(Customer customer){
+            Address pickupAddress = createValidPickupAddress();
+            Address deliveryAddress = createValidDeliveryAddress();
+
+            assertThatNullPointerException().isThrownBy(() -> {
+                new OrderDelivery(customer, pickupAddress, deliveryAddress);
+            });
         }
 
         @TDD
