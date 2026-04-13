@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
@@ -37,6 +36,20 @@ public class OrderDeliveryTest {
             assertThat(sut.getPickupAddress()).isEqualTo(pickupAddress);
             assertThat(sut.getDeliveryAddress()).isEqualTo(deliveryAddress);
             assertThat(sut.getStatus()).isEqualTo(StatusOrder.CREATED);
+        }
+
+        @TDD
+        @ParameterizedTest
+        @MethodSource("invalidAddresses")
+        @DisplayName("[#3] Should throw exception when pickup address is invalid")
+        void shouldThrowExceptionWhenPickupAddressIsInvalid(String street, String number, String neighborhood, String city, String state, String country, String cepValue){
+            Address deliveryAddress = new Address("Street A", "10", "Center", "São Carlos", "SP", "Brasil", new Cep("13500-000"));
+
+            assertThatThrownBy(() -> {
+                Cep cep = cepValue == null ? null : new Cep(cepValue);
+                Address pickupAddress = new Address(street, number, neighborhood, city, state, country, cep);
+                new OrderDelivery(pickupAddress, deliveryAddress);
+            }).isInstanceOf(IllegalArgumentException.class);
         }
 
         @TDD
