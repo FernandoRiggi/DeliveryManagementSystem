@@ -2,6 +2,8 @@ package br.ifsp.demo.domain.aggregate;
 
 import br.ifsp.demo.annotation.TDD;
 import br.ifsp.demo.domain.event.EventType;
+import br.ifsp.demo.domain.valueObject.Address;
+import br.ifsp.demo.domain.valueObject.Cep;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,8 +26,8 @@ public class OrderDeliveryTest {
     @Test
     @DisplayName("[#1]Should create order delivery with pickup and delivery addresses")
     void shouldCreateOrderDeliveryWithPickupAndDeliveryAddresses(){
-        Address pickupAddress = new Address("Street A", "10", "Center", "São Carlos", "SP", "Brasil", "13500-000");
-        Address deliveryAddress = new Address("Street B", "11", "Center", "Araraquara", "SP", "Brasil", "13400-000");
+        Address pickupAddress = new Address("Street A", "10", "Center", "São Carlos", "SP", "Brasil", new Cep("13500-000"));
+        Address deliveryAddress = new Address("Street B", "11", "Center", "Araraquara", "SP", "Brasil", new Cep("13400-000"));
 
         OrderDelivery sut = new OrderDelivery(pickupAddress, deliveryAddress);
 
@@ -153,5 +155,14 @@ public class OrderDeliveryTest {
         assertThatIllegalStateException().isThrownBy(() -> order.dispatch(null));
     }
 
+    private OrderDelivery createValidOrder(){
+        Address pickupAddress = new Address("Street A", "10", "Center", "São Carlos", "SP", "Brasil", new Cep("13500-000"));
+        Address deliveryAddress = new Address("Street B", "11", "Center", "Araraquara", "SP", "Brasil", new Cep("13400-000"));
 
+        return new OrderDelivery(pickupAddress, deliveryAddress);
+    }
+
+    private DeliveryMan createValidDeliveryMan(){
+        return new DeliveryMan("John Doe", 10);
+    }
 }
