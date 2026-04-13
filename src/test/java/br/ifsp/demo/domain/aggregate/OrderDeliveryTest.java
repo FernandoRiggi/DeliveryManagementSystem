@@ -8,7 +8,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.stream.Stream;
+
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 public class OrderDeliveryTest {
     //Como cliente
@@ -29,6 +37,46 @@ public class OrderDeliveryTest {
             assertThat(sut.getPickupAddress()).isEqualTo(pickupAddress);
             assertThat(sut.getDeliveryAddress()).isEqualTo(deliveryAddress);
             assertThat(sut.getStatus()).isEqualTo(StatusOrder.CREATED);
+        }
+
+        @TDD
+        @ParameterizedTest
+        @MethodSource("invalidAddresses")
+        @DisplayName("[#4] Should throw exception when delivery address is invalid")
+        void shouldThrownExceptionWhenDeliveryAddressIsInvalid(String street, String number, String neighborhood, String city, String state, String country, String cepValue) {
+            Address pickupAddress = new Address("Street A", "10", "Center", "São Carlos", "SP", "Brasil", new Cep("13500-000"));
+
+            assertThatThrownBy(() -> {
+                Cep cep = cepValue == null ? null : new Cep(cepValue);
+                Address deliveryAddress = new Address(street, number, neighborhood, city, state, country, cep);
+                new OrderDelivery(pickupAddress, deliveryAddress);
+            }).isInstanceOf(IllegalArgumentException.class);
+        }
+
+        private static Stream<Arguments> invalidAddresses() {
+            return Stream.of(
+                    arguments(null, "10", "Center", "São Carlos", "SP", "Brasil", "13500-000"),
+                    arguments("", "10", "Center", "São Carlos", "SP", "Brasil", "13500-000"),
+
+                    arguments("Street B", null, "Center", "São Carlos", "SP", "Brasil", "13500-000"),
+                    arguments("Street B", "", "Center", "São Carlos", "SP", "Brasil", "13500-000"),
+
+                    arguments("Street B", "10", null, "São Carlos", "SP", "Brasil", "13500-000"),
+                    arguments("Street B", "10", "", "São Carlos", "SP", "Brasil", "13500-000"),
+
+                    arguments("Street B", "10", "Center", null, "SP", "Brasil", "13500-000"),
+                    arguments("Street B", "10", "Center", "", "SP", "Brasil", "13500-000"),
+
+                    arguments("Street B", "10", "Center", "São Carlos", null, "Brasil", "13500-000"),
+                    arguments("Street B", "10", "Center", "São Carlos", "", "Brasil", "13500-000"),
+
+                    arguments("Street B", "10", "Center", "São Carlos", "SP", null, "13500-000"),
+                    arguments("Street B", "10", "Center", "São Carlos", "SP", "", "13500-000"),
+
+                    arguments("Street B", "10", "Center", "São Carlos", "SP", "Brasil", null),
+                    arguments("Street B", "10", "Center", "São Carlos", "SP", "Brasil", ""),
+                    arguments("Street B", "10", "Center", "São Carlos", "SP", "Brasil", "cep-invalido")
+            );
         }
     }
 
