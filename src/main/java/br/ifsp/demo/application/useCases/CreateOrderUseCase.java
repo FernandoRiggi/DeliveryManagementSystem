@@ -4,8 +4,9 @@ import br.ifsp.demo.domain.aggregate.OrderDelivery;
 import br.ifsp.demo.domain.dto.CreateOrderRequest;
 import br.ifsp.demo.domain.repository.CustomerRepository;
 import br.ifsp.demo.domain.repository.OrderDeliveryRepository;
+import org.springframework.stereotype.Service;
 
-
+@Service
 public class CreateOrderUseCase {
     private final OrderDeliveryRepository repo;
     private final CustomerRepository customerRepository;
