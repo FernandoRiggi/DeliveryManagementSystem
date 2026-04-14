@@ -17,8 +17,23 @@ public class OrderDelivery {
     @Getter
     private final Address deliveryAddress;
     private final List<OrderDeliveryEvent> OrderEvents;
+    @Getter
+    private final Customer customer;
 
-    public OrderDelivery(Address pickupAddress, Address deliveryAddress) {
+    public OrderDelivery(Customer customer, Address pickupAddress, Address deliveryAddress) {
+        if (customer == null) {
+            throw new NullPointerException("Customer cannot be null");
+        }
+
+        if (pickupAddress == null) {
+            throw new NullPointerException("PickupAddress cannot be null");
+        }
+
+        if (deliveryAddress == null) {
+            throw new NullPointerException("DeliveryAddress cannot be null");
+        }
+
+        this.customer = customer;
         this.pickupAddress = pickupAddress;
         this.deliveryAddress = deliveryAddress;
         this.statusOrder = StatusOrder.CREATED;

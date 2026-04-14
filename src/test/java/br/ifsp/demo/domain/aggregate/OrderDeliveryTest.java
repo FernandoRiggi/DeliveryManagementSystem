@@ -4,11 +4,21 @@ import br.ifsp.demo.annotation.TDD;
 import br.ifsp.demo.domain.event.EventType;
 import br.ifsp.demo.domain.valueObject.Address;
 import br.ifsp.demo.domain.valueObject.Cep;
+import br.ifsp.demo.domain.valueObject.CustomerType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullSource;
+
+import java.util.stream.Stream;
+
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 public class OrderDeliveryTest {
     //Como cliente
@@ -23,12 +33,121 @@ public class OrderDeliveryTest {
         void shouldCreateOrderDeliveryWithPickupAndDeliveryAddresses(){
             Address pickupAddress = new Address("Street A", "10", "Center", "São Carlos", "SP", "Brasil", new Cep("13500-000"));
             Address deliveryAddress = new Address("Street B", "11", "Center", "Araraquara", "SP", "Brasil", new Cep("13400-000"));
-
-            OrderDelivery sut = new OrderDelivery(pickupAddress, deliveryAddress);
+            Customer customer = new Customer("John Doe", CustomerType.REGULAR);
+            OrderDelivery sut = new OrderDelivery(customer, pickupAddress, deliveryAddress);
 
             assertThat(sut.getPickupAddress()).isEqualTo(pickupAddress);
             assertThat(sut.getDeliveryAddress()).isEqualTo(deliveryAddress);
             assertThat(sut.getStatus()).isEqualTo(StatusOrder.CREATED);
+        }
+
+        @TDD
+        @ParameterizedTest
+        @MethodSource("invalidCustomers")
+        @DisplayName("Should throw exception when customer is invalid")
+        void shouldThrowExceptionWhenCustomerIsInvalid(String name, CustomerType type){
+            Address pickupAddress = createValidPickupAddress();
+            Address deliveryAddress = createValidDeliveryAddress();
+
+            assertThatThrownBy(() -> {
+                Customer sut = new Customer(name, type);
+                new OrderDelivery(sut, pickupAddress, deliveryAddress);
+            }).isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @TDD
+        @ParameterizedTest
+        @NullSource
+        @DisplayName("Should throw null pointer exception when customer is null")
+        void shouldThrowNullPointerExceptionWhenCustomerIsNull(Customer customer){
+            Address pickupAddress = createValidPickupAddress();
+            Address deliveryAddress = createValidDeliveryAddress();
+
+            assertThatNullPointerException().isThrownBy(() -> {
+                new OrderDelivery(customer, pickupAddress, deliveryAddress);
+            });
+        }
+
+        @TDD
+        @Test
+        @DisplayName("Should throw null pointer exception when pickup address is null")
+        void shouldThrowNullPointerExceptionWhenPickupAddressIsNull(){
+            assertThatNullPointerException().isThrownBy(() -> {
+                new OrderDelivery(createValidCustomer(), null, createValidDeliveryAddress());
+            });
+        }
+
+        @TDD
+        @Test
+        @DisplayName("Should throw null pointer exception when delivery address is null")
+        void shouldThrownNullPointerExceptionWhenDeliveryAddressIsNull(){
+            assertThatNullPointerException().isThrownBy(() -> {
+                new OrderDelivery(createValidCustomer(), createValidPickupAddress(), null);
+            });
+        }
+
+        @TDD
+        @ParameterizedTest
+        @MethodSource("invalidAddresses")
+        @DisplayName("[#3] Should throw exception when pickup address is invalid")
+        void shouldThrowExceptionWhenPickupAddressIsInvalid(String street, String number, String neighborhood, String city, String state, String country, String cepValue){
+            Address deliveryAddress = new Address("Street A", "10", "Center", "São Carlos", "SP", "Brasil", new Cep("13500-000"));
+
+            assertThatThrownBy(() -> {
+                Cep cep = cepValue == null ? null : new Cep(cepValue);
+                Address pickupAddress = new Address(street, number, neighborhood, city, state, country, cep);
+                new OrderDelivery(createValidCustomer() ,pickupAddress, deliveryAddress);
+            }).isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @TDD
+        @ParameterizedTest
+        @MethodSource("invalidAddresses")
+        @DisplayName("[#4] Should throw exception when delivery address is invalid")
+        void shouldThrownExceptionWhenDeliveryAddressIsInvalid(String street, String number, String neighborhood, String city, String state, String country, String cepValue) {
+            Address pickupAddress = new Address("Street A", "10", "Center", "São Carlos", "SP", "Brasil", new Cep("13500-000"));
+
+            assertThatThrownBy(() -> {
+                Cep cep = cepValue == null ? null : new Cep(cepValue);
+                Address deliveryAddress = new Address(street, number, neighborhood, city, state, country, cep);
+                new OrderDelivery(createValidCustomer(), pickupAddress, deliveryAddress);
+            }).isInstanceOf(IllegalArgumentException.class);
+        }
+
+        private static Stream<Arguments> invalidAddresses() {
+            return Stream.of(
+                    arguments(null, "10", "Center", "São Carlos", "SP", "Brasil", "13500-000"),
+                    arguments("", "10", "Center", "São Carlos", "SP", "Brasil", "13500-000"),
+
+                    arguments("Street B", null, "Center", "São Carlos", "SP", "Brasil", "13500-000"),
+                    arguments("Street B", "", "Center", "São Carlos", "SP", "Brasil", "13500-000"),
+
+                    arguments("Street B", "10", null, "São Carlos", "SP", "Brasil", "13500-000"),
+                    arguments("Street B", "10", "", "São Carlos", "SP", "Brasil", "13500-000"),
+
+                    arguments("Street B", "10", "Center", null, "SP", "Brasil", "13500-000"),
+                    arguments("Street B", "10", "Center", "", "SP", "Brasil", "13500-000"),
+
+                    arguments("Street B", "10", "Center", "São Carlos", null, "Brasil", "13500-000"),
+                    arguments("Street B", "10", "Center", "São Carlos", "", "Brasil", "13500-000"),
+
+                    arguments("Street B", "10", "Center", "São Carlos", "SP", null, "13500-000"),
+                    arguments("Street B", "10", "Center", "São Carlos", "SP", "", "13500-000"),
+
+                    arguments("Street B", "10", "Center", "São Carlos", "SP", "Brasil", null),
+                    arguments("Street B", "10", "Center", "São Carlos", "SP", "Brasil", ""),
+                    arguments("Street B", "10", "Center", "São Carlos", "SP", "Brasil", "cep-invalido")
+            );
+        }
+
+        private static Stream<Arguments> invalidCustomers() {
+            return Stream.of(
+                    arguments(null, CustomerType.REGULAR),
+                    arguments("", CustomerType.REGULAR),
+                    arguments(" ", CustomerType.REGULAR),
+                    arguments("   ", CustomerType.REGULAR),
+                    arguments("John Doe", null)
+            );
         }
     }
 
@@ -168,11 +287,23 @@ public class OrderDeliveryTest {
     private OrderDelivery createValidOrder(){
         Address pickupAddress = new Address("Street A", "10", "Center", "São Carlos", "SP", "Brasil", new Cep("13500-000"));
         Address deliveryAddress = new Address("Street B", "11", "Center", "Araraquara", "SP", "Brasil", new Cep("13400-000"));
-
-        return new OrderDelivery(pickupAddress, deliveryAddress);
+        Customer customer = new Customer("John Doe", CustomerType.REGULAR);
+        return new OrderDelivery(customer, pickupAddress, deliveryAddress);
     }
 
     private DeliveryMan createValidDeliveryMan(){
         return new DeliveryMan("John Doe", 10);
+    }
+
+    private Customer createValidCustomer(){
+        return new Customer("John Doe", CustomerType.REGULAR);
+    }
+
+    private Address createValidPickupAddress() {
+        return new Address("Street A", "10", "Center", "São Carlos", "SP", "Brasil", new Cep("13500-000"));
+    }
+
+    private Address createValidDeliveryAddress() {
+        return new Address("Street B", "11", "Center", "Araraquara", "SP", "Brasil", new Cep("13400-000"));
     }
 }

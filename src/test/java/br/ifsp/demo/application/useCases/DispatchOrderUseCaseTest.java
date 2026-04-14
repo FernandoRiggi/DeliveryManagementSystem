@@ -1,5 +1,6 @@
 package br.ifsp.demo.application.useCases;
 import br.ifsp.demo.annotation.TDD;
+import br.ifsp.demo.domain.aggregate.Customer;
 import br.ifsp.demo.domain.aggregate.DeliveryMan;
 import br.ifsp.demo.domain.aggregate.OrderDelivery;
 import br.ifsp.demo.domain.aggregate.StatusOrder;
@@ -7,6 +8,7 @@ import br.ifsp.demo.domain.repository.DeliveryManRepository;
 import br.ifsp.demo.domain.repository.OrderDeliveryRepository;
 import br.ifsp.demo.domain.valueObject.Address;
 import br.ifsp.demo.domain.valueObject.Cep;
+import br.ifsp.demo.domain.valueObject.CustomerType;
 import br.ifsp.demo.exception.DeliveryManNotFoundException;
 import br.ifsp.demo.exception.OrderNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -69,8 +71,9 @@ public class DispatchOrderUseCaseTest {
     private OrderDelivery createValidOrder(){
         Address pickupAddress = new Address("Street A", "10", "Center", "São Carlos", "SP", "Brasil", new Cep("13500-000"));
         Address deliveryAddress = new Address("Street B", "11", "Center", "Araraquara", "SP", "Brasil", new Cep("13400-000"));
+        Customer customer = new Customer("John Doe", CustomerType.REGULAR);
 
-        return new OrderDelivery(pickupAddress, deliveryAddress);
+        return new OrderDelivery(customer, pickupAddress, deliveryAddress);
     }
 
     private DeliveryMan createValidDeliveryMan(){
