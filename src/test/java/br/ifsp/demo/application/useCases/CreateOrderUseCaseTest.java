@@ -54,6 +54,22 @@ public class CreateOrderUseCaseTest {
         verify(repo, never()).save(any(OrderDelivery.class));
     }
 
+    @TDD
+    @Test
+    @DisplayName("[#4] Should not save order when delivery address is invavlid")
+    void shouldNotSaveOrderWhenDeliveryAddressIsInvalid(){
+        CreateOrderRequest request = new CreateOrderRequest(
+                createValidCustomer(),
+                createValidPickupAddress(),
+                null
+        );
+
+        assertThatThrownBy(() -> sut.create(request))
+                .isInstanceOf(NullPointerException.class);
+
+        verify(repo, never()).save(any(OrderDelivery.class));
+    }
+
     private DeliveryMan createValidDeliveryMan(){
         return new DeliveryMan("John Doe", 10);
     }
