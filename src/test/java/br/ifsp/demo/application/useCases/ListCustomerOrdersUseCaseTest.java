@@ -80,6 +80,19 @@ public class ListCustomerOrdersUseCaseTest {
 
     @TDD
     @Test
+    @DisplayName("[#53] Should return a list with only active orders")
+    void shouldReturnOnlyActiveOrders(){
+        when(customerRepository.exists(customer)).thenReturn(true);
+        when(orderDeliveryRepository.findAllByCustomer(customer)).thenReturn(List.of(orderDelivery,orderDispatched, orderEnRoute, orderConcluded, orderCanceled));
+
+        List<OrderDelivery> result = sut.listActiveOrders(customer);
+
+        assertThat(result).isNotEmpty().containsExactlyInAnyOrder(orderDelivery, orderDispatched, orderEnRoute);
+
+    }
+
+    @TDD
+    @Test
     @DisplayName("[#54] Should return a empty list when the customer doesn't have any orders")
     void shouldReturnEmptyListWhenCustomerHasNoOrders(){
         when(customerRepository.exists(customer)).thenReturn(true);
