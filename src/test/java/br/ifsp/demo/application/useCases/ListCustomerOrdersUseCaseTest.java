@@ -11,6 +11,7 @@ import br.ifsp.demo.domain.valueObject.Cep;
 import br.ifsp.demo.domain.valueObject.CustomerType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -101,5 +102,17 @@ public class ListCustomerOrdersUseCaseTest {
         List<OrderDelivery> result = sut.listAll(customer);
 
         assertThat(result).isEmpty();
+    }
+
+    @TDD
+    @Test
+    @DisplayName("[#55] Should return the concluded and canceled orders from a customer")
+    void shouldReturnInactiveOrdersFromACustomer(){
+        when(customerRepository.exists(customer)).thenReturn(true);
+        when(orderDeliveryRepository.findAllByCustomer(customer)).thenReturn(List.of(orderDelivery, orderDispatched, orderEnRoute, orderConcluded, orderCanceled));
+
+        List<OrderDelivery> result = sut.listInactiveOrders(customer);
+
+        assertThat(result).isNotEmpty().containsExactlyInAnyOrder(orderConcluded, orderCanceled);
     }
 }
