@@ -33,18 +33,29 @@ public class ListCustomerOrdersUseCaseTest {
     @InjectMocks
     private ListCustomerOrdersUseCase sut;
 
+    Customer customer = new Customer("Lucas", CustomerType.REGULAR);
+
+    Address pickUpAddress = new Address("Street A", "10", "Center", "São Carlos", "SP", "Brasil", new Cep("13500-000"));
+    Address deliveryAddress = new Address("Street B", "11", "Center", "Araraquara", "SP", "Brasil", new Cep("13400-000"));
+
+    OrderDelivery orderDelivery = new OrderDelivery(customer,pickUpAddress, deliveryAddress);
+
+    @TDD
+    @Test
+    @DisplayName("[#52] Should return all the orders from a customer")
+    void shouldReturnAllOrdersFromACustomer(){
+        when(customerRepository.exists(customer)).thenReturn(true);
+        when(orderDeliveryRepository.findAllByCustomer(customer)).thenReturn(List.of(orderDelivery));
+
+        List<OrderDelivery> result = sut.listAll(customer);
+
+        assertThat(result).isNotEmpty().contains(orderDelivery);
+    }
 
     @TDD
     @Test
     @DisplayName("[#54] Should return a empty list when the customer doesn't have any orders")
     void shouldReturnEmptyListWhenCustomerHasNoOrders(){
-        Customer customer = new Customer("Lucas", CustomerType.REGULAR);
-
-        Address pickUpAddress = new Address("Street A", "10", "Center", "São Carlos", "SP", "Brasil", new Cep("13500-000"));
-        Address deliveryAddress = new Address("Street B", "11", "Center", "Araraquara", "SP", "Brasil", new Cep("13400-000"));
-
-        OrderDelivery orderDelivery = new OrderDelivery(customer,pickUpAddress, deliveryAddress);
-
         when(customerRepository.exists(customer)).thenReturn(true);
         when(orderDeliveryRepository.findAllByCustomer(customer)).thenReturn(Collections.emptyList());
 
