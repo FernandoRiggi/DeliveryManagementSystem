@@ -34,4 +34,15 @@ public class ListCustomerOrdersUseCase {
                 .toList();
     }
 
+    List<OrderDelivery> listInactiveOrders(Customer customer){
+        if(!customerRepository.exists(customer)){
+            throw new IllegalArgumentException("Customer not found");
+        }
+        return orderDeliveryRepository.findAllByCustomer(customer)
+                .stream()
+                .filter(orderDelivery -> orderDelivery.getStatus() == StatusOrder.CONCLUDED || orderDelivery.getStatus() == StatusOrder.CANCELED)
+                .toList();
+    }
+
+
 }
