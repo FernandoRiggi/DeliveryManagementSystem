@@ -5,6 +5,7 @@ import br.ifsp.demo.domain.aggregate.Customer;
 import br.ifsp.demo.domain.aggregate.DeliveryMan;
 import br.ifsp.demo.domain.aggregate.OrderDelivery;
 import br.ifsp.demo.domain.dto.CreateOrderRequest;
+import br.ifsp.demo.domain.repository.CustomerRepository;
 import br.ifsp.demo.domain.repository.OrderDeliveryRepository;
 import br.ifsp.demo.domain.valueObject.Address;
 import br.ifsp.demo.domain.valueObject.Cep;
@@ -91,7 +92,7 @@ public class CreateOrderUseCaseTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Customer not found");
 
-        verify(customerRepository, times(1).exists(customer));
+        verify(customerRepository, times(1)).exists(customer);
         verify(repo, never()).save(any(OrderDelivery.class));
     }
 
