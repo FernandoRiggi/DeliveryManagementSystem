@@ -15,6 +15,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,6 +36,22 @@ public class CreateOrderUseCaseTest {
         sut.create(request);
 
         verify(repo, times(1)).save(any(OrderDelivery.class));
+    }
+
+    @TDD
+    @Test
+    @DisplayName("[#3] Should not save order when pickup address is invalid")
+    void shouldNotSaveOrderWhenPickupAddressIsInvalid() {
+        CreateOrderRequest request = new CreateOrderRequest(
+                createValidCustomer(),
+                null,
+                createValidDeliveryAddress()
+        );
+
+        assertThatThrownBy(() -> sut.create(request))
+                .isInstanceOf(NullPointerException.class);
+
+        verify(repo, never()).save(any(OrderDelivery.class));
     }
 
     private DeliveryMan createValidDeliveryMan(){
