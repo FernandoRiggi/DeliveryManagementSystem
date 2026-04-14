@@ -25,6 +25,9 @@ public class CreateOrderUseCaseTest {
     @Mock
     private OrderDeliveryRepository repo;
 
+    @Mock
+    private CustomerRepository customerRepository;
+
     @InjectMocks CreateOrderUseCase sut;
 
     @TDD
@@ -56,7 +59,7 @@ public class CreateOrderUseCaseTest {
 
     @TDD
     @Test
-    @DisplayName("[#4] Should not save order when delivery address is invavlid")
+    @DisplayName("[#4] Should not save order when delivery address is invalid")
     void shouldNotSaveOrderWhenDeliveryAddressIsInvalid(){
         CreateOrderRequest request = new CreateOrderRequest(
                 createValidCustomer(),
@@ -67,6 +70,28 @@ public class CreateOrderUseCaseTest {
         assertThatThrownBy(() -> sut.create(request))
                 .isInstanceOf(NullPointerException.class);
 
+        verify(repo, never()).save(any(OrderDelivery.class));
+    }
+
+    @TDD
+    @Test
+    @DisplayName("[#44] Should throw exception when customer is not found")
+    void shouldThrowExceptionWhenCustomerIsNotFound(){
+        Customer customer = createValidCustomer();
+
+        CreateOrderRequest request = new CreateOrderRequest(
+                customer,
+                createValidPickupAddress(),
+                createValidDeliveryAddress()
+        );
+
+        when(customerRepository.exists(customer)).thenReturn(false);
+
+        assertThatThrownBy(() -> sut.create(request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Customer not found");
+
+        verify(customerRepository, times(1).exists(customer));
         verify(repo, never()).save(any(OrderDelivery.class));
     }
 
