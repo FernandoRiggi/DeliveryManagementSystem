@@ -8,21 +8,45 @@ public record LogisticScore(int value) {
         if(value < 0) value = 0;
     }
 
-    public static LogisticScore calculate(CustomerType customerType, int activieOrders , double distance, int time) {
-        int customerTypeValue = switch (customerType){
+    public static LogisticScore calculate(CustomerType customerType, int activeOrders , double distance, int time) {
+        int score = switch (customerType){
             case REGULAR -> 10;
-            case PREMIUM -> 20;
-            case BUSINESS -> 15;
+            case BUSINESS -> 20;
+            case PREMIUM -> 30;
         };
 
-        int value = customerTypeValue + time - (activieOrders * (int) distance);
-        return new LogisticScore(value);
+        if(distance <= 3) {
+            score += 20;
+        } else if(distance <= 8) {
+            score += 10;
+        } else score += 0;
+
+        if (time <= 15) {
+            score += 0;
+        } else if (time <= 30) {
+            score += 10;
+        } else if (time <= 60) {
+            score += 20;
+        } else {
+            score += 30;
+        }
+
+        if (activeOrders <= 1) {
+            score += 0;
+        } else if (activeOrders == 2) {
+            score -= 10;
+        } else {
+            score -= 20;
+        }
+
+
+        return new LogisticScore(score);
 
     }
 
     public PriorityLevel GetPriorityLevel() {
-        if(value >= 50) return PriorityLevel.CRITICAL;
-        if(value >= 25) return PriorityLevel.URGENT;
+        if(value >= 60) return PriorityLevel.CRITICAL;
+        if(value >= 30) return PriorityLevel.URGENT;
         return PriorityLevel.NORMAL;
     }
 }
