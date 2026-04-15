@@ -374,6 +374,20 @@ public class OrderDeliveryTest {
             assertThat(deliveryMan.getCapacity()).isEqualTo(initialCapacity);
         }
 
+        @TDD
+        @Test
+        @DisplayName("[#48] Given route was canceled, when dispatching to another deliveryman, then order should be reassigned")
+        void shouldAllowReassigningOrderToAnotherDeliverymanAfterRouteCancellation() {
+            DeliveryMan newDeliveryMan = new DeliveryMan("Jane Doe", 10);
+
+            order.dispatch(deliveryMan);
+            order.cancelRoute();
+            order.dispatch(newDeliveryMan);
+
+            assertThat(order.getStatus()).isEqualTo(StatusOrder.DISPATCHED);
+            assertThat(order.getDeliveryman()).isEqualTo(newDeliveryMan);
+        }
+
         @Functional
         @Test
         @DisplayName("[VL] Order must have maximum 4 events: CREATED, DISPATCHED, EN_ROUTE and CONCLUDED or" +
