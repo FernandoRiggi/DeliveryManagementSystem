@@ -314,8 +314,9 @@ public class OrderDeliveryTest {
                     .anyMatch(event -> event.getType() == EventType.CONCLUDED);
         }
 
+        @TDD
         @Test
-        @DisplayName("Should throw IllegalStateException when order is already CONCLUDED")
+        @DisplayName("[#26] Should throw IllegalStateException when order is already CONCLUDED")
         void shouldThrowIllegalStateExceptionWhenOrderIsAlreadyCONCLUDED(){
             order.dispatch(deliveryMan);
             order.startRoute();
