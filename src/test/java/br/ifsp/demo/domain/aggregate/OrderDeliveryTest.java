@@ -468,6 +468,24 @@ public class OrderDeliveryTest {
 
             assertThat(order.getStatus()).isEqualTo(StatusOrder.CREATED);
         }
+
+        @TDD
+        @Test
+        @DisplayName("[#48] Given order is DISPATCHED, when deliveryman cancels route, then CREATED event should be added to history")
+        void shouldAddCreatedEventWhenRouteIsCanceled() {
+            order.dispatch(deliveryMan);
+
+            order.cancelRoute();
+
+            assertThat(order.getEvents())
+                    .extracting(OrderDeliveryEvent::getType)
+                    .containsExactly(
+                            EventType.CREATED,
+                            EventType.DISPATCHED,
+                            EventType.ROUTE_CANCELED,
+                            EventType.CREATED
+                    );
+        }
     }
 
     private OrderDelivery createValidOrder(){
