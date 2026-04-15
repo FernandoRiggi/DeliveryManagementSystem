@@ -1,6 +1,7 @@
 package br.ifsp.demo.domain.valueObject;
 
 import br.ifsp.demo.annotation.TDD;
+import br.ifsp.demo.domain.aggregate.PriorityLevel;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +18,7 @@ class LogisticScoreTest {
     void ShouldCreateNormalPriorityWhenRegularCustomer(){
         LogisticScore score = LogisticScore.calculate(REGULAR, 0,8.0, 10);
 
-        assertThat(score.toPriorityLevel()).isEqualTo(NORMAL);
+        assertThat(score.GetPriorityLevel()).isEqualTo(PriorityLevel.NORMAL);
     }
 
 }

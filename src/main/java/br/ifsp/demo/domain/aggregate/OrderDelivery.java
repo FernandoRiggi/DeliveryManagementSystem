@@ -19,6 +19,7 @@ public class OrderDelivery {
     private final List<OrderDeliveryEvent> OrderEvents;
     @Getter
     private final Customer customer;
+    private double distanceKm;
 
     public OrderDelivery(Customer customer, Address pickupAddress, Address deliveryAddress) {
         if (customer == null) {
