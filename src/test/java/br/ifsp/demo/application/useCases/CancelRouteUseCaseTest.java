@@ -59,4 +59,24 @@ public class CancelRouteUseCaseTest {
         verify(repo, never()).save(any());
     }
 
+    @TDD
+    @Test
+    @DisplayName("[#48] Given invalid order state, when cancelRoute, then should propagate IllegalStateException")
+    void shouldPropagateIllegalStateExceptionWhenOrderCannotCancelRoute() {
+        UUID orderId = UUID.randomUUID();
+        OrderDelivery order = mock(OrderDelivery.class);
+
+        when(repo.findById(orderId)).thenReturn(Optional.of(order));
+        doThrow(new IllegalStateException("[OrderStatus is not DISPATCHED or EN_ROUTE]"))
+                .when(order).cancelRoute();
+
+        assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> sut.cancelRoute(orderId))
+                .withMessage("[OrderStatus is not DISPATCHED or EN_ROUTE]");
+
+        verify(repo).findById(orderId);
+        verify(order).cancelRoute();
+        verify(repo, never()).save(any());
+    }
+
 }
