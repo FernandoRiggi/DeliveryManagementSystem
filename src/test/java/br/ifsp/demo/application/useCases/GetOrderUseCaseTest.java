@@ -4,6 +4,7 @@ import br.ifsp.demo.annotation.TDD;
 import br.ifsp.demo.domain.aggregate.OrderDelivery;
 import br.ifsp.demo.domain.aggregate.StatusOrder;
 import br.ifsp.demo.domain.repository.OrderDeliveryRepository;
+import br.ifsp.demo.exception.OrderNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,7 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,5 +45,15 @@ public class GetOrderUseCaseTest {
 
         verify(orderDeliveryRepository).findById(orderId);
         verify(order).getStatus();
+    }
+
+    @Test
+    @DisplayName("Should throw OrderNotFoundException when order id not found")
+    void shouldThrowOrderNotFoundWhenOrderIdNotFound() {
+        UUID idNotFound = UUID.randomUUID();
+        when(orderDeliveryRepository.findById(idNotFound)).thenReturn(Optional.empty());
+
+        assertThatExceptionOfType(OrderNotFoundException.class).isThrownBy(() -> sut.findById(idNotFound));
+        verify(orderDeliveryRepository, never()).save(any());
     }
 }
