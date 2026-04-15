@@ -221,6 +221,7 @@ public class OrderDeliveryTest {
         @Test
         @DisplayName("[#47 Given that an order has StatusOrder EN_ROUTE, when canceled, the status should be canceled ]")
         void ShouldReturnStatusCanceledWhenCanceledOrderEnRoute() {
+            order.dispatch(deliveryMan);
             order.startRoute();
             order.cancel();
             assertThat(order.getStatus()).isEqualTo(StatusOrder.CANCELED);
