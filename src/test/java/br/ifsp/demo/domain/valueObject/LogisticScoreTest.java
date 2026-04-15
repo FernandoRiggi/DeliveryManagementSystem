@@ -75,4 +75,16 @@ class LogisticScoreTest {
 
         assertThat(score.GetPriorityLevel()).isEqualTo(PriorityLevel.CRITICAL);
     }
+
+    @TDD
+    @Test
+    @DisplayName("[#36] When waiting time increases, priority classification must update")
+    void shouldUpdatePriorityWhenWaitingTimeIncreases() {
+        LogisticScore before = LogisticScore.calculate(CustomerType.REGULAR, 0, 8.0, 10);
+        LogisticScore after  = LogisticScore.calculate(CustomerType.REGULAR, 0, 8.0, 50);
+
+        assertThat(before.GetPriorityLevel()).isEqualTo(PriorityLevel.NORMAL);
+        assertThat(after.GetPriorityLevel()).isEqualTo(PriorityLevel.URGENT);
+        assertThat(after.value()).isGreaterThan(before.value());
+    }
 }

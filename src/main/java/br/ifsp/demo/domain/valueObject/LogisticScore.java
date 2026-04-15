@@ -10,8 +10,8 @@ public record LogisticScore(int value) {
 
     public static LogisticScore calculate(CustomerType customerType, int activieOrders , double distance, int time) {
         int customerTypeValue = switch (customerType){
-            case REGULAR -> 0;
-            case PREMIUM -> 10;
+            case REGULAR -> 10;
+            case PREMIUM -> 20;
             case BUSINESS -> 15;
         };
 
