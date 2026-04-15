@@ -37,10 +37,10 @@ public class GetOrderUseCaseTest {
         when(orderDeliveryRepository.findById(orderId)).thenReturn(Optional.of(order));
         when(order.getStatus()).thenReturn(currentStatus);
 
-        StatusOrder response = sut.findById(orderId);
+        OrderDelivery response = sut.findById(orderId);
 
         assertThat(response).isNotNull();
-        assertThat(response).isEqualTo(currentStatus);
+        assertThat(response.getStatus()).isEqualTo(currentStatus);
 
         verify(orderDeliveryRepository).findById(orderId);
         verify(order).getStatus();
