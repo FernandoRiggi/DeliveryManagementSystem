@@ -59,4 +59,26 @@ public class GetOrderUseCaseTest {
         assertThatExceptionOfType(OrderNotFoundException.class).isThrownBy(() -> sut.findById(idNotFound));
         verify(orderDeliveryRepository, never()).save(any());
     }
+
+    @TDD
+    @Test
+    @DisplayName("Should return all orders by customer")
+    void shouldReturnAllOrdersByCustomer() {
+        Customer customer = new Customer("John Doe", CustomerType.REGULAR);
+
+        OrderDelivery order1 = mock(OrderDelivery.class);
+        OrderDelivery order2 = mock(OrderDelivery.class);
+
+        List<OrderDelivery> orders = List.of(order1, order2);
+
+        when(orderDeliveryRepository.findAllByCustomer(customer)).thenReturn(orders);
+
+        List<OrderDelivery> response = sut.findAllOrdersByCustomer(customer);
+
+        assertThat(response).isNotNull();
+        assertThat(response).hasSize(2);
+        assertThat(response).containsExactly(order1, order2);
+
+        verify(orderDeliveryRepository).findAllByCustomer(customer);
+    }
 }
