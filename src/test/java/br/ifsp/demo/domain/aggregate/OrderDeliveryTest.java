@@ -191,6 +191,8 @@ public class OrderDeliveryTest {
         @DisplayName("[#15] Given that an order has StatusOrder CONCLUDED, when canceled," +
                 " must throw an exception of type IllegalStateException.")
         void ShouldThrowIllegalStateExceptionWhenCanceledOrderConcluded() {
+            order.dispatch(deliveryMan);
+            order.startRoute();
             order.concluded();
             assertThatIllegalStateException().isThrownBy(order::cancel);
         }
@@ -219,6 +221,7 @@ public class OrderDeliveryTest {
         @Test
         @DisplayName("[#47 Given that an order has StatusOrder EN_ROUTE, when canceled, the status should be canceled ]")
         void ShouldReturnStatusCanceledWhenCanceledOrderEnRoute() {
+            order.dispatch(deliveryMan);
             order.startRoute();
             order.cancel();
             assertThat(order.getStatus()).isEqualTo(StatusOrder.CANCELED);
@@ -340,6 +343,8 @@ public class OrderDeliveryTest {
         @Test
         @DisplayName("[#40] Given order CONCLUDED, when dispatch, then should throw IllegalStateException")
         void shouldThrowIllegalStateExceptionWhenDispatchConcludedOrder() {
+            order.dispatch(deliveryMan);
+            order.startRoute();
             order.concluded();
 
             assertThatIllegalStateException().isThrownBy(() -> order.dispatch(deliveryMan));
@@ -360,6 +365,39 @@ public class OrderDeliveryTest {
             assertThat(order.getEvents().size()).isEqualTo(2);
             assertThat(order.getEvents()).extracting(OrderDeliveryEvent::getType)
                     .containsExactly(EventType.CREATED, EventType.CANCELLATION);
+        }
+
+        @TDD
+        @Test
+        @DisplayName("[#48] Given order is DISPATCHED, when deliveryman cancels route, then deliveryman capacity should be restored")
+        void shouldRestoreCapacityWhenRouteIsCanceled() {
+            int initialCapacity = deliveryMan.getCapacity();
+            order.dispatch(deliveryMan);
+
+            order.cancelRoute();
+
+            assertThat(deliveryMan.getCapacity()).isEqualTo(initialCapacity);
+        }
+
+        @TDD
+        @Test
+        @DisplayName("[#48] Given route was canceled, when dispatching to another deliveryman, then order should be reassigned")
+        void shouldAllowReassigningOrderToAnotherDeliverymanAfterRouteCancellation() {
+            DeliveryMan newDeliveryMan = new DeliveryMan("Jane Doe", 10);
+
+            order.dispatch(deliveryMan);
+            order.cancelRoute();
+            order.dispatch(newDeliveryMan);
+
+            assertThat(order.getStatus()).isEqualTo(StatusOrder.DISPATCHED);
+            assertThat(order.getDeliveryman()).isEqualTo(newDeliveryMan);
+        }
+
+        @TDD
+        @Test
+        @DisplayName("[#48] Given order is CREATED, when canceling route, then should throw IllegalStateException")
+        void shouldThrowExceptionWhenCancelingRouteFromCreated() {
+            assertThatIllegalStateException().isThrownBy(() -> order.cancelRoute());
         }
 
         @Functional
@@ -456,6 +494,35 @@ public class OrderDeliveryTest {
 
             assertThat(order.getEvents())
                     .anyMatch(event -> event.getType() == EventType.CANCELLATION);
+        }
+
+        @TDD
+        @Test
+        @DisplayName("[#48] Given order is DISPATCHED, when deliveryman cancels route, then status should return to CREATED")
+        void shouldReturnStatusToCreatedWhenRouteIsCanceled() {
+            order.dispatch(deliveryMan);
+
+            order.cancelRoute();
+
+            assertThat(order.getStatus()).isEqualTo(StatusOrder.CREATED);
+        }
+
+        @TDD
+        @Test
+        @DisplayName("[#48] Given order is DISPATCHED, when deliveryman cancels route, then CREATED event should be added to history")
+        void shouldAddCreatedEventWhenRouteIsCanceled() {
+            order.dispatch(deliveryMan);
+
+            order.cancelRoute();
+
+            assertThat(order.getEvents())
+                    .extracting(OrderDeliveryEvent::getType)
+                    .containsExactly(
+                            EventType.CREATED,
+                            EventType.DISPATCHED,
+                            EventType.ROUTE_CANCELED,
+                            EventType.CREATED
+                    );
         }
     }
 

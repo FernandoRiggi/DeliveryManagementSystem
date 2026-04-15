@@ -92,6 +92,22 @@ public class OrderDelivery {
         OrderEvents.add(new OrderDeliveryEvent(EventType.DISPATCHED));
     }
 
+    public void cancelRoute() {
+        if (this.statusOrder != StatusOrder.DISPATCHED
+                && this.statusOrder != StatusOrder.EN_ROUTE) {
+            throw new IllegalStateException("[OrderStatus is not DISPATCHED or EN_ROUTE]");
+        }
+
+        if (this.deliveryMan != null) {
+            this.deliveryMan.setCapacity(this.deliveryMan.getCapacity() + 1);
+        }
+
+        this.deliveryMan = null;
+        this.statusOrder = StatusOrder.CREATED;
+        OrderEvents.add(new OrderDeliveryEvent(EventType.ROUTE_CANCELED));
+        OrderEvents.add(new OrderDeliveryEvent(EventType.CREATED));
+    }
+
     public DeliveryMan getDeliveryman() {
         return deliveryMan;
     }
