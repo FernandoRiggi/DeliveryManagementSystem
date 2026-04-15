@@ -314,6 +314,16 @@ public class OrderDeliveryTest {
                     .anyMatch(event -> event.getType() == EventType.CONCLUDED);
         }
 
+        @Test
+        @DisplayName("Should throw IllegalStateException when order is already CONCLUDED")
+        void shouldThrowIllegalStateExceptionWhenOrderIsAlreadyCONCLUDED(){
+            order.dispatch(deliveryMan);
+            order.startRoute();
+            order.concluded();
+
+            assertThatIllegalStateException().isThrownBy(() -> order.concluded());
+        }
+
         @TDD
         @Test
         @DisplayName("[#39] Given order DISPATCHED, when dispatch again, then should throw IllegalStateException")
