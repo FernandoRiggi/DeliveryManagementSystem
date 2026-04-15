@@ -159,12 +159,12 @@ public class OrderDeliveryTest {
 
     @Nested
     @DisplayName("Cancellation and dispatch")
-    class LifecycleTest{
+    class LifecycleTest {
         private OrderDelivery order;
         private DeliveryMan deliveryMan;
 
         @BeforeEach
-        void SetUp(){
+        void SetUp() {
             order = createValidOrder();
             deliveryMan = createValidDeliveryMan();
         }
@@ -210,7 +210,7 @@ public class OrderDeliveryTest {
         @Test
         @DisplayName("[#46] Canceling an order that has a cancellation event" +
                 " should return an error and not change anything.")
-        void  ShouldReturnIllegalStateExceptionWhenOrderHasCancellationEvent() {
+        void ShouldReturnIllegalStateExceptionWhenOrderHasCancellationEvent() {
             order.cancel();
             assertThatIllegalStateException().isThrownBy(order::cancel);
         }
@@ -240,7 +240,7 @@ public class OrderDeliveryTest {
         @DisplayName("[#19] Given order CANCELED, when dispatch, then should throw IllegalStateException")
         void ShouldThrowIllegalStateExceptionWhenDispatchCanceledOrder() {
             order.cancel();
-            assertThatIllegalStateException().isThrownBy(()-> order.dispatch(deliveryMan));
+            assertThatIllegalStateException().isThrownBy(() -> order.dispatch(deliveryMan));
         }
 
         @TDD
@@ -254,13 +254,43 @@ public class OrderDeliveryTest {
 
         @TDD
         @Test
-        @DisplayName("[#21] Given order dispatched successfully, then should generate DISPATCHED event")
-        void ShouldGenerateDispatchedEventWhenOrderDispatched() {
+        @DisplayName("[#24] Given order is DISPATCHED, when deliveryMan start route, then status should be EN_ROUTE")
+        void ShouldChangeStatusToEnRouteWhenDeliveryManStartRoute() {
             order.dispatch(deliveryMan);
+            order.startRoute();
 
-            boolean hasDispatchedEvent = order.getEvents().stream()
-                    .anyMatch(event -> event.getType() == EventType.DISPATCHED);
-            assertThat(hasDispatchedEvent).isTrue();
+            assertThat(order.getStatus()).isEqualTo(StatusOrder.EN_ROUTE);
+        }
+
+        @Test
+        @DisplayName("Should throw IllegalStateException when order is already EN_ROUTE")
+        void shouldThrowIllegalStateExceptionWhenOrderIsAlreadyEnRoute(){
+            order.dispatch(deliveryMan);
+            order.startRoute();
+
+            assertThatIllegalStateException().isThrownBy(() -> order.startRoute());
+        }
+
+        @TDD
+        @Test
+        @DisplayName("[#25] Given order is EN_ROUTE, when deliveryMan confirm deliver, then status should be CONCLUDED")
+        void shouldChangeStatusToConcludedWhenDeliveryManConfirmDeliver(){
+            order.dispatch(deliveryMan);
+            order.startRoute();
+            order.concluded();
+
+            assertThat(order.getEvents()).anyMatch(event -> event.getType() == EventType.CONCLUDED);
+        }
+
+        @TDD
+        @Test
+        @DisplayName("[#26] Should throw IllegalStateException when order is already CONCLUDED")
+        void shouldThrowIllegalStateExceptionWhenOrderIsAlreadyCONCLUDED(){
+            order.dispatch(deliveryMan);
+            order.startRoute();
+            order.concluded();
+
+            assertThatIllegalStateException().isThrownBy(() -> order.concluded());
         }
 
         @TDD
@@ -329,6 +359,72 @@ public class OrderDeliveryTest {
         }
     }
 
+    @Nested
+    @DisplayName("Event history")
+    class EventHistoryTest {
+        private OrderDelivery order;
+        private DeliveryMan deliveryMan;
+
+        @BeforeEach
+        void setUp() {
+            order = createValidOrder();
+            deliveryMan = createValidDeliveryMan();
+        }
+
+        @TDD
+        @Test
+        @DisplayName("[#21] Given order dispatched successfully, then should generate DISPATCHED event")
+        void ShouldGenerateDispatchedEventWhenOrderDispatched() {
+            order.dispatch(deliveryMan);
+
+            boolean hasDispatchedEvent = order.getEvents().stream()
+                    .anyMatch(event -> event.getType() == EventType.DISPATCHED);
+            assertThat(hasDispatchedEvent).isTrue();
+        }
+
+        @TDD
+        @Test
+        @DisplayName("[#27] Given order is created, when the system registers the creation, then CREATED event should be added to history")
+        void shouldAddCreatedEventToHistoryWhenOrderIsCreated() {
+            assertThat(order.getEvents())
+                    .extracting(OrderDeliveryEvent::getType)
+                    .containsExactly(EventType.CREATED);
+        }
+
+        @TDD
+        @Test
+        @DisplayName("[#27] Should generate EN_ROUTE event when route starts")
+        void shouldGenerateEnRouteEventWhenRouteStarts() {
+            order.dispatch(deliveryMan);
+            order.startRoute();
+
+            assertThat(order.getEvents())
+                    .anyMatch(event -> event.getType() == EventType.EN_ROUTE);
+        }
+
+        @TDD
+        @Test
+        @DisplayName("[#27] Should generate CONCLUDED event when order is delivered")
+        void shouldGenerateConcludedEventWhenOrderIsDelivered(){
+            order.dispatch(deliveryMan);
+            order.startRoute();
+            order.concluded();
+
+            assertThat(order.getEvents())
+                    .anyMatch(event -> event.getType() == EventType.CONCLUDED);
+        }
+
+        @TDD
+        @Test
+        @DisplayName("[#27] when order is canceled, then a CANCELLATION event should be added to history")
+        void shouldGenerateCANCELLATIONEventWhenOrderIsCanceled() {
+            order.cancel();
+
+            assertThat(order.getEvents())
+                    .anyMatch(event -> event.getType() == EventType.CANCELLATION);
+        }
+    }
+
     private OrderDelivery createValidOrder(){
         Address pickupAddress = new Address("Street A", "10", "Center", "São Carlos", "SP", "Brasil", new Cep("13500-000"));
         Address deliveryAddress = new Address("Street B", "11", "Center", "Araraquara", "SP", "Brasil", new Cep("13400-000"));
@@ -343,7 +439,6 @@ public class OrderDeliveryTest {
     private Customer createValidCustomer(){
         return new Customer("John Doe", CustomerType.REGULAR);
     }
-
 
     private Address createValidPickupAddress() {
         return new Address("Street A", "10", "Center", "São Carlos", "SP", "Brasil", new Cep("13500-000"));
