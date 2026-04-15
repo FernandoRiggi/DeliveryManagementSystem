@@ -49,4 +49,9 @@ public record LogisticScore(int value) {
         if(value >= 30) return PriorityLevel.URGENT;
         return PriorityLevel.NORMAL;
     }
+
+    public boolean isHigherThan(LogisticScore other) {
+        return this.value > other.value;
+    }
+
 }
