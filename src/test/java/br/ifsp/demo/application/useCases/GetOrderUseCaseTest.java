@@ -96,4 +96,15 @@ public class GetOrderUseCaseTest {
         verify(orderDeliveryRepository).findAllByCustomer(customer);
     }
 
+    @TDD
+    @Test
+    @DisplayName("Should throw NullPointerException when customer is null")
+    void shouldThrowNullPointerExceptionWhenCustomerIsNull() {
+        assertThatNullPointerException()
+                .isThrownBy(() -> sut.findAllOrdersByCustomer(null))
+                .withMessage("Customer cannot be null");
+
+        verify(orderDeliveryRepository, never()).findAllByCustomer(any());
+    }
+
 }
