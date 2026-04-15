@@ -282,17 +282,6 @@ public class OrderDeliveryTest {
             assertThat(order.getEvents()).anyMatch(event -> event.getType() == EventType.CONCLUDED);
         }
 
-        @Test
-        @DisplayName("Should generate CONCLUDED event when order is delivered")
-        void shouldGenerateConcludedEventWhenOrderIsDelivered(){
-            order.dispatch(deliveryMan);
-            order.startRoute();
-            order.concluded();
-
-            assertThat(order.getEvents())
-                    .anyMatch(event -> event.getType() == EventType.CONCLUDED);
-        }
-
         @TDD
         @Test
         @DisplayName("[#26] Should throw IllegalStateException when order is already CONCLUDED")
@@ -411,6 +400,18 @@ public class OrderDeliveryTest {
 
             assertThat(order.getEvents())
                     .anyMatch(event -> event.getType() == EventType.EN_ROUTE);
+        }
+
+        @TDD
+        @Test
+        @DisplayName("[#27] Should generate CONCLUDED event when order is delivered")
+        void shouldGenerateConcludedEventWhenOrderIsDelivered(){
+            order.dispatch(deliveryMan);
+            order.startRoute();
+            order.concluded();
+
+            assertThat(order.getEvents())
+                    .anyMatch(event -> event.getType() == EventType.CONCLUDED);
         }
     }
 
