@@ -2,6 +2,7 @@ package br.ifsp.demo.domain.valueObject;
 
 import br.ifsp.demo.annotation.TDD;
 import br.ifsp.demo.domain.aggregate.PriorityLevel;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -19,6 +20,15 @@ class LogisticScoreTest {
         LogisticScore score = LogisticScore.calculate(REGULAR, 0,8.0, 10);
 
         assertThat(score.GetPriorityLevel()).isEqualTo(PriorityLevel.NORMAL);
+    }
+
+    @TDD
+    @Test
+    @DisplayName("[#38] Should never be a negative value")
+    void ShouldNeverBeNegativeValue(){
+        LogisticScore score = LogisticScore.calculate(REGULAR, 3,10.0, 5);
+
+        assertThat(score.score()).isGreaterThanOrEqualTo(0);
     }
 
 }
