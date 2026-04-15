@@ -30,13 +30,20 @@ public class CalculateOrderPriorityUseCase {
         return LogisticScore.calculate(order.getCustomer().type(),activeCount,order.getDistanceKm(),timeInMinutes);
     }
 
-    public List<OrderDelivery> getPriorityQueue(List<OrderDelivery> orders,
-                                                Map<OrderDelivery, Integer> waitingTimes) {
+    public List<OrderDelivery> getPriorityQueue(List<OrderDelivery> orders, Map<OrderDelivery, Integer> timeInMinutes) {
         return orders.stream()
                 .filter(o -> o.getStatus() == StatusOrder.CREATED)
                 .sorted(Comparator.comparingInt(
-                        (OrderDelivery o) -> calculate(o, waitingTimes.getOrDefault(o, 0)).value()
+                        (OrderDelivery o) -> calculate(o, timeInMinutes.getOrDefault(o, 0)).value()
                 ).reversed())
+                .toList();
+    }
+
+    public List<LogisticScore> recalculateQueue(OrderDelivery triggerOrder, Map<OrderDelivery, Integer> timeInMinutes) {
+        return repo
+                .findAllActiveOrders(triggerOrder.getCustomer())
+                .stream()
+                .map(o -> calculate(o, timeInMinutes.getOrDefault(o, 0)))
                 .toList();
     }
 
