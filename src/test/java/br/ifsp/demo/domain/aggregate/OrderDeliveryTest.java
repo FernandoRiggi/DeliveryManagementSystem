@@ -265,6 +265,16 @@ public class OrderDeliveryTest {
 
         @TDD
         @Test
+        @DisplayName("[#24] Given order is DISPATCHED, when deliveryMan start route, then status should be EN_ROUTE")
+        void ShouldChangeStatusToEnRouteWhenDeliveryManStartRoute(){
+            order.dispatch(deliveryMan);
+            order.startRoute();
+
+            assertThat(order.getStatus()).isEqualTo(StatusOrder.EN_ROUTE);
+        }
+
+        @TDD
+        @Test
         @DisplayName("[#39] Given order DISPATCHED, when dispatch again, then should throw IllegalStateException")
         void shouldThrowIllegalStateExceptionWhenDispatchAlreadyDispatchedOrder() {
             order.dispatch(deliveryMan);
