@@ -391,6 +391,28 @@ public class OrderDeliveryTest {
         }
     }
 
+    @Nested
+    @DisplayName("Event history")
+    class EventHistoryTest {
+        private OrderDelivery order;
+        private DeliveryMan deliveryMan;
+
+        @BeforeEach
+        void setUp() {
+            order = createValidOrder();
+            deliveryMan = createValidDeliveryMan();
+        }
+
+        @TDD
+        @Test
+        @DisplayName("[#27] Given order is created, when the system registers the creation, then CREATED event should be added to history")
+        void shouldAddCreatedEventToHistoryWhenOrderIsCreated() {
+            assertThat(order.getEvents())
+                    .extracting(OrderDeliveryEvent::getType)
+                    .containsExactly(EventType.CREATED);
+        }
+    }
+
     private OrderDelivery createValidOrder(){
         Address pickupAddress = new Address("Street A", "10", "Center", "São Carlos", "SP", "Brasil", new Cep("13500-000"));
         Address deliveryAddress = new Address("Street B", "11", "Center", "Araraquara", "SP", "Brasil", new Cep("13400-000"));
