@@ -85,4 +85,42 @@ public class CalculateOrderPriorityUseCaseTest {
                 .hasMessageContaining("CREATED");
     }
 
+    @TDD
+    @Test
+    @DisplayName("[#37] Order with higher score should come firts in the queue")
+    void orderWithHigherScoreShouldComeFirstInQueue() {
+        OrderDelivery order1 = new OrderDelivery(regularCustomer, pickupAddress, deliveryAddress, 8.0);
+        OrderDelivery order2 = new OrderDelivery(premiumCustomer, pickupAddress, deliveryAddress, 3.0);
+
+        when(orderRepository.findAllActiveOrders(regularCustomer)).thenReturn(List.of(order1));
+        when(orderRepository.findAllActiveOrders(premiumCustomer)).thenReturn(List.of(order2));
+
+        List<OrderDelivery> queue = sut.getPriorityQueue();
+
+        assertThat(queue).first().isEqualTo(order2);
+    }
+
+    @TDD
+    @Test
+    @DisplayName("[#37] Should not appear dispatched orders in the queue")
+    void shouldNotAppearDispatchedOrdersInQueue() {
+
+        OrderDelivery createdOrder = new OrderDelivery(regularCustomer, pickupAddress, deliveryAddress, 8.0);
+        OrderDelivery dispatchedOrder = new OrderDelivery(regularCustomer, pickupAddress, deliveryAddress, 8.0);
+        dispatchedOrder.dispatch(new DeliveryMan("Carlos", 5));
+
+        when(orderRepository.findAllActiveOrders(regularCustomer)).thenReturn(List.of(createdOrder));
+
+        List<OrderDelivery> queue = sut.getPriorityQueue();
+
+        assertThat(queue).containsOnly(createdOrder);
+    }
 }
+
+
+
+
+
+
+
+
