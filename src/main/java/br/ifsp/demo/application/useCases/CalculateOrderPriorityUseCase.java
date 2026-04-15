@@ -5,6 +5,10 @@ import br.ifsp.demo.domain.aggregate.StatusOrder;
 import br.ifsp.demo.domain.repository.OrderDeliveryRepository;
 import br.ifsp.demo.domain.valueObject.LogisticScore;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+
 public class CalculateOrderPriorityUseCase {
 
     private final OrderDeliveryRepository repo;
@@ -24,6 +28,16 @@ public class CalculateOrderPriorityUseCase {
         int activeCount = repo.findAllActiveOrders(order.getCustomer()).size();
 
         return LogisticScore.calculate(order.getCustomer().type(),activeCount,order.getDistanceKm(),timeInMinutes);
+    }
+
+    public List<OrderDelivery> getPriorityQueue(List<OrderDelivery> orders,
+                                                Map<OrderDelivery, Integer> waitingTimes) {
+        return orders.stream()
+                .filter(o -> o.getStatus() == StatusOrder.CREATED)
+                .sorted(Comparator.comparingInt(
+                        (OrderDelivery o) -> calculate(o, waitingTimes.getOrDefault(o, 0)).value()
+                ).reversed())
+                .toList();
     }
 
 }

@@ -19,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -95,7 +96,7 @@ public class CalculateOrderPriorityUseCaseTest {
         when(orderRepository.findAllActiveOrders(regularCustomer)).thenReturn(List.of(order1));
         when(orderRepository.findAllActiveOrders(premiumCustomer)).thenReturn(List.of(order2));
 
-        List<OrderDelivery> queue = sut.getPriorityQueue();
+        List<OrderDelivery> queue = sut.getPriorityQueue(List.of(order1, order2), Map.of(order1, 10, order2, 60));
 
         assertThat(queue).first().isEqualTo(order2);
     }
@@ -109,9 +110,7 @@ public class CalculateOrderPriorityUseCaseTest {
         OrderDelivery dispatchedOrder = new OrderDelivery(regularCustomer, pickupAddress, deliveryAddress, 8.0);
         dispatchedOrder.dispatch(new DeliveryMan("Carlos", 5));
 
-        when(orderRepository.findAllActiveOrders(regularCustomer)).thenReturn(List.of(createdOrder));
-
-        List<OrderDelivery> queue = sut.getPriorityQueue();
+        List<OrderDelivery> queue = sut.getPriorityQueue(List.of(createdOrder, dispatchedOrder), Map.of(createdOrder, 10, dispatchedOrder, 10));
 
         assertThat(queue).containsOnly(createdOrder);
     }
