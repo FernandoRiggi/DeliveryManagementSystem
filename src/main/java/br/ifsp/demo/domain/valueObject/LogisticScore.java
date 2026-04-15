@@ -4,7 +4,11 @@ import br.ifsp.demo.domain.aggregate.PriorityLevel;
 
 public record LogisticScore(int score) {
 
-    public static LogisticScore calculate(CustomerType customerType,int activieOrders ,double distance, int time) {
+    public LogisticScore {
+        if(score < 0) score = 0;
+    }
+
+    public static LogisticScore calculate(CustomerType customerType, int activieOrders , double distance, int time) {
         int customerTypeValue = switch (customerType){
             case REGULAR -> 0;
             case PREMIUM -> 10;
