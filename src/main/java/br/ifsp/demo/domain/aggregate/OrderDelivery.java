@@ -64,6 +64,8 @@ public class OrderDelivery {
     }
 
     public void concluded(){
+        if (this.statusOrder != StatusOrder.EN_ROUTE) throw new IllegalStateException("[OrderStatus is not EN_ROUTE]");
+
         this.statusOrder = StatusOrder.CONCLUDED;
         OrderEvents.add(new OrderDeliveryEvent(EventType.CONCLUDED));
     }
