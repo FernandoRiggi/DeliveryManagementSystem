@@ -1,6 +1,7 @@
-package br.ifsp.demo.application.useCases;
+package br.ifsp.demo.application;
 
 import br.ifsp.demo.annotation.TDD;
+import br.ifsp.demo.application.UseCases.ListCustomerOrdersUseCase;
 import br.ifsp.demo.domain.aggregate.Customer;
 import br.ifsp.demo.domain.aggregate.DeliveryMan;
 import br.ifsp.demo.domain.aggregate.OrderDelivery;
@@ -11,7 +12,6 @@ import br.ifsp.demo.domain.valueObject.Cep;
 import br.ifsp.demo.domain.valueObject.CustomerType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
