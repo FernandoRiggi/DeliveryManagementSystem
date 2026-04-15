@@ -352,17 +352,6 @@ public class OrderDeliveryTest {
             assertThatIllegalStateException().isThrownBy(() -> order.dispatch(null));
         }
 
-        @TDD
-        @Test
-        @DisplayName("[#48] Given order is DISPATCHED, when deliveryman cancels route, then status should return to CREATED")
-        void shouldReturnStatusToCreatedWhenRouteIsCanceled() {
-            order.dispatch(deliveryMan);
-
-            order.cancelRoute();
-
-            assertThat(order.getStatus()).isEqualTo(StatusOrder.CREATED);
-        }
-
         @Functional
         @Test
         @DisplayName("[VL] Canceled order must have at minimum 2 events: CREATED and CANCELLATION")
@@ -467,6 +456,17 @@ public class OrderDeliveryTest {
 
             assertThat(order.getEvents())
                     .anyMatch(event -> event.getType() == EventType.CANCELLATION);
+        }
+
+        @TDD
+        @Test
+        @DisplayName("[#48] Given order is DISPATCHED, when deliveryman cancels route, then status should return to CREATED")
+        void shouldReturnStatusToCreatedWhenRouteIsCanceled() {
+            order.dispatch(deliveryMan);
+
+            order.cancelRoute();
+
+            assertThat(order.getStatus()).isEqualTo(StatusOrder.CREATED);
         }
     }
 
