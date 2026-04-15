@@ -44,5 +44,13 @@ public class ListCustomerOrdersUseCase {
                 .toList();
     }
 
-
+    List<OrderDelivery> listAllCreatedOrders(Customer customer){
+        if(!customerRepository.exists(customer)){
+            throw new IllegalArgumentException("Customer not found");
+        }
+        return orderDeliveryRepository.findAllByCustomer(customer)
+                .stream()
+                .filter(orderDelivery -> orderDelivery.getStatus() == StatusOrder.CREATED)
+                .toList();
+    }
 }
