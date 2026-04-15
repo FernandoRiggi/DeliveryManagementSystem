@@ -73,7 +73,7 @@ public class DispatchOrderUseCaseTest {
         Address deliveryAddress = new Address("Street B", "11", "Center", "Araraquara", "SP", "Brasil", new Cep("13400-000"));
         Customer customer = new Customer("John Doe", CustomerType.REGULAR);
 
-        return new OrderDelivery(customer, pickupAddress, deliveryAddress);
+        return new OrderDelivery(customer, pickupAddress, deliveryAddress,10.0);
     }
 
     private DeliveryMan createValidDeliveryMan(){

@@ -19,7 +19,7 @@ class LogisticScoreTest {
     void shouldCreateNormalPriorityWhenRegularCustomer(){
         LogisticScore score = LogisticScore.calculate(REGULAR, 0,8.0, 10);
 
-        assertThat(score.GetPriorityLevel()).isEqualTo(PriorityLevel.NORMAL);
+        assertThat(score.getPriorityLevel()).isEqualTo(PriorityLevel.NORMAL);
     }
 
     @TDD
@@ -37,7 +37,7 @@ class LogisticScoreTest {
     void shouldCreateUrgentPriority(){
         LogisticScore score = LogisticScore.calculate(CustomerType.PREMIUM, 0,10.0, 15);
 
-        assertThat(score.GetPriorityLevel()).isEqualTo(PriorityLevel.URGENT);
+        assertThat(score.getPriorityLevel()).isEqualTo(PriorityLevel.URGENT);
     }
 
     @TDD
@@ -46,7 +46,7 @@ class LogisticScoreTest {
     void shouldCreateNormalPriorityButWithPenalty(){
         LogisticScore score = LogisticScore.calculate(CustomerType.REGULAR, 2,10.0, 10);
 
-        assertThat(score.GetPriorityLevel()).isEqualTo(PriorityLevel.NORMAL);
+        assertThat(score.getPriorityLevel()).isEqualTo(PriorityLevel.NORMAL);
     }
 
     @TDD
@@ -55,7 +55,7 @@ class LogisticScoreTest {
     void shouldCreateUrgentForPremiumCustomer(){
         LogisticScore score = LogisticScore.calculate(CustomerType.PREMIUM, 1,5.0, 30);
 
-        assertThat(score.GetPriorityLevel()).isEqualTo(PriorityLevel.URGENT);
+        assertThat(score.getPriorityLevel()).isEqualTo(PriorityLevel.URGENT);
     }
 
     @TDD
@@ -64,7 +64,7 @@ class LogisticScoreTest {
     void shouldCreateCriticalWithNoPenalty(){
         LogisticScore score = LogisticScore.calculate(CustomerType.PREMIUM, 0,3.0, 60);
 
-        assertThat(score.GetPriorityLevel()).isEqualTo(PriorityLevel.CRITICAL);
+        assertThat(score.getPriorityLevel()).isEqualTo(PriorityLevel.CRITICAL);
     }
 
     @TDD
@@ -73,7 +73,7 @@ class LogisticScoreTest {
     void shouldCreateCriticalWithPenalty(){
         LogisticScore score = LogisticScore.calculate(CustomerType.PREMIUM, 4,3.0, 80);
 
-        assertThat(score.GetPriorityLevel()).isEqualTo(PriorityLevel.CRITICAL);
+        assertThat(score.getPriorityLevel()).isEqualTo(PriorityLevel.CRITICAL);
     }
 
     @TDD
@@ -83,8 +83,8 @@ class LogisticScoreTest {
         LogisticScore before = LogisticScore.calculate(CustomerType.REGULAR, 0, 8.0, 10);
         LogisticScore after  = LogisticScore.calculate(CustomerType.REGULAR, 0, 8.0, 50);
 
-        assertThat(before.GetPriorityLevel()).isEqualTo(PriorityLevel.NORMAL);
-        assertThat(after.GetPriorityLevel()).isEqualTo(PriorityLevel.URGENT);
+        assertThat(before.getPriorityLevel()).isEqualTo(PriorityLevel.NORMAL);
+        assertThat(after.getPriorityLevel()).isEqualTo(PriorityLevel.URGENT);
         assertThat(after.value()).isGreaterThan(before.value());
     }
 

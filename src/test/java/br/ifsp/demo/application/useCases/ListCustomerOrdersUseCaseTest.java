@@ -52,18 +52,18 @@ public class ListCustomerOrdersUseCaseTest {
         Address pickupAddress = new Address("Street A", "10", "Center", "São Carlos", "SP", "Brasil", new Cep("13500-000"));
         Address deliveryAddress = new Address("Street B", "11", "Center", "Araraquara", "SP", "Brasil", new Cep("13400-000"));
 
-        orderDelivery = new OrderDelivery(customer, pickupAddress, deliveryAddress);
+        orderDelivery = new OrderDelivery(customer, pickupAddress, deliveryAddress,10.0);
 
-        orderDispatched = new OrderDelivery(customer, pickupAddress, deliveryAddress);
+        orderDispatched = new OrderDelivery(customer, pickupAddress, deliveryAddress,10.0);
         orderDispatched.dispatch(deliveryMan);
 
-        orderEnRoute = new OrderDelivery(customer, pickupAddress, deliveryAddress);
+        orderEnRoute = new OrderDelivery(customer, pickupAddress, deliveryAddress,10.0);
         orderEnRoute.startRoute();
 
-        orderConcluded = new OrderDelivery(customer, pickupAddress, deliveryAddress);
+        orderConcluded = new OrderDelivery(customer, pickupAddress, deliveryAddress,10.0);
         orderConcluded.concluded();
 
-        orderCanceled = new OrderDelivery(customer, pickupAddress, deliveryAddress);
+        orderCanceled = new OrderDelivery(customer, pickupAddress, deliveryAddress,10.0);
         orderCanceled.cancel();
     }
 

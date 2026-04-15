@@ -44,7 +44,7 @@ public record LogisticScore(int value) {
 
     }
 
-    public PriorityLevel GetPriorityLevel() {
+    public PriorityLevel getPriorityLevel() {
         if(value >= 60) return PriorityLevel.CRITICAL;
         if(value >= 30) return PriorityLevel.URGENT;
         return PriorityLevel.NORMAL;

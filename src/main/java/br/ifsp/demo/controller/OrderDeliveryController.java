@@ -52,7 +52,9 @@ public class OrderDeliveryController {
                     new Cep(body.deliveryCep())
             );
 
-            CreateOrderRequest request = new CreateOrderRequest(customer, pickingAddress, deliveryAddress);
+            Double distanceKm = body.distanceKm();
+
+            CreateOrderRequest request = new CreateOrderRequest(customer, pickingAddress, deliveryAddress, distanceKm);
             createOrderUseCase.create(request);
 
             return ResponseEntity.status(HttpStatus.CREATED).build();
