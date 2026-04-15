@@ -16,7 +16,7 @@ class LogisticScoreTest {
     @TDD
     @Test
     @DisplayName("[#30] Should create a NORMAL priority - Regular customer, 0 orders, 8km, 10Min")
-    void ShouldCreateNormalPriorityWhenRegularCustomer(){
+    void shouldCreateNormalPriorityWhenRegularCustomer(){
         LogisticScore score = LogisticScore.calculate(REGULAR, 0,8.0, 10);
 
         assertThat(score.GetPriorityLevel()).isEqualTo(PriorityLevel.NORMAL);
@@ -25,10 +25,19 @@ class LogisticScoreTest {
     @TDD
     @Test
     @DisplayName("[#38] Should never be a negative value")
-    void ShouldNeverBeNegativeValue(){
+    void shouldNeverBeNegativeValue(){
         LogisticScore score = LogisticScore.calculate(REGULAR, 3,10.0, 5);
 
-        assertThat(score.score()).isGreaterThanOrEqualTo(0);
+        assertThat(score.value()).isGreaterThanOrEqualTo(0);
+    }
+
+    @TDD
+    @Test
+    @DisplayName("[#32] Should create a URGENT priority - Business customer, 0 orders, 10km, 15Min")
+    void shouldCreateUrgentPriority(){
+        LogisticScore score = LogisticScore.calculate(CustomerType.BUSINESS, 0,10.0, 15);
+
+        assertThat(score.GetPriorityLevel()).isEqualTo(PriorityLevel.URGENT);
     }
 
 }
