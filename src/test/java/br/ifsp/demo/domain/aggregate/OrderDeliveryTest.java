@@ -254,17 +254,6 @@ public class OrderDeliveryTest {
 
         @TDD
         @Test
-        @DisplayName("[#21] Given order dispatched successfully, then should generate DISPATCHED event")
-        void ShouldGenerateDispatchedEventWhenOrderDispatched() {
-            order.dispatch(deliveryMan);
-
-            boolean hasDispatchedEvent = order.getEvents().stream()
-                    .anyMatch(event -> event.getType() == EventType.DISPATCHED);
-            assertThat(hasDispatchedEvent).isTrue();
-        }
-
-        @TDD
-        @Test
         @DisplayName("[#24] Given order is DISPATCHED, when deliveryMan start route, then status should be EN_ROUTE")
         void ShouldChangeStatusToEnRouteWhenDeliveryManStartRoute() {
             order.dispatch(deliveryMan);
@@ -401,6 +390,17 @@ public class OrderDeliveryTest {
         void setUp() {
             order = createValidOrder();
             deliveryMan = createValidDeliveryMan();
+        }
+
+        @TDD
+        @Test
+        @DisplayName("[#21] Given order dispatched successfully, then should generate DISPATCHED event")
+        void ShouldGenerateDispatchedEventWhenOrderDispatched() {
+            order.dispatch(deliveryMan);
+
+            boolean hasDispatchedEvent = order.getEvents().stream()
+                    .anyMatch(event -> event.getType() == EventType.DISPATCHED);
+            assertThat(hasDispatchedEvent).isTrue();
         }
 
         @TDD
