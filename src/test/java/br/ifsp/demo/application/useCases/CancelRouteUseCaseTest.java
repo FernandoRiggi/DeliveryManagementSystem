@@ -3,6 +3,7 @@ package br.ifsp.demo.application.useCases;
 import br.ifsp.demo.annotation.TDD;
 import br.ifsp.demo.domain.aggregate.OrderDelivery;
 import br.ifsp.demo.domain.repository.OrderDeliveryRepository;
+import br.ifsp.demo.exception.OrderNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,6 +41,22 @@ public class CancelRouteUseCaseTest {
         verify(repo).findById(orderId);
         verify(order).cancelRoute();
         verify(repo).save(order);
+    }
+
+    @TDD
+    @Test
+    @DisplayName("[#48] Given non existing order id, when cancelRoute, then should throw OrderNotFoundException")
+    void shouldThrowOrderNotFoundExceptionWhenOrderDoesNotExist() {
+        UUID orderId = UUID.randomUUID();
+
+        when(repo.findById(orderId)).thenReturn(Optional.empty());
+
+        assertThatExceptionOfType(OrderNotFoundException.class)
+                .isThrownBy(() -> sut.cancelRoute(orderId))
+                .withMessage("[OrderDelivery Not Found]");
+
+        verify(repo).findById(orderId);
+        verify(repo, never()).save(any());
     }
 
 }
