@@ -191,6 +191,8 @@ public class OrderDeliveryTest {
         @DisplayName("[#15] Given that an order has StatusOrder CONCLUDED, when canceled," +
                 " must throw an exception of type IllegalStateException.")
         void ShouldThrowIllegalStateExceptionWhenCanceledOrderConcluded() {
+            order.dispatch(deliveryMan);
+            order.startRoute();
             order.concluded();
             assertThatIllegalStateException().isThrownBy(order::cancel);
         }
