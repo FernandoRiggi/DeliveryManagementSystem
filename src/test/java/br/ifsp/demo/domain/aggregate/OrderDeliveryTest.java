@@ -332,7 +332,7 @@ public class OrderDeliveryTest {
         @Test
         @DisplayName("[VL] Order must have maximum 4 events: CREATED, DISPATCHED, EN_ROUTE and CONCLUDED or" +
                 " CREATED, DISPATCHED, EN_ROUTE AND CANCELLATION")
-        void MustContainMaximumOfFourEventsInAnOrder() {
+        void MustContainMaximumOfFourEventsInAnOrder(){
             order.dispatch(deliveryMan);
             order.startRoute();
             order.cancel();
