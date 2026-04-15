@@ -87,4 +87,14 @@ class LogisticScoreTest {
         assertThat(after.GetPriorityLevel()).isEqualTo(PriorityLevel.URGENT);
         assertThat(after.value()).isGreaterThan(before.value());
     }
+
+    @TDD
+    @Test
+    @DisplayName("[#37] Higher score should have delivery priority over lower score")
+    void shouldHaveHigherScoreHaveHigherPriority(){
+        LogisticScore score1 = LogisticScore.calculate(CustomerType.REGULAR, 0, 8.0, 10);
+        LogisticScore score2 = LogisticScore.calculate(CustomerType.PREMIUM, 0, 8.0, 10);
+
+        assertThat(score1.isHigherThan(score2)).isTrue();
+    }
 }
