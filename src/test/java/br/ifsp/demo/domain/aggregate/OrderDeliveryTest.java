@@ -226,7 +226,7 @@ public class OrderDeliveryTest {
 
         @TDD
         @Test
-        @DisplayName("[BUG 01] Given order dispatched, deliveryman capacity should be decremented by 1")
+        @DisplayName("[BUG #65] Given order dispatched, deliveryman capacity should be decremented by 1")
         void shouldDecrementDeliverymanCapacityWhenDispatched() {
             int initialCapacity = deliveryMan.getCapacity();
             order.dispatch(deliveryMan);

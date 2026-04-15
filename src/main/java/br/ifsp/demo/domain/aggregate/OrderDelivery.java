@@ -77,13 +77,14 @@ public class OrderDelivery {
         if(deliveryMan == null) throw new IllegalStateException("[Deliveryman null]");
         if(this.statusOrder == StatusOrder.CANCELED) throw new IllegalStateException("[Order already cancelled]");
         if(this.statusOrder == StatusOrder.DISPATCHED)  throw new IllegalStateException("[Order already dispatched]");
-        if(this.statusOrder == StatusOrder.CONCLUDED) throw new IllegalStateException("[Order already concluded]");
+        if (this.statusOrder == StatusOrder.CONCLUDED) throw new IllegalStateException("[Order already concluded]");
 
         if(deliveryMan.getCapacity() <= 0)
             throw new IllegalStateException(String.format("[%s] is not enough capacity", deliveryMan.getName()));
+
         this.statusOrder = StatusOrder.DISPATCHED;
         this.deliveryMan = deliveryMan;
-
+        deliveryMan.setCapacity(deliveryMan.getCapacity() - 1);
         OrderEvents.add(new OrderDeliveryEvent(EventType.DISPATCHED));
     }
 
