@@ -159,12 +159,12 @@ public class OrderDeliveryTest {
 
     @Nested
     @DisplayName("Cancellation and dispatch")
-    class LifecycleTest{
+    class LifecycleTest {
         private OrderDelivery order;
         private DeliveryMan deliveryMan;
 
         @BeforeEach
-        void SetUp(){
+        void SetUp() {
             order = createValidOrder();
             deliveryMan = createValidDeliveryMan();
         }
@@ -210,7 +210,7 @@ public class OrderDeliveryTest {
         @Test
         @DisplayName("[#46] Canceling an order that has a cancellation event" +
                 " should return an error and not change anything.")
-        void  ShouldReturnIllegalStateExceptionWhenOrderHasCancellationEvent() {
+        void ShouldReturnIllegalStateExceptionWhenOrderHasCancellationEvent() {
             order.cancel();
             assertThatIllegalStateException().isThrownBy(order::cancel);
         }
@@ -240,7 +240,7 @@ public class OrderDeliveryTest {
         @DisplayName("[#19] Given order CANCELED, when dispatch, then should throw IllegalStateException")
         void ShouldThrowIllegalStateExceptionWhenDispatchCanceledOrder() {
             order.cancel();
-            assertThatIllegalStateException().isThrownBy(()-> order.dispatch(deliveryMan));
+            assertThatIllegalStateException().isThrownBy(() -> order.dispatch(deliveryMan));
         }
 
         @TDD
@@ -266,7 +266,7 @@ public class OrderDeliveryTest {
         @TDD
         @Test
         @DisplayName("[#24] Given order is DISPATCHED, when deliveryMan start route, then status should be EN_ROUTE")
-        void ShouldChangeStatusToEnRouteWhenDeliveryManStartRoute(){
+        void ShouldChangeStatusToEnRouteWhenDeliveryManStartRoute() {
             order.dispatch(deliveryMan);
             order.startRoute();
 
@@ -275,7 +275,7 @@ public class OrderDeliveryTest {
 
         @Test
         @DisplayName("Should generate EN_ROUTE event when route starts")
-        void shouldGenerateEnRouteEventWhenRouteStarts(){
+        void shouldGenerateEnRouteEventWhenRouteStarts() {
             order.dispatch(deliveryMan);
             order.startRoute();
 
@@ -307,6 +307,46 @@ public class OrderDeliveryTest {
         void shouldThrowIllegalStateExceptionWhenNoDeliverymanAvailable() {
             assertThatIllegalStateException().isThrownBy(() -> order.dispatch(null));
         }
+
+        @Functional
+        @Test
+        @DisplayName("[VL] Canceled order must have at minimum 2 events: CREATED and CANCELLATION")
+        void canceledOrderMustHaveMinimumTwoEvents() {
+            order.cancel();
+            assertThat(order.getEvents().size()).isEqualTo(2);
+            assertThat(order.getEvents()).extracting(OrderDeliveryEvent::getType)
+                    .containsExactly(EventType.CREATED, EventType.CANCELLATION);
+        }
+
+        @Functional
+        @Test
+        @DisplayName("[VL] Order must have maximum 4 events: CREATED, DISPATCHED, EN_ROUTE and CONCLUDED or" +
+                " CREATED, DISPATCHED, EN_ROUTE AND CANCELLATION")
+        void MustContainMaximumOfFourEventsInAnOrder() {
+            order.dispatch(deliveryMan);
+            order.startRoute();
+            order.cancel();
+
+            List<EventType> eventsTypes = order.getEvents()
+                    .stream()
+                    .map(OrderDeliveryEvent::type)
+                    .toList();
+
+            assertThat(eventsTypes.size()).isEqualTo(4);
+
+            boolean sequenceValid = eventsTypes.equals(List.of(
+                    EventType.CREATED,
+                    EventType.DISPATCHED,
+                    EventType.EN_ROUTE,
+                    EventType.CONCLUDED)
+            ) || eventsTypes.equals(List.of(
+                    EventType.CREATED,
+                    EventType.DISPATCHED,
+                    EventType.EN_ROUTE,
+                    EventType.CANCELLATION));
+
+            assertThat(sequenceValid).isTrue();
+        }
     }
 
     private OrderDelivery createValidOrder(){
@@ -324,44 +364,6 @@ public class OrderDeliveryTest {
         return new Customer("John Doe", CustomerType.REGULAR);
     }
 
-    @Functional
-    @Test
-    @DisplayName("[VL] Canceled order must have at minimum 2 events: CREATED and CANCELLATION")
-    void canceledOrderMustHaveMinimumTwoEvents() {
-        order.cancel();
-        assertThat(order.getEvents().size()).isEqualTo(2);
-        assertThat(order.getEvents()).extracting(OrderDeliveryEvent::getType)
-                .containsExactly(EventType.CREATED, EventType.CANCELLATION);
-    }
-
-    @Functional
-    @Test
-    @DisplayName("[VL] Order must have maximum 4 events: CREATED, DISPATCHED, EN_ROUTE and CONCLUDED or" +
-            " CREATED, DISPATCHED, EN_ROUTE AND CANCELLATION")
-    void MustContainMaximumOfFourEventsInAnOrder(){
-        order.dispatch(deliveryMan);
-        order.startRoute();
-        order.cancel();
-
-        List<EventType> eventsTypes = order.getEvents()
-                .stream()
-                .map(OrderDeliveryEvent::type)
-                .toList();
-
-        assertThat(eventsTypes.size()).isEqualTo(4);
-
-        boolean sequenceValid = eventsTypes.equals(List.of(
-                EventType.CREATED,
-                EventType.DISPATCHED,
-                EventType.EN_ROUTE,
-                EventType.CONCLUDED)
-        ) || eventsTypes.equals(List.of(
-                EventType.CREATED,
-                EventType.DISPATCHED,
-                EventType.EN_ROUTE,
-                EventType.CANCELLATION));
-
-        assertThat(sequenceValid).isTrue();
     private Address createValidPickupAddress() {
         return new Address("Street A", "10", "Center", "São Carlos", "SP", "Brasil", new Cep("13500-000"));
     }

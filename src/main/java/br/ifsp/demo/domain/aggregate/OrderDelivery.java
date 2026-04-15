@@ -69,7 +69,9 @@ public class OrderDelivery {
     }
 
     public void startRoute(){
+        if(this.statusOrder != StatusOrder.DISPATCHED) throw new IllegalArgumentException("[OrderStatus is not DISPATCHED]");
         this.statusOrder = StatusOrder.EN_ROUTE;
+
         OrderEvents.add(new OrderDeliveryEvent(EventType.EN_ROUTE));
     }
 
