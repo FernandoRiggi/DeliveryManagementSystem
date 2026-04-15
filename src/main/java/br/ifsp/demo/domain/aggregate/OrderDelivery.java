@@ -8,8 +8,11 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 public class OrderDelivery {
+    @Getter
+    private UUID id;
     private StatusOrder statusOrder;
     private DeliveryMan deliveryMan;
     @Getter
@@ -33,6 +36,7 @@ public class OrderDelivery {
             throw new NullPointerException("DeliveryAddress cannot be null");
         }
 
+        this.id = UUID.randomUUID();
         this.customer = customer;
         this.pickupAddress = pickupAddress;
         this.deliveryAddress = deliveryAddress;
@@ -90,6 +94,16 @@ public class OrderDelivery {
         this.deliveryMan = deliveryMan;
         deliveryMan.setCapacity(deliveryMan.getCapacity() - 1);
         OrderEvents.add(new OrderDeliveryEvent(EventType.DISPATCHED));
+    }
+
+    public void restore(StatusOrder status, DeliveryMan deliveryMan) {
+        this.statusOrder = status;
+        this.deliveryMan = deliveryMan;
+        this.OrderEvents.clear();
+    }
+
+    public void restoreId(UUID id) {
+        this.id = id;
     }
 
     public DeliveryMan getDeliveryman() {
