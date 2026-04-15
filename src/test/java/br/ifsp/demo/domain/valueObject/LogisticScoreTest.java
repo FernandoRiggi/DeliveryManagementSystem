@@ -70,7 +70,7 @@ class LogisticScoreTest {
     @TDD
     @Test
     @DisplayName("[#35] Should create a CRITICAL priority - Premium customer, 4 orders, 3km, 80Min")
-    void shouldCreateCriticalForRegularCustomer(){
+    void shouldCreateCriticalWithPenalty(){
         LogisticScore score = LogisticScore.calculate(CustomerType.PREMIUM, 4,3.0, 80);
 
         assertThat(score.GetPriorityLevel()).isEqualTo(PriorityLevel.CRITICAL);
