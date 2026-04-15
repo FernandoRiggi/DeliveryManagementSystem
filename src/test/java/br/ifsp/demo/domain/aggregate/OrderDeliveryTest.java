@@ -413,6 +413,16 @@ public class OrderDeliveryTest {
             assertThat(order.getEvents())
                     .anyMatch(event -> event.getType() == EventType.CONCLUDED);
         }
+
+        @TDD
+        @Test
+        @DisplayName("[#27] when order is canceled, then a CANCELLATION event should be added to history")
+        void shouldGenerateCANCELLATIONEventWhenOrderIsCanceled() {
+            order.cancel();
+
+            assertThat(order.getEvents())
+                    .anyMatch(event -> event.getType() == EventType.CANCELLATION);
+        }
     }
 
     private OrderDelivery createValidOrder(){
