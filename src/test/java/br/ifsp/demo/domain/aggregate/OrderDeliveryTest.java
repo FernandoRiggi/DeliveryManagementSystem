@@ -343,6 +343,8 @@ public class OrderDeliveryTest {
         @Test
         @DisplayName("[#40] Given order CONCLUDED, when dispatch, then should throw IllegalStateException")
         void shouldThrowIllegalStateExceptionWhenDispatchConcludedOrder() {
+            order.dispatch(deliveryMan);
+            order.startRoute();
             order.concluded();
 
             assertThatIllegalStateException().isThrownBy(() -> order.dispatch(deliveryMan));
