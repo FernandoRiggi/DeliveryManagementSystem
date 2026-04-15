@@ -263,16 +263,6 @@ public class OrderDeliveryTest {
         }
 
         @Test
-        @DisplayName("Should generate EN_ROUTE event when route starts")
-        void shouldGenerateEnRouteEventWhenRouteStarts() {
-            order.dispatch(deliveryMan);
-            order.startRoute();
-
-            assertThat(order.getEvents())
-                    .anyMatch(event -> event.getType() == EventType.EN_ROUTE);
-        }
-
-        @Test
         @DisplayName("Should throw IllegalStateException when order is already EN_ROUTE")
         void shouldThrowIllegalStateExceptionWhenOrderIsAlreadyEnRoute(){
             order.dispatch(deliveryMan);
@@ -410,6 +400,17 @@ public class OrderDeliveryTest {
             assertThat(order.getEvents())
                     .extracting(OrderDeliveryEvent::getType)
                     .containsExactly(EventType.CREATED);
+        }
+
+        @TDD
+        @Test
+        @DisplayName("[#27] Should generate EN_ROUTE event when route starts")
+        void shouldGenerateEnRouteEventWhenRouteStarts() {
+            order.dispatch(deliveryMan);
+            order.startRoute();
+
+            assertThat(order.getEvents())
+                    .anyMatch(event -> event.getType() == EventType.EN_ROUTE);
         }
     }
 
