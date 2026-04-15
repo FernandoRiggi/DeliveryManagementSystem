@@ -224,6 +224,17 @@ public class OrderDeliveryTest {
             assertThat(order.getStatus()).isEqualTo(StatusOrder.CANCELED);
         }
 
+        @TDD
+        @Test
+        @DisplayName("[BUG 01] Given order dispatched, deliveryman capacity should be decremented by 1")
+        void shouldDecrementDeliverymanCapacityWhenDispatched() {
+            int initialCapacity = deliveryMan.getCapacity();
+            order.dispatch(deliveryMan);
+
+            assertThat(deliveryMan.getCapacity()).isEqualTo(initialCapacity - 1);
+        }
+
+
         //Como operador
         @TDD
         @Test
@@ -443,8 +454,18 @@ public class OrderDeliveryTest {
     private Address createValidPickupAddress() {
         return new Address("Street A", "10", "Center", "São Carlos", "SP", "Brasil", new Cep("13500-000"));
     }
-
     private Address createValidDeliveryAddress() {
         return new Address("Street B", "11", "Center", "Araraquara", "SP", "Brasil", new Cep("13400-000"));
+    }
+
+    private boolean hasEvent(OrderDelivery order, EventType type) {
+        return order.getEvents().stream()
+                .anyMatch(event -> event.getType() == type);
+    }
+
+    private long countEvents(OrderDelivery order, EventType type) {
+        return order.getEvents().stream()
+                .filter(event -> event.getType() == type)
+                .count();
     }
 }
