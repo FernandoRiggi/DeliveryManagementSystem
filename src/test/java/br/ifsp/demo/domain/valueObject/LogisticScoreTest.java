@@ -57,4 +57,14 @@ class LogisticScoreTest {
 
         assertThat(score.GetPriorityLevel()).isEqualTo(PriorityLevel.URGENT);
     }
+
+    @TDD
+    @Test
+    @DisplayName("[#34] Should create a CRITICAL priority - Premium customer, 0 orders, 3km, 60Min")
+    void shouldCreateCriticalForPremiumCustomer(){
+        LogisticScore score = LogisticScore.calculate(CustomerType.PREMIUM, 0,3.0, 60);
+
+        assertThat(score.GetPriorityLevel()).isEqualTo(PriorityLevel.CRITICAL);
+    }
+
 }
