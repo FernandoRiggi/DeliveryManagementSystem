@@ -65,10 +65,12 @@ public class OrderDelivery {
 
     public void concluded(){
         this.statusOrder = StatusOrder.CONCLUDED;
+        OrderEvents.add(new OrderDeliveryEvent(EventType.CONCLUDED));
     }
 
     public void startRoute(){
         this.statusOrder = StatusOrder.EN_ROUTE;
+        OrderEvents.add(new OrderDeliveryEvent(EventType.EN_ROUTE));
     }
 
     public void dispatch(DeliveryMan deliveryMan) {
