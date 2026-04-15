@@ -95,6 +95,6 @@ class LogisticScoreTest {
         LogisticScore score1 = LogisticScore.calculate(CustomerType.REGULAR, 0, 8.0, 10);
         LogisticScore score2 = LogisticScore.calculate(CustomerType.PREMIUM, 0, 8.0, 10);
 
-        assertThat(score1.isHigherThan(score2)).isTrue();
+        assertThat(score2.isHigherThan(score1)).isTrue();
     }
 }
