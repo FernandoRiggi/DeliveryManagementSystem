@@ -19,8 +19,10 @@ public class OrderDelivery {
     private final List<OrderDeliveryEvent> OrderEvents;
     @Getter
     private final Customer customer;
+    @Getter
+    private final double distanceKm;
 
-    public OrderDelivery(Customer customer, Address pickupAddress, Address deliveryAddress) {
+    public OrderDelivery(Customer customer, Address pickupAddress, Address deliveryAddress, double distanceKm) {
         if (customer == null) {
             throw new NullPointerException("Customer cannot be null");
         }
@@ -33,12 +35,17 @@ public class OrderDelivery {
             throw new NullPointerException("DeliveryAddress cannot be null");
         }
 
+        if (distanceKm <= 0) {
+            throw new IllegalArgumentException("Distance cannot be zero or negative");
+        }
+
         this.customer = customer;
         this.pickupAddress = pickupAddress;
         this.deliveryAddress = deliveryAddress;
         this.statusOrder = StatusOrder.CREATED;
         OrderEvents = new ArrayList<>();
         OrderEvents.add(new OrderDeliveryEvent(EventType.CREATED));
+        this.distanceKm = distanceKm;
     }
 
 

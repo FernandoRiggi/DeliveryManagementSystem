@@ -35,7 +35,7 @@ public class CreateOrderUseCaseTest {
     @Test
     @DisplayName("[#56] Should create and save order delivery")
     void ShouldCreateAndSaveOrderDelivery(){
-        CreateOrderRequest request = new CreateOrderRequest(createValidCustomer(), createValidPickupAddress(), createValidDeliveryAddress());
+        CreateOrderRequest request = new CreateOrderRequest(createValidCustomer(), createValidPickupAddress(), createValidDeliveryAddress(), 10.0);
 
         sut.create(request);
 
@@ -49,7 +49,8 @@ public class CreateOrderUseCaseTest {
         CreateOrderRequest request = new CreateOrderRequest(
                 createValidCustomer(),
                 null,
-                createValidDeliveryAddress()
+                createValidDeliveryAddress(),
+                10.0
         );
 
         assertThatThrownBy(() -> sut.create(request))
@@ -65,7 +66,8 @@ public class CreateOrderUseCaseTest {
         CreateOrderRequest request = new CreateOrderRequest(
                 createValidCustomer(),
                 createValidPickupAddress(),
-                null
+                null,
+                10.0
         );
 
         assertThatThrownBy(() -> sut.create(request))
@@ -83,7 +85,8 @@ public class CreateOrderUseCaseTest {
         CreateOrderRequest request = new CreateOrderRequest(
                 customer,
                 createValidPickupAddress(),
-                createValidDeliveryAddress()
+                createValidDeliveryAddress(),
+                10.0
         );
 
         when(customerRepository.exists(customer)).thenReturn(false);

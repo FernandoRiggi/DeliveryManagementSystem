@@ -18,6 +18,8 @@ public record CreateOrderHttpRequest(
         String deliveryCity,
         String deliveryState,
         String deliveryCountry,
-        String deliveryCep
+        String deliveryCep,
+
+        Double distanceKm
 ) {
 }

@@ -11,4 +11,5 @@ public interface OrderDeliveryRepository {
     Optional<OrderDelivery> findById(UUID orderId);
     void save(OrderDelivery orderDelivery);
     List<OrderDelivery> findAllByCustomer(Customer customer);
+    List<OrderDelivery> findAllActiveOrders(Customer customer);
 }

@@ -31,7 +31,8 @@ public class CreateOrderUseCase {
         OrderDelivery order = new OrderDelivery(
                 request.customer(),
                 request.pickingAddress(),
-                request.deliveryAddress()
+                request.deliveryAddress(),
+                request.distanceKm()
         );
         repo.save(order);
     }

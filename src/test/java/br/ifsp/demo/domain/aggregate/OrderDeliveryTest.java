@@ -39,7 +39,7 @@ public class OrderDeliveryTest {
             Address pickupAddress = new Address("Street A", "10", "Center", "São Carlos", "SP", "Brasil", new Cep("13500-000"));
             Address deliveryAddress = new Address("Street B", "11", "Center", "Araraquara", "SP", "Brasil", new Cep("13400-000"));
             Customer customer = new Customer("John Doe", CustomerType.REGULAR);
-            OrderDelivery sut = new OrderDelivery(customer, pickupAddress, deliveryAddress);
+            OrderDelivery sut = new OrderDelivery(customer, pickupAddress, deliveryAddress,10.0);
 
             assertThat(sut.getPickupAddress()).isEqualTo(pickupAddress);
             assertThat(sut.getDeliveryAddress()).isEqualTo(deliveryAddress);
@@ -56,7 +56,7 @@ public class OrderDeliveryTest {
 
             assertThatThrownBy(() -> {
                 Customer sut = new Customer(name, type);
-                new OrderDelivery(sut, pickupAddress, deliveryAddress);
+                new OrderDelivery(sut, pickupAddress, deliveryAddress,10.0);
             }).isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -69,7 +69,7 @@ public class OrderDeliveryTest {
             Address deliveryAddress = createValidDeliveryAddress();
 
             assertThatNullPointerException().isThrownBy(() -> {
-                new OrderDelivery(customer, pickupAddress, deliveryAddress);
+                new OrderDelivery(customer, pickupAddress, deliveryAddress,10.0);
             });
         }
 
@@ -78,7 +78,7 @@ public class OrderDeliveryTest {
         @DisplayName("Should throw null pointer exception when pickup address is null")
         void shouldThrowNullPointerExceptionWhenPickupAddressIsNull(){
             assertThatNullPointerException().isThrownBy(() -> {
-                new OrderDelivery(createValidCustomer(), null, createValidDeliveryAddress());
+                new OrderDelivery(createValidCustomer(), null, createValidDeliveryAddress(),10.0);
             });
         }
 
@@ -87,7 +87,7 @@ public class OrderDeliveryTest {
         @DisplayName("Should throw null pointer exception when delivery address is null")
         void shouldThrownNullPointerExceptionWhenDeliveryAddressIsNull(){
             assertThatNullPointerException().isThrownBy(() -> {
-                new OrderDelivery(createValidCustomer(), createValidPickupAddress(), null);
+                new OrderDelivery(createValidCustomer(), createValidPickupAddress(), null,10.0);
             });
         }
 
@@ -101,7 +101,7 @@ public class OrderDeliveryTest {
             assertThatThrownBy(() -> {
                 Cep cep = cepValue == null ? null : new Cep(cepValue);
                 Address pickupAddress = new Address(street, number, neighborhood, city, state, country, cep);
-                new OrderDelivery(createValidCustomer() ,pickupAddress, deliveryAddress);
+                new OrderDelivery(createValidCustomer() ,pickupAddress, deliveryAddress,10.0);
             }).isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -115,7 +115,7 @@ public class OrderDeliveryTest {
             assertThatThrownBy(() -> {
                 Cep cep = cepValue == null ? null : new Cep(cepValue);
                 Address deliveryAddress = new Address(street, number, neighborhood, city, state, country, cep);
-                new OrderDelivery(createValidCustomer(), pickupAddress, deliveryAddress);
+                new OrderDelivery(createValidCustomer(), pickupAddress, deliveryAddress,10.0);
             }).isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -530,7 +530,7 @@ public class OrderDeliveryTest {
         Address pickupAddress = new Address("Street A", "10", "Center", "São Carlos", "SP", "Brasil", new Cep("13500-000"));
         Address deliveryAddress = new Address("Street B", "11", "Center", "Araraquara", "SP", "Brasil", new Cep("13400-000"));
         Customer customer = new Customer("John Doe", CustomerType.REGULAR);
-        return new OrderDelivery(customer, pickupAddress, deliveryAddress);
+        return new OrderDelivery(customer, pickupAddress, deliveryAddress,10.0);
     }
 
     private DeliveryMan createValidDeliveryMan(){
