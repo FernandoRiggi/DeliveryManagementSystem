@@ -81,4 +81,19 @@ public class GetOrderUseCaseTest {
 
         verify(orderDeliveryRepository).findAllByCustomer(customer);
     }
+    @TDD
+    @Test
+    @DisplayName("Should throw OrderNotFoundException when customer has no orders")
+    void shouldThrowOrderNotFoundExceptionWhenCustomerHasNoOrders() {
+        Customer customer = new Customer("John Doe", CustomerType.REGULAR);
+
+        when(orderDeliveryRepository.findAllByCustomer(customer)).thenReturn(List.of());
+
+        assertThatExceptionOfType(OrderNotFoundException.class)
+                .isThrownBy(() -> sut.findAllOrdersByCustomer(customer))
+                .withMessage("[Orders not found]");
+
+        verify(orderDeliveryRepository).findAllByCustomer(customer);
+    }
+
 }
