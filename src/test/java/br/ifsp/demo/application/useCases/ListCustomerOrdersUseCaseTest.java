@@ -115,4 +115,18 @@ public class ListCustomerOrdersUseCaseTest {
 
         assertThat(result).isNotEmpty().containsExactlyInAnyOrder(orderConcluded, orderCanceled);
     }
+
+    @TDD
+    @Test
+    @DisplayName("[#61] Should return orders that are not dispatch yet from a customer")
+    void shouldReturnNonDispatchedOrdersFromACustomer(){
+        when(customerRepository.exists(customer)).thenReturn(true);
+        when(orderDeliveryRepository.findAllByCustomer(customer)).thenReturn(List.of(orderDelivery, orderDispatched, orderEnRoute, orderConcluded, orderCanceled));
+
+        List<OrderDelivery> result = sut.listAllCreatedOrders(customer);
+
+        assertThat(result).isNotEmpty().containsExactly(orderDelivery);
+    }
+
+
 }
