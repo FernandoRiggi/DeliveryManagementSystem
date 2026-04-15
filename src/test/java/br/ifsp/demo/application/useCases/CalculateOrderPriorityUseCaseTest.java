@@ -117,8 +117,24 @@ public class CalculateOrderPriorityUseCaseTest {
 
     @TDD
     @Test
-    @DisplayName("[#49] New order increases created count than recalculates existing scores")
+    @DisplayName("[#49] New order increases created count then recalculates existing scores")
     void newOrderShouldReduceExistingScores() {
+        OrderDelivery existing = new OrderDelivery(regularCustomer, pickupAddress, deliveryAddress, 10.0);
+        OrderDelivery newOrder = new OrderDelivery(regularCustomer, pickupAddress, deliveryAddress, 10.0);
+
+        when(orderRepository.findAllActiveOrders(regularCustomer)).thenReturn(List.of(existing)).thenReturn(List.of(existing, newOrder));
+
+        LogisticScore before = sut.calculate(existing, 10);
+
+        List<LogisticScore> after = sut.recalculateQueue(newOrder, Map.of(existing, 10, newOrder, 10));
+
+        assertThat(after.getFirst().value()).isLessThanOrEqualTo(before.value());
+    }
+
+    @TDD
+    @Test
+    @DisplayName("[#50] Cancelling an order decreases created count then recalculates existing scores")
+    void cancelOrderShouldReduceExistingScores() {
         OrderDelivery existing = new OrderDelivery(regularCustomer, pickupAddress, deliveryAddress, 10.0);
         OrderDelivery newOrder = new OrderDelivery(regularCustomer, pickupAddress, deliveryAddress, 10.0);
 
