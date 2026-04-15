@@ -47,6 +47,10 @@ public class OrderDelivery {
         boolean hasCancellationEvent = OrderEvents.stream().anyMatch(event -> event.getType() == EventType.CANCELLATION);
         if(hasCancellationEvent) throw new IllegalStateException("[Order already cancelled]");
 
+        if(this.statusOrder == StatusOrder.DISPATCHED){
+            deliveryMan.setCapacity(deliveryMan.getCapacity() + 1);
+        }
+
         this.statusOrder = StatusOrder.CANCELED;
         OrderEvents.add(new OrderDeliveryEvent(EventType.CANCELLATION));
     }

@@ -234,6 +234,29 @@ public class OrderDeliveryTest {
             assertThat(deliveryMan.getCapacity()).isEqualTo(initialCapacity - 1);
         }
 
+        @TDD
+        @Test
+        @DisplayName("[BUG] Given order DISPATCHED and then canceled, deliveryman capacity should be restored")
+        void shouldRestoreDeliverymanCapacityWhenDispatchedOrderCanceled() {
+            int initialCapacity = deliveryMan.getCapacity();
+            order.dispatch(deliveryMan);
+            order.cancel();
+
+            assertThat(deliveryMan.getCapacity()).isEqualTo(initialCapacity);
+        }
+
+        @TDD
+        @Test
+        @DisplayName("[BUG] Given order EN_ROUTE and then canceled, deliveryman capacity should be restored")
+        void shouldRestoreCapacityWhenEnRouteOrderCanceled() {
+            int initialCapacity = deliveryMan.getCapacity();
+
+            order.dispatch(deliveryMan);
+            order.startRoute();
+            order.cancel();
+
+            assertThat(deliveryMan.getCapacity()).isEqualTo(initialCapacity);
+        }
 
         //Como operador
         @TDD
