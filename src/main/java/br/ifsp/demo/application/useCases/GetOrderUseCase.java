@@ -1,10 +1,12 @@
 package br.ifsp.demo.application.useCases;
 
+import br.ifsp.demo.domain.aggregate.Customer;
 import br.ifsp.demo.domain.aggregate.OrderDelivery;
 import br.ifsp.demo.domain.repository.CustomerRepository;
 import br.ifsp.demo.domain.repository.OrderDeliveryRepository;
 import br.ifsp.demo.exception.OrderNotFoundException;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -23,4 +25,17 @@ public class GetOrderUseCase {
                 .orElseThrow(() -> new OrderNotFoundException("[OrderDelivery Not Found]"));
     }
 
+    public List<OrderDelivery> findAllOrdersByCustomer(Customer customer) {
+        if (customer == null) {
+            throw new NullPointerException("Customer cannot be null");
+        }
+
+        List<OrderDelivery> orders = orderDeliveryRepository.findAllByCustomer(customer);
+
+        if (orders.isEmpty()) {
+            throw new OrderNotFoundException("[Orders not found]");
+        }
+
+        return orders;
+    }
 }
