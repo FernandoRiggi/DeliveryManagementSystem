@@ -283,6 +283,15 @@ public class OrderDeliveryTest {
                     .anyMatch(event -> event.getType() == EventType.EN_ROUTE);
         }
 
+        @Test
+        @DisplayName("Should throw IllegalStateException when order is already EN_ROUTE")
+        void shouldThrowIllegalStateExceptionWhenOrderIsAlreadyEnRoute(){
+            order.dispatch(deliveryMan);
+            order.startRoute();
+
+            assertThatIllegalStateException().isThrownBy(() -> order.startRoute());
+        }
+
         @TDD
         @Test
         @DisplayName("[#39] Given order DISPATCHED, when dispatch again, then should throw IllegalStateException")
