@@ -294,6 +294,17 @@ public class OrderDeliveryTest {
 
         @TDD
         @Test
+        @DisplayName("[#25] Given order is EN_ROUTE, when deliveryMan confirm deliver, then status should be CONCLUDED")
+        void shouldChangeStatusToConcludedWhenDeliveryManConfirmDeliver(){
+            order.dispatch(deliveryMan);
+            order.startRoute();
+            order.concluded();
+
+            assertThat(order.getEvents()).anyMatch(event -> event.getType() == EventType.CONCLUDED);
+        }
+
+        @TDD
+        @Test
         @DisplayName("[#39] Given order DISPATCHED, when dispatch again, then should throw IllegalStateException")
         void shouldThrowIllegalStateExceptionWhenDispatchAlreadyDispatchedOrder() {
             order.dispatch(deliveryMan);
