@@ -362,6 +362,18 @@ public class OrderDeliveryTest {
                     .containsExactly(EventType.CREATED, EventType.CANCELLATION);
         }
 
+        @TDD
+        @Test
+        @DisplayName("[#48] Given order is DISPATCHED, when deliveryman cancels route, then deliveryman capacity should be restored")
+        void shouldRestoreCapacityWhenRouteIsCanceled() {
+            int initialCapacity = deliveryMan.getCapacity();
+            order.dispatch(deliveryMan);
+
+            order.cancelRoute();
+
+            assertThat(deliveryMan.getCapacity()).isEqualTo(initialCapacity);
+        }
+
         @Functional
         @Test
         @DisplayName("[VL] Order must have maximum 4 events: CREATED, DISPATCHED, EN_ROUTE and CONCLUDED or" +
