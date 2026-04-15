@@ -273,6 +273,16 @@ public class OrderDeliveryTest {
             assertThat(order.getStatus()).isEqualTo(StatusOrder.EN_ROUTE);
         }
 
+        @Test
+        @DisplayName("Should generate EN_ROUTE event when route starts")
+        void shouldGenerateEnRouteEventWhenRouteStarts(){
+            order.dispatch(deliveryMan);
+            order.startRoute();
+
+            assertThat(order.getEvents())
+                    .anyMatch(event -> event.getType() == EventType.EN_ROUTE);
+        }
+
         @TDD
         @Test
         @DisplayName("[#39] Given order DISPATCHED, when dispatch again, then should throw IllegalStateException")
