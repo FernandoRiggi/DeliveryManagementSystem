@@ -1,9 +1,11 @@
 package br.ifsp.demo.application.useCases;
 
 import br.ifsp.demo.annotation.TDD;
+import br.ifsp.demo.domain.aggregate.Customer;
 import br.ifsp.demo.domain.aggregate.OrderDelivery;
 import br.ifsp.demo.domain.aggregate.StatusOrder;
 import br.ifsp.demo.domain.repository.OrderDeliveryRepository;
+import br.ifsp.demo.domain.valueObject.CustomerType;
 import br.ifsp.demo.exception.OrderNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -31,17 +34,17 @@ public class GetOrderUseCaseTest {
     @TDD
     @Test
     @DisplayName("[#28] Given customer has an order, when getById, then current status should be returned")
-    void shouldReturnCurrentStatusWhenGettingOrderById(StatusOrder currentStatus) {
+    void shouldReturnCurrentStatusWhenGettingOrderById() {
         OrderDelivery order = mock(OrderDelivery.class);
         UUID orderId = UUID.randomUUID();
 
         when(orderDeliveryRepository.findById(orderId)).thenReturn(Optional.of(order));
-        when(order.getStatus()).thenReturn(currentStatus);
+        when(order.getStatus()).thenReturn(StatusOrder.DISPATCHED);
 
         OrderDelivery response = sut.findById(orderId);
 
         assertThat(response).isNotNull();
-        assertThat(response.getStatus()).isEqualTo(currentStatus);
+        assertThat(response.getStatus()).isEqualTo(StatusOrder.DISPATCHED);
 
         verify(orderDeliveryRepository).findById(orderId);
         verify(order).getStatus();
