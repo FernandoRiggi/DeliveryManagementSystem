@@ -2,6 +2,7 @@ package br.ifsp.demo.application.useCases;
 
 import br.ifsp.demo.annotation.TDD;
 import br.ifsp.demo.domain.aggregate.Customer;
+import br.ifsp.demo.domain.aggregate.DeliveryMan;
 import br.ifsp.demo.domain.aggregate.OrderDelivery;
 import br.ifsp.demo.domain.aggregate.PriorityLevel;
 import br.ifsp.demo.domain.repository.OrderDeliveryRepository;
@@ -19,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -61,4 +63,26 @@ public class CalculateOrderPriorityUseCaseTest {
 
         assertThat(score.getPriorityLevel()).isEqualTo(PriorityLevel.NORMAL);
     }
+
+    @TDD
+    @Test
+    @DisplayName("Should throw NullPointerException when order is null")
+    void shouldThrowWhenOrderIsNull() {
+        assertThatThrownBy(() -> sut.calculate(null, 10))
+                .isInstanceOf(NullPointerException.class);
+    }
+
+    @TDD
+    @Test
+    @DisplayName("Should throw IllegalStateException when order is not CREATED")
+    void shouldThrowWhenOrderIsNotCreated() {
+        OrderDelivery dispatched = new OrderDelivery(regularCustomer, pickupAddress, deliveryAddress, 8.0);
+
+        dispatched.dispatch(new DeliveryMan("Carlos", 5));
+
+        assertThatThrownBy(() -> sut.calculate(dispatched, 10))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("CREATED");
+    }
+
 }
