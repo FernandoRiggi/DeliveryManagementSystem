@@ -18,7 +18,7 @@ public class CalculateOrderPriorityUseCase {
             throw new NullPointerException("Order cannot be null");
         }
         if(order.getStatus() != StatusOrder.CREATED){
-            throw new IllegalArgumentException("Priority can only be calculated in orders with status CREATED");
+            throw new IllegalStateException("Priority can only be calculated in orders with status CREATED");
         }
 
         int activeCount = repo.findAllActiveOrders(order.getCustomer()).size();
