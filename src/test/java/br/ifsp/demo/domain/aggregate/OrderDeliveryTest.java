@@ -388,6 +388,13 @@ public class OrderDeliveryTest {
             assertThat(order.getDeliveryman()).isEqualTo(newDeliveryMan);
         }
 
+        @TDD
+        @Test
+        @DisplayName("[#48] Given order is CREATED, when canceling route, then should throw IllegalStateException")
+        void shouldThrowExceptionWhenCancelingRouteFromCreated() {
+            assertThatIllegalStateException().isThrownBy(() -> order.cancelRoute());
+        }
+
         @Functional
         @Test
         @DisplayName("[VL] Order must have maximum 4 events: CREATED, DISPATCHED, EN_ROUTE and CONCLUDED or" +
