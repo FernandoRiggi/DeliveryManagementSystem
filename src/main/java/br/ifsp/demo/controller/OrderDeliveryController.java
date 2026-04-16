@@ -1,36 +1,40 @@
 package br.ifsp.demo.controller;
 
-import br.ifsp.demo.application.useCases.CreateOrderUseCase;
+import br.ifsp.demo.application.useCases.*;
 import br.ifsp.demo.domain.aggregate.Customer;
+import br.ifsp.demo.domain.aggregate.OrderDelivery;
 import br.ifsp.demo.domain.dto.CreateOrderHttpRequest;
 import br.ifsp.demo.domain.dto.CreateOrderRequest;
 import br.ifsp.demo.domain.dto.ErrorResponse;
+import br.ifsp.demo.domain.repository.CustomerRepository;
 import br.ifsp.demo.domain.valueObject.Address;
 import br.ifsp.demo.domain.valueObject.Cep;
-import br.ifsp.demo.domain.valueObject.CustomerType;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(path = "/api/v1/orders")
+@AllArgsConstructor
 public class OrderDeliveryController {
     private final CreateOrderUseCase createOrderUseCase;
-
-    public OrderDeliveryController(CreateOrderUseCase createOrderUseCase) {
-        this.createOrderUseCase = createOrderUseCase;
-    }
+    private final CustomerRepository customerRepository;
+    private final CalculateOrderPriorityUseCase calculateOrderPriorityUseCase;
+    private final CancelRouteUseCase cancelRouteUseCase;
+    private final CancelOrderUseCase cancelOrderUseCase;
+    private final GetOrderUseCase getOrderUseCase;
+    private final DispatchOrderUseCase dispatchOrderUseCase;
+    private final ListCustomerOrdersUseCase listCustomerOrdersUseCase;
 
     @PostMapping
     public ResponseEntity<?> create(@RequestBody CreateOrderHttpRequest body){
         try {
-            Customer customer = new Customer(
-                    body.customerName(),
-                    CustomerType.valueOf(body.customerType().toUpperCase())
-            );
+            Customer customer = customerRepository.findById(body.customerId())
+                    .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
 
             Address pickingAddress = new Address(
                     body.pickupStreet(),
@@ -54,7 +58,7 @@ public class OrderDeliveryController {
 
             Double distanceKm = body.distanceKm();
 
-            CreateOrderRequest request = new CreateOrderRequest(customer, pickingAddress, deliveryAddress, distanceKm);
+            CreateOrderRequest request = new CreateOrderRequest(customer.getCustomerId(), pickingAddress, deliveryAddress, distanceKm);
             createOrderUseCase.create(request);
 
             return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -62,6 +66,67 @@ public class OrderDeliveryController {
             return ResponseEntity
                     .badRequest()
                     .body(new ErrorResponse(e.getMessage()));
+        }
+    }
+
+    @GetMapping("/{orderId}")
+    public ResponseEntity<?> getById(@PathVariable UUID orderId) {
+        try {
+            OrderDelivery order = getOrderUseCase.findById(orderId);
+            return ResponseEntity.ok(order);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse(e.getMessage()));
+        }
+    }
+
+    @PatchMapping("/{orderId}/cancel")
+    public ResponseEntity<?> cancel(@PathVariable UUID orderId) {
+        try {
+            cancelOrderUseCase.cancelOrderDelivery(orderId);
+            return ResponseEntity.noContent().build();
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        }
+    }
+
+    @PatchMapping("/{orderId}/dispatch/{deliverymanId}")
+    public ResponseEntity<?> dispatch(
+            @PathVariable UUID orderId,
+            @PathVariable UUID deliverymanId
+    ) {
+        try {
+            dispatchOrderUseCase.dispatch(orderId, deliverymanId);
+            return ResponseEntity.noContent().build();
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        }
+    }
+
+    @PatchMapping("/{orderId}/cancel-route")
+    public ResponseEntity<?> cancelRoute(@PathVariable UUID orderId) {
+        try {
+            cancelRouteUseCase.cancelRoute(orderId);
+            return ResponseEntity.noContent().build();
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        }
+    }
+
+    @GetMapping("/customer/{customerId}")
+    public ResponseEntity<?> listByCustomer(@PathVariable UUID customerId) {
+        try {
+            Customer customer = customerRepository.findById(customerId)
+                    .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
+
+            return ResponseEntity.ok(listCustomerOrdersUseCase.listAll(customer));
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
         }
     }
 }

@@ -411,7 +411,7 @@ public class OrderDeliveryTest {
 
             List<EventType> eventsTypes = order.getEvents()
                     .stream()
-                    .map(OrderDeliveryEvent::type)
+                    .map(OrderDeliveryEvent::getType)
                     .toList();
 
             assertThat(eventsTypes.size()).isEqualTo(4);

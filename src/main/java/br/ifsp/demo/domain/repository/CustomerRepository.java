@@ -1,7 +1,9 @@
-package br.ifsp.demo.domain.repository;
+    package br.ifsp.demo.domain.repository;
 
-import br.ifsp.demo.domain.aggregate.Customer;
+    import br.ifsp.demo.domain.aggregate.Customer;
+    import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface CustomerRepository {
-    boolean exists(Customer customer);
-}
+    import java.util.UUID;
+
+    public interface CustomerRepository extends JpaRepository<Customer, UUID> {
+    }

@@ -4,11 +4,13 @@ import br.ifsp.demo.domain.aggregate.OrderDelivery;
 import br.ifsp.demo.domain.aggregate.StatusOrder;
 import br.ifsp.demo.domain.repository.OrderDeliveryRepository;
 import br.ifsp.demo.domain.valueObject.LogisticScore;
+import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+@Service
 public class CalculateOrderPriorityUseCase {
 
     private final OrderDeliveryRepository repo;
@@ -27,7 +29,7 @@ public class CalculateOrderPriorityUseCase {
 
         int activeCount = repo.findAllActiveOrders(order.getCustomer()).size();
 
-        return LogisticScore.calculate(order.getCustomer().type(),activeCount,order.getDistanceKm(),timeInMinutes);
+        return LogisticScore.calculate(order.getCustomer().getType(),activeCount,order.getDistanceKm(),timeInMinutes);
     }
 
     public List<OrderDelivery> getPriorityQueue(List<OrderDelivery> orders, Map<OrderDelivery, Integer> timeInMinutes) {
