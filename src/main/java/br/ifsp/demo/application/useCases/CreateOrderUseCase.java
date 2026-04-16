@@ -1,5 +1,6 @@
 package br.ifsp.demo.application.useCases;
 
+import br.ifsp.demo.domain.aggregate.Customer;
 import br.ifsp.demo.domain.aggregate.OrderDelivery;
 import br.ifsp.demo.domain.dto.CreateOrderRequest;
 import br.ifsp.demo.domain.repository.CustomerRepository;
@@ -24,12 +25,11 @@ public class CreateOrderUseCase {
             throw new NullPointerException("Request cannot be null");
         }
 
-        if (!customerRepository.exists(request.customer())) {
-            throw new IllegalArgumentException("Customer not found");
-        }
+        Customer customer = customerRepository.findById(request.customerId())
+                .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
 
         OrderDelivery order = new OrderDelivery(
-                request.customer(),
+                customer,
                 request.pickingAddress(),
                 request.deliveryAddress(),
                 request.distanceKm()

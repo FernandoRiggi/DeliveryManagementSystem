@@ -3,10 +3,12 @@ package br.ifsp.demo.application.useCases;
 import br.ifsp.demo.domain.aggregate.OrderDelivery;
 import br.ifsp.demo.domain.repository.OrderDeliveryRepository;
 import br.ifsp.demo.exception.OrderNotFoundException;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.UUID;
 
+@Service
 public class CancelOrderUseCase {
     private final OrderDeliveryRepository repo;
 
@@ -15,9 +17,13 @@ public class CancelOrderUseCase {
     }
 
     public void cancelOrderDelivery(UUID OrderId) {
-        Optional<OrderDelivery> order = Optional.ofNullable(repo.findById(OrderId)
+        Optional<OrderDelivery> order = Optional.of(repo.findById(OrderId)
                 .orElseThrow(() -> new OrderNotFoundException("[OrderDelivery Not Found]")));
 
-        order.ifPresent(OrderDelivery::cancel);
+        order.ifPresent( o -> {
+                    o.cancel();
+                    repo.save(o);
+                }
+        );
     }
 }

@@ -5,11 +5,13 @@ import br.ifsp.demo.domain.aggregate.OrderDelivery;
 import br.ifsp.demo.domain.repository.CustomerRepository;
 import br.ifsp.demo.domain.repository.OrderDeliveryRepository;
 import br.ifsp.demo.exception.OrderNotFoundException;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Service
 public class GetOrderUseCase {
     private final OrderDeliveryRepository orderDeliveryRepository;
     private final CustomerRepository customerRepository;
@@ -20,7 +22,7 @@ public class GetOrderUseCase {
         this.customerRepository = customerRepository;
     }
 
-    OrderDelivery findById(UUID orderId) {
+    public OrderDelivery findById(UUID orderId) {
         return orderDeliveryRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("[OrderDelivery Not Found]"));
     }
