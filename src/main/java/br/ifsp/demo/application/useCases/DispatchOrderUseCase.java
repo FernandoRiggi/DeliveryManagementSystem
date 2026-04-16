@@ -6,10 +6,12 @@ import br.ifsp.demo.domain.repository.DeliveryManRepository;
 import br.ifsp.demo.domain.repository.OrderDeliveryRepository;
 import br.ifsp.demo.exception.DeliveryManNotFoundException;
 import br.ifsp.demo.exception.OrderNotFoundException;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.UUID;
 
+@Service
 public class DispatchOrderUseCase {
     private final DeliveryManRepository deliveryManRepository;
     private final OrderDeliveryRepository orderDeliveryRepository;

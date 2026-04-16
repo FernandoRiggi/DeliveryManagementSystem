@@ -5,9 +5,11 @@ import br.ifsp.demo.domain.aggregate.OrderDelivery;
 import br.ifsp.demo.domain.aggregate.StatusOrder;
 import br.ifsp.demo.domain.repository.CustomerRepository;
 import br.ifsp.demo.domain.repository.OrderDeliveryRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class ListCustomerOrdersUseCase {
     private final OrderDeliveryRepository orderDeliveryRepository;
     private final CustomerRepository customerRepository;
@@ -18,16 +20,16 @@ public class ListCustomerOrdersUseCase {
     }
 
     List<OrderDelivery> listAll(Customer customer){
-        if(!customerRepository.exists(customer)){
-            throw new IllegalArgumentException("Customer not found");
-        }
+        customerRepository.findById(customer.getCustomerId())
+                .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
+
         return orderDeliveryRepository.findAllByCustomer(customer);
     }
 
     List<OrderDelivery> listActiveOrders(Customer customer){
-        if(!customerRepository.exists(customer)){
-            throw new IllegalArgumentException("Customer not found");
-        }
+        customerRepository.findById(customer.getCustomerId())
+                .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
+
         return orderDeliveryRepository.findAllByCustomer(customer)
                 .stream()
                 .filter(orderDelivery -> orderDelivery.getStatus() != StatusOrder.CONCLUDED && orderDelivery.getStatus() != StatusOrder.CANCELED)
@@ -35,9 +37,9 @@ public class ListCustomerOrdersUseCase {
     }
 
     List<OrderDelivery> listInactiveOrders(Customer customer){
-        if(!customerRepository.exists(customer)){
-            throw new IllegalArgumentException("Customer not found");
-        }
+        customerRepository.findById(customer.getCustomerId())
+                .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
+
         return orderDeliveryRepository.findAllByCustomer(customer)
                 .stream()
                 .filter(orderDelivery -> orderDelivery.getStatus() == StatusOrder.CONCLUDED || orderDelivery.getStatus() == StatusOrder.CANCELED)
@@ -45,9 +47,9 @@ public class ListCustomerOrdersUseCase {
     }
 
     List<OrderDelivery> listAllCreatedOrders(Customer customer){
-        if(!customerRepository.exists(customer)){
-            throw new IllegalArgumentException("Customer not found");
-        }
+        customerRepository.findById(customer.getCustomerId())
+                .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
+
         return orderDeliveryRepository.findAllByCustomer(customer)
                 .stream()
                 .filter(orderDelivery -> orderDelivery.getStatus() == StatusOrder.CREATED)

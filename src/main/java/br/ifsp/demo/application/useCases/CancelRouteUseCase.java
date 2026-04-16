@@ -4,9 +4,11 @@ package br.ifsp.demo.application.useCases;
 import br.ifsp.demo.domain.aggregate.OrderDelivery;
 import br.ifsp.demo.domain.repository.OrderDeliveryRepository;
 import br.ifsp.demo.exception.OrderNotFoundException;
+import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+@Service
 public class CancelRouteUseCase {
     private final OrderDeliveryRepository repo;
 
