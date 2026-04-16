@@ -5,9 +5,11 @@ import br.ifsp.demo.domain.aggregate.OrderDelivery;
 import br.ifsp.demo.domain.aggregate.StatusOrder;
 import br.ifsp.demo.domain.repository.CustomerRepository;
 import br.ifsp.demo.domain.repository.OrderDeliveryRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class ListCustomerOrdersUseCase {
     private final OrderDeliveryRepository orderDeliveryRepository;
     private final CustomerRepository customerRepository;
