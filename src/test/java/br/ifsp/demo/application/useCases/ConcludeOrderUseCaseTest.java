@@ -79,4 +79,29 @@ public class ConcludeOrderUseCaseTest {
         verify(repo, never()).save(any());
     }
 
+    @Test
+    @DisplayName("Should throw IllegalStateException when order is not EN_ROUTE")
+    void shouldThrowIllegalStateExceptionWhenOrderIsNotEnRoute() {
+        UUID orderId = UUID.randomUUID();
+
+        Customer customer = new Customer("John Doe", CustomerType.REGULAR);
+
+        Address pickupAddress = new Address(
+                "Street A", "10", "Center", "São Carlos", "SP", "Brasil", new Cep("13500-000")
+        );
+        Address deliveryAddress = new Address(
+                "Street B", "11", "Center", "Araraquara", "SP", "Brasil", new Cep("13400-000")
+        );
+
+        OrderDelivery order = new OrderDelivery(customer, pickupAddress, deliveryAddress, 10.0);
+
+        when(repo.findById(orderId)).thenReturn(Optional.of(order));
+
+        assertThatIllegalStateException()
+                .isThrownBy(() -> sut.conclude(orderId))
+                .withMessage("[OrderStatus is not EN_ROUTE]");
+
+        verify(repo).findById(orderId);
+        verify(repo, never()).save(any());
+    }
 }
