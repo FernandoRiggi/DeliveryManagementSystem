@@ -63,4 +63,20 @@ public class ConcludeOrderUseCaseTest {
         verify(repo).findById(orderId);
         verify(repo).save(order);
     }
+
+    @Test
+    @DisplayName("Should throw OrderNotFoundException when order does not exist")
+    void shouldThrowOrderNotFoundExceptionWhenOrderDoesNotExist() {
+        UUID orderId = UUID.randomUUID();
+
+        when(repo.findById(orderId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> sut.conclude(orderId))
+                .isInstanceOf(OrderNotFoundException.class)
+                .hasMessage("[OrderDelivery Not Found]");
+
+        verify(repo).findById(orderId);
+        verify(repo, never()).save(any());
+    }
+
 }
