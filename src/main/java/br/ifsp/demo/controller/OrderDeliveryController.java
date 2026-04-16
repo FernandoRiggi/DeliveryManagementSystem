@@ -29,6 +29,7 @@ public class OrderDeliveryController {
     private final GetOrderUseCase getOrderUseCase;
     private final DispatchOrderUseCase dispatchOrderUseCase;
     private final ListCustomerOrdersUseCase listCustomerOrdersUseCase;
+    private final ConcludeOrderUseCase concludeOrderUseCase;
 
     @PostMapping
     public ResponseEntity<?> create(@RequestBody CreateOrderHttpRequest body){
