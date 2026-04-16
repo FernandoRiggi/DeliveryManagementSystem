@@ -1,8 +1,12 @@
 package br.ifsp.demo.domain.valueObject;
 
-public record Cep(String value) {
+import lombok.Getter;
 
-    public Cep {
+public class Cep {
+    @Getter
+    private final String value;
+
+    public Cep(String value) {
         if (value == null || value.isBlank()){
             throw new IllegalArgumentException("[cep is required]");
         }
@@ -13,7 +17,7 @@ public record Cep(String value) {
             throw new IllegalArgumentException("[cep must contain 8 digits]");
         }
 
-        value = normalizedValue;
+        this.value = normalizedValue;
     }
 
     public String formatted(){
