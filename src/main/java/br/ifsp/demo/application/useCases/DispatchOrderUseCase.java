@@ -29,5 +29,6 @@ public class DispatchOrderUseCase {
                 .orElseThrow(() -> new DeliveryManNotFoundException("Delivery Man not found"));
 
         order.dispatch(deliveryman);
+        orderDeliveryRepository.save(order);
     }
 }

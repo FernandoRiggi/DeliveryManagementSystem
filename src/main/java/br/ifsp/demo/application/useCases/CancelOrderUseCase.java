@@ -20,6 +20,10 @@ public class CancelOrderUseCase {
         Optional<OrderDelivery> order = Optional.of(repo.findById(OrderId)
                 .orElseThrow(() -> new OrderNotFoundException("[OrderDelivery Not Found]")));
 
-        order.ifPresent(OrderDelivery::cancel);
+        order.ifPresent( o -> {
+                    o.cancel();
+                    repo.save(o);
+                }
+        );
     }
 }
