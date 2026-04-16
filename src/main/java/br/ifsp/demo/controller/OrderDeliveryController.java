@@ -130,5 +130,14 @@ public class OrderDeliveryController {
         }
     }
 
+    @PatchMapping("/{orderId}/conclude")
+    public ResponseEntity<?> conclude(@PathVariable UUID orderId) {
+        try {
+            concludeOrderUseCase.conclude(orderId);
+            return ResponseEntity.noContent().build();
 
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        }
+    }
 }
