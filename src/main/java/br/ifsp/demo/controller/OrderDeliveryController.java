@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -110,6 +111,19 @@ public class OrderDeliveryController {
         try {
             cancelRouteUseCase.cancelRoute(orderId);
             return ResponseEntity.noContent().build();
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        }
+    }
+
+    @GetMapping("/customer/{customerId}")
+    public ResponseEntity<?> listByCustomer(@PathVariable UUID customerId) {
+        try {
+            Customer customer = customerRepository.findById(customerId)
+                    .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
+
+            return ResponseEntity.ok(listCustomerOrdersUseCase.listAll(customer));
 
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));

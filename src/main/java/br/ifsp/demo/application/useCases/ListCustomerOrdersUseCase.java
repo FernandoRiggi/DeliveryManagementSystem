@@ -19,7 +19,7 @@ public class ListCustomerOrdersUseCase {
         this.customerRepository = customerRepository;
     }
 
-    List<OrderDelivery> listAll(Customer customer){
+    public List<OrderDelivery> listAll(Customer customer){
         customerRepository.findById(customer.getCustomerId())
                 .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
 
