@@ -11,6 +11,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Map;
@@ -18,6 +20,7 @@ import java.util.Map;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(MockitoExtension.class)
 class GetPriorityQueueUseCaseTest {
 
     private Customer regularCustomer;
@@ -36,6 +39,7 @@ class GetPriorityQueueUseCaseTest {
         deliveryAddress = new Address("Street B", "11", "Center", "Araraquara", "SP", "Brasil", new Cep("13400-000"));
     }
 
+    GetPriorityQueueUseCase sut = new GetPriorityQueueUseCase();
 
     @TDD
     @Test
@@ -50,8 +54,8 @@ class GetPriorityQueueUseCaseTest {
         Map<OrderDelivery, LogisticScore> score = Map.of(
                 normal, new LogisticScore(10),
                 normalHigher, new LogisticScore(20),
-                urgent, new LogisticScore(5),
-                critical, new LogisticScore(2));
+                urgent, new LogisticScore(40),
+                critical, new LogisticScore(70));
 
         List<OrderDelivery> result = sut.execute(List.of(normal, normalHigher, urgent, critical), score);
 
