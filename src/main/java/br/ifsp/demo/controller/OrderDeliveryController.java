@@ -79,4 +79,15 @@ public class OrderDeliveryController {
                     .body(new ErrorResponse(e.getMessage()));
         }
     }
+
+    @PatchMapping("/{orderId}/cancel")
+    public ResponseEntity<?> cancel(@PathVariable UUID orderId) {
+        try {
+            cancelOrderUseCase.cancelOrderDelivery(orderId);
+            return ResponseEntity.noContent().build();
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        }
+    }
 }
