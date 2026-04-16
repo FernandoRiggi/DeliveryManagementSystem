@@ -99,7 +99,28 @@ public class OrderDelivery {
     public void restore(StatusOrder status, DeliveryMan deliveryMan) {
         this.statusOrder = status;
         this.deliveryMan = deliveryMan;
+
         this.OrderEvents.clear();
+        this.OrderEvents.add(new OrderDeliveryEvent(EventType.CREATED));
+
+        if (status == StatusOrder.DISPATCHED) {
+            this.OrderEvents.add(new OrderDeliveryEvent(EventType.DISPATCHED));
+        }
+
+        if (status == StatusOrder.EN_ROUTE) {
+            this.OrderEvents.add(new OrderDeliveryEvent(EventType.DISPATCHED));
+            this.OrderEvents.add(new OrderDeliveryEvent(EventType.EN_ROUTE));
+        }
+
+        if (status == StatusOrder.CONCLUDED) {
+            this.OrderEvents.add(new OrderDeliveryEvent(EventType.DISPATCHED));
+            this.OrderEvents.add(new OrderDeliveryEvent(EventType.EN_ROUTE));
+            this.OrderEvents.add(new OrderDeliveryEvent(EventType.CONCLUDED));
+        }
+
+        if (status == StatusOrder.CANCELED) {
+            this.OrderEvents.add(new OrderDeliveryEvent(EventType.CANCELLATION));
+        }
     }
 
     public void restoreId(UUID id) {

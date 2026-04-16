@@ -29,7 +29,7 @@ public class OrderDeliveryMapper {
                 entity.getDeliveryCity(),
                 entity.getDeliveryState(),
                 entity.getDeliveryCountry(),
-                new Cep(entity.getPickupCep() != null ? entity.getPickupCep() : "")
+                new Cep(entity.getDeliveryCep() != null ? entity.getDeliveryCep() : "")
         );
 
         OrderDelivery order = new OrderDelivery(
@@ -40,6 +40,7 @@ public class OrderDeliveryMapper {
 
         DeliveryMan deliveryMan = DeliveryManMapper.toDomain(entity.getDeliveryMan());
         order.restore(entity.getStatus(), deliveryMan);
+        order.restoreId(entity.getId());
         return order;
     }
 }
