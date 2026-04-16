@@ -17,6 +17,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
+import java.util.UUID;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
@@ -35,7 +38,11 @@ public class CreateOrderUseCaseTest {
     @Test
     @DisplayName("[#56] Should create and save order delivery")
     void ShouldCreateAndSaveOrderDelivery(){
-        CreateOrderRequest request = new CreateOrderRequest(createValidCustomer(), createValidPickupAddress(), createValidDeliveryAddress(), 10.0);
+        UUID customerId = UUID.randomUUID();
+        Customer customer = createValidCustomer();
+        CreateOrderRequest request = new CreateOrderRequest(customerId, createValidPickupAddress(), createValidDeliveryAddress(), 10.0);
+
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
 
         sut.create(request);
 
@@ -46,12 +53,16 @@ public class CreateOrderUseCaseTest {
     @Test
     @DisplayName("[#3] Should not save order when pickup address is invalid")
     void shouldNotSaveOrderWhenPickupAddressIsInvalid() {
+        UUID customerId = UUID.randomUUID();
+        Customer customer = createValidCustomer();
         CreateOrderRequest request = new CreateOrderRequest(
-                createValidCustomer(),
+                customerId,
                 null,
                 createValidDeliveryAddress(),
                 10.0
         );
+
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
 
         assertThatThrownBy(() -> sut.create(request))
                 .isInstanceOf(NullPointerException.class);
@@ -63,12 +74,17 @@ public class CreateOrderUseCaseTest {
     @Test
     @DisplayName("[#4] Should not save order when delivery address is invalid")
     void shouldNotSaveOrderWhenDeliveryAddressIsInvalid(){
+        UUID customerId = UUID.randomUUID();
+        Customer customer = createValidCustomer();
         CreateOrderRequest request = new CreateOrderRequest(
-                createValidCustomer(),
+                customerId,
                 createValidPickupAddress(),
                 null,
                 10.0
         );
+
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
+
 
         assertThatThrownBy(() -> sut.create(request))
                 .isInstanceOf(NullPointerException.class);
@@ -80,22 +96,22 @@ public class CreateOrderUseCaseTest {
     @Test
     @DisplayName("[#44] Should throw exception when customer is not found")
     void shouldThrowExceptionWhenCustomerIsNotFound(){
-        Customer customer = createValidCustomer();
+        UUID customerId = UUID.randomUUID();
 
         CreateOrderRequest request = new CreateOrderRequest(
-                customer,
+                customerId,
                 createValidPickupAddress(),
                 createValidDeliveryAddress(),
                 10.0
         );
 
-        when(customerRepository.exists(customer)).thenReturn(false);
+        when(customerRepository.findById(customerId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> sut.create(request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Customer not found");
 
-        verify(customerRepository, times(1)).exists(customer);
+        verify(customerRepository, times(1)).findById(customerId);
         verify(repo, never()).save(any(OrderDelivery.class));
     }
 
