@@ -22,7 +22,7 @@ public class GetOrderUseCase {
         this.customerRepository = customerRepository;
     }
 
-    OrderDelivery findById(UUID orderId) {
+    public OrderDelivery findById(UUID orderId) {
         return orderDeliveryRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("[OrderDelivery Not Found]"));
     }

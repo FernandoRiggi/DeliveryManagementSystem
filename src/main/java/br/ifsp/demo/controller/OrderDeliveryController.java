@@ -14,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping(path = "/api/v1/orders")
 @AllArgsConstructor
@@ -62,6 +64,18 @@ public class OrderDeliveryController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity
                     .badRequest()
+                    .body(new ErrorResponse(e.getMessage()));
+        }
+    }
+
+    @GetMapping("/{orderId}")
+    public ResponseEntity<?> getById(@PathVariable UUID orderId) {
+        try {
+            OrderDelivery order = getOrderUseCase.findById(orderId);
+            return ResponseEntity.ok(order);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ErrorResponse(e.getMessage()));
         }
     }
