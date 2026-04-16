@@ -2,6 +2,7 @@ package br.ifsp.demo.controller;
 
 import br.ifsp.demo.application.useCases.*;
 import br.ifsp.demo.domain.aggregate.Customer;
+import br.ifsp.demo.domain.aggregate.OrderDelivery;
 import br.ifsp.demo.domain.dto.CreateOrderHttpRequest;
 import br.ifsp.demo.domain.dto.CreateOrderRequest;
 import br.ifsp.demo.domain.dto.ErrorResponse;
@@ -11,10 +12,7 @@ import br.ifsp.demo.domain.valueObject.Cep;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(path = "/api/v1/orders")
