@@ -99,6 +99,14 @@ public class OrderDelivery {
         OrderEvents.add(new OrderDeliveryEvent(EventType.DISPATCHED));
     }
 
+    public void startDelivery() {
+        if (this.statusOrder != StatusOrder.DISPATCHED) {
+            throw new IllegalStateException("Order must be dispatched to start delivery");
+        }
+
+        this.statusOrder = StatusOrder.EN_ROUTE;
+    }
+
     public void cancelRoute() {
         if (this.statusOrder != StatusOrder.DISPATCHED
                 && this.statusOrder != StatusOrder.EN_ROUTE) {
