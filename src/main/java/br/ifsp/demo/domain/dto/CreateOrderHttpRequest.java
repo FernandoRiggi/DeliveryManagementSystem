@@ -1,8 +1,9 @@
 package br.ifsp.demo.domain.dto;
 
+import java.util.UUID;
+
 public record CreateOrderHttpRequest(
-        String customerName,
-        String customerType,
+        UUID customerId,
 
         String pickupStreet,
         String pickupNumber,
