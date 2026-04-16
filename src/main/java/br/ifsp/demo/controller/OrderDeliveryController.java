@@ -29,6 +29,7 @@ public class OrderDeliveryController {
     private final GetOrderUseCase getOrderUseCase;
     private final DispatchOrderUseCase dispatchOrderUseCase;
     private final ListCustomerOrdersUseCase listCustomerOrdersUseCase;
+    private final ConcludeOrderUseCase concludeOrderUseCase;
 
     @PostMapping
     public ResponseEntity<?> create(@RequestBody CreateOrderHttpRequest body){
@@ -124,6 +125,17 @@ public class OrderDeliveryController {
                     .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
 
             return ResponseEntity.ok(listCustomerOrdersUseCase.listAll(customer));
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        }
+    }
+
+    @PatchMapping("/{orderId}/conclude")
+    public ResponseEntity<?> conclude(@PathVariable UUID orderId) {
+        try {
+            concludeOrderUseCase.conclude(orderId);
+            return ResponseEntity.noContent().build();
 
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
