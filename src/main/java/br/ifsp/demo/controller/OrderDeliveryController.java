@@ -104,4 +104,15 @@ public class OrderDeliveryController {
             return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
         }
     }
+
+    @PatchMapping("/{orderId}/cancel-route")
+    public ResponseEntity<?> cancelRoute(@PathVariable UUID orderId) {
+        try {
+            cancelRouteUseCase.cancelRoute(orderId);
+            return ResponseEntity.noContent().build();
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        }
+    }
 }
