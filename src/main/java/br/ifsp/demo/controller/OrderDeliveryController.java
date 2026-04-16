@@ -90,4 +90,18 @@ public class OrderDeliveryController {
             return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
         }
     }
+
+    @PatchMapping("/{orderId}/dispatch/{deliverymanId}")
+    public ResponseEntity<?> dispatch(
+            @PathVariable UUID orderId,
+            @PathVariable UUID deliverymanId
+    ) {
+        try {
+            dispatchOrderUseCase.dispatch(orderId, deliverymanId);
+            return ResponseEntity.noContent().build();
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        }
+    }
 }
