@@ -1,6 +1,7 @@
 package br.ifsp.demo.domain.aggregate;
 
 import br.ifsp.demo.annotation.Functional;
+import br.ifsp.demo.annotation.Structural;
 import br.ifsp.demo.annotation.TDD;
 import br.ifsp.demo.domain.event.EventType;
 import br.ifsp.demo.domain.event.OrderDeliveryEvent;
@@ -58,6 +59,24 @@ public class OrderDeliveryTest {
                 Customer sut = new Customer(name, type);
                 new OrderDelivery(sut, pickupAddress, deliveryAddress,10.0);
             }).isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Structural
+        @Test
+        @DisplayName("[Structural] Should throw IllegalArgumentException when distanceKm is zero")
+        void shouldThrowIllegalArgumentExceptionWhenDistanceIsZero() {
+            assertThatThrownBy(() ->
+                new OrderDelivery(createValidCustomer(), createValidPickupAddress(), createValidDeliveryAddress(), 0.0)
+            ).isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Structural
+        @Test
+        @DisplayName("[Structural] Should throw IllegalArgumentException when distanceKm is negative")
+        void shouldThrowIllegalArgumentExceptionWhenDistanceIsNegative() {
+            assertThatThrownBy(() ->
+                new OrderDelivery(createValidCustomer(), createValidPickupAddress(), createValidDeliveryAddress(), -1.0)
+            ).isInstanceOf(IllegalArgumentException.class);
         }
 
         @TDD
@@ -398,6 +417,30 @@ public class OrderDeliveryTest {
         @DisplayName("[#48] Given order is CREATED, when canceling route, then should throw IllegalStateException")
         void shouldThrowExceptionWhenCancelingRouteFromCreated() {
             assertThatIllegalStateException().isThrownBy(() -> order.cancelRoute());
+        }
+
+        @Structural
+        @Test
+        @DisplayName("[Structural] Given order is EN_ROUTE, when cancelRoute, then status should return to CREATED")
+        void shouldAllowCancelRouteFromEnRoute() {
+            order.dispatch(deliveryMan);
+            order.startRoute();
+            order.cancelRoute();
+
+            assertThat(order.getStatus()).isEqualTo(StatusOrder.CREATED);
+            assertThat(order.getDeliveryman()).isNull();
+        }
+
+        @Structural
+        @Test
+        @DisplayName("[Structural] Given order is EN_ROUTE, when cancelRoute, then deliveryman capacity should be restored")
+        void shouldRestoreCapacityWhenCancelRouteFromEnRoute() {
+            int initialCapacity = deliveryMan.getCapacity();
+            order.dispatch(deliveryMan);
+            order.startRoute();
+            order.cancelRoute();
+
+            assertThat(deliveryMan.getCapacity()).isEqualTo(initialCapacity);
         }
 
         @Functional
