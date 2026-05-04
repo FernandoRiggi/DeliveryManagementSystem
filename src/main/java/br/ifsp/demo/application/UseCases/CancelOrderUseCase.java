@@ -1,4 +1,4 @@
-package br.ifsp.demo.application.useCases;
+package br.ifsp.demo.application;
 
 import br.ifsp.demo.domain.aggregate.OrderDelivery;
 import br.ifsp.demo.domain.repository.OrderDeliveryRepository;

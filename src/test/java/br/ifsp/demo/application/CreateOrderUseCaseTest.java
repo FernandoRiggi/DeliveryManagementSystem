@@ -1,6 +1,7 @@
-package br.ifsp.demo.application.useCases;
+package br.ifsp.demo.application;
 
 import br.ifsp.demo.annotation.TDD;
+import br.ifsp.demo.application.UseCases.CreateOrderUseCase;
 import br.ifsp.demo.domain.aggregate.Customer;
 import br.ifsp.demo.domain.aggregate.DeliveryMan;
 import br.ifsp.demo.domain.aggregate.OrderDelivery;
@@ -32,7 +33,8 @@ public class CreateOrderUseCaseTest {
     @Mock
     private CustomerRepository customerRepository;
 
-    @InjectMocks CreateOrderUseCase sut;
+    @InjectMocks
+    CreateOrderUseCase sut;
 
     @TDD
     @Test
