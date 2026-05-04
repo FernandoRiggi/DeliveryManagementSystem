@@ -1,6 +1,6 @@
 package br.ifsp.demo.controller;
 
-import br.ifsp.demo.application.UseCases.*;
+import br.ifsp.demo.application.*;
 import br.ifsp.demo.domain.aggregate.Customer;
 import br.ifsp.demo.domain.aggregate.OrderDelivery;
 import br.ifsp.demo.domain.dto.CreateOrderHttpRequest;

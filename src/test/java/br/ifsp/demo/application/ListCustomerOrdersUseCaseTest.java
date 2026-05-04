@@ -1,7 +1,7 @@
 package br.ifsp.demo.application;
 
 import br.ifsp.demo.annotation.TDD;
-import br.ifsp.demo.application.UseCases.ListCustomerOrdersUseCase;
+import br.ifsp.demo.application.ListCustomerOrdersUseCase;
 import br.ifsp.demo.domain.aggregate.Customer;
 import br.ifsp.demo.domain.aggregate.DeliveryMan;
 import br.ifsp.demo.domain.aggregate.OrderDelivery;

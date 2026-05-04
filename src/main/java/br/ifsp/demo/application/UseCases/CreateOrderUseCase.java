@@ -1,4 +1,4 @@
-package br.ifsp.demo.application.UseCases;
+package br.ifsp.demo.application;
 
 import br.ifsp.demo.domain.aggregate.Customer;
 import br.ifsp.demo.domain.aggregate.OrderDelivery;
