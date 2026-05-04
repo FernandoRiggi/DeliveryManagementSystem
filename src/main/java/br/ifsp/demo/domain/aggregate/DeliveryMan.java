@@ -1,34 +1,36 @@
 package br.ifsp.demo.domain.aggregate;
 
-import jakarta.persistence.*;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.UUID;
 
-@Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "delivery_man")
+@Getter
 public class DeliveryMan {
-    @Id
-    @Getter
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID id;
-
-    @Setter
-    @Getter
-    @Column(nullable = false)
     private String name;
-
-    @Setter
-    @Getter
-    @Column(nullable = false)
     private int capacity;
 
+    private DeliveryMan() {}
+
     public DeliveryMan(String name, int capacity) {
+        this.id = UUID.randomUUID();
         this.name = name;
         this.capacity = capacity;
+    }
+
+    public static DeliveryMan reconstitute(UUID id, String name, int capacity) {
+        DeliveryMan deliveryMan = new DeliveryMan();
+        deliveryMan.id = id;
+        deliveryMan.name = name;
+        deliveryMan.capacity = capacity;
+        return deliveryMan;
+    }
+
+    public void decreaseCapacity() {
+        this.capacity--;
+    }
+
+    public void increaseCapacity() {
+        this.capacity++;
     }
 }
