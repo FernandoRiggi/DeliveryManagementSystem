@@ -213,6 +213,25 @@ public class OrderDeliveryTest {
             assertThatIllegalStateException().isThrownBy(order::cancel);
         }
 
+        @Structural
+        @UnitTest
+        @Test
+        @DisplayName("[Structural] Should cancel an order when status is not CONCLUDED")
+        void ShouldCancelOrderWhenStatusIsNotConcluded() {
+            order.dispatch(deliveryMan);
+            order.startRoute();
+            assertThatNoException().isThrownBy(order::cancel);
+        }
+
+        @Structural
+        @UnitTest
+        @Test
+        @DisplayName("[Structural] Should cancel an order when status is not CONCLUDED")
+        void ShouldCancelOrderWhenStatusIsNotConcluded2() {
+            order.dispatch(deliveryMan);
+            assertThatNoException().isThrownBy(order::cancel);
+        }
+
         @TDD
         @Test
         @DisplayName("[#16] Given that an order is canceled," +
