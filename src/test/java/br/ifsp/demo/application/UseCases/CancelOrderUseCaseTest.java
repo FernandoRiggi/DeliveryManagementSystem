@@ -1,4 +1,4 @@
-package br.ifsp.demo.application;
+package br.ifsp.demo.application.UseCases;
 
 import br.ifsp.demo.annotation.TDD;
 import br.ifsp.demo.domain.repository.OrderDeliveryRepository;

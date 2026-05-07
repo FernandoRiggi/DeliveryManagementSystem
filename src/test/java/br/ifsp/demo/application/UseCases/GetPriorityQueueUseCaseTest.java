@@ -1,4 +1,4 @@
-package br.ifsp.demo.application;
+package br.ifsp.demo.application.UseCases;
 
 import br.ifsp.demo.annotation.TDD;
 import br.ifsp.demo.domain.aggregate.Customer;
@@ -9,7 +9,6 @@ import br.ifsp.demo.domain.valueObject.CustomerType;
 import br.ifsp.demo.domain.valueObject.LogisticScore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -18,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class GetPriorityQueueUseCaseTest {
