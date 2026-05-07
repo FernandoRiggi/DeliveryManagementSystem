@@ -97,6 +97,16 @@ class LogisticScoreTest {
         assertThat(score.getPriorityLevel()).isEqualTo(PriorityLevel.NORMAL);
     }
 
+    @Structural
+    @Test
+    @DisplayName("[Structural] Should return false when score is not higher than other")
+    void shouldReturnFalseWhenScoreIsNotHigherThanOther() {
+        LogisticScore lower = LogisticScore.calculate(CustomerType.REGULAR, 0, 8.0, 10);
+        LogisticScore higher = LogisticScore.calculate(CustomerType.PREMIUM, 0, 8.0, 10);
+
+        assertThat(lower.isHigherThan(higher)).isFalse();
+    }
+
     @TDD
     @Test
     @DisplayName("[#37] Higher score should have delivery priority over lower score")
