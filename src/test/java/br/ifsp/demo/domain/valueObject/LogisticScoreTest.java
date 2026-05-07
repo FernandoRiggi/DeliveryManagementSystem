@@ -89,6 +89,14 @@ class LogisticScoreTest {
         assertThat(after.value()).isGreaterThan(before.value());
     }
 
+    @Structural
+    @Test
+    @DisplayName("[Structural] Should calculate score for BUSINESS customer type")
+    void shouldCalculateScoreForBusinessCustomerType() {
+        LogisticScore score = LogisticScore.calculate(CustomerType.BUSINESS, 0, 10.0, 10);
+        assertThat(score.getPriorityLevel()).isEqualTo(PriorityLevel.NORMAL);
+    }
+
     @TDD
     @Test
     @DisplayName("[#37] Higher score should have delivery priority over lower score")
