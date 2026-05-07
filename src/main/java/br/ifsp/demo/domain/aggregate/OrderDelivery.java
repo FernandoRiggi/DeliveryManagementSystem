@@ -13,27 +13,25 @@ import java.util.UUID;
 public class OrderDelivery {
 
     @Getter
-    private UUID id;
+    private final UUID id;
 
     private StatusOrder statusOrder;
 
     private DeliveryMan deliveryMan;
 
     @Getter
-    private Address pickupAddress;
+    private final Address pickupAddress;
 
     @Getter
-    private Address deliveryAddress;
+    private  final Address deliveryAddress;
 
     private List<OrderDeliveryEvent> orderEvents = new ArrayList<>();
 
     @Getter
-    private Customer customer;
+    private final Customer customer;
 
     @Getter
-    private double distanceKm;
-
-    private OrderDelivery() {}
+    private final double distanceKm;
 
     public OrderDelivery(Customer customer, Address pickupAddress, Address deliveryAddress, double distanceKm) {
         if (customer == null)
@@ -54,20 +52,48 @@ public class OrderDelivery {
         this.orderEvents.add(new OrderDeliveryEvent(EventType.CREATED));
     }
 
-    public static OrderDelivery reconstitute(UUID id, StatusOrder statusOrder, Customer customer,
-            DeliveryMan deliveryMan, Address pickupAddress, Address deliveryAddress,
-            double distanceKm, List<OrderDeliveryEvent> events) {
-        OrderDelivery o = new OrderDelivery();
-        o.id = id;
-        o.statusOrder = statusOrder;
-        o.customer = customer;
-        o.deliveryMan = deliveryMan;
-        o.pickupAddress = pickupAddress;
-        o.deliveryAddress = deliveryAddress;
-        o.distanceKm = distanceKm;
-        o.orderEvents = new ArrayList<>(events);
-        return o;
+    private OrderDelivery(
+            UUID id,
+            StatusOrder statusOrder,
+            Customer customer,
+            DeliveryMan deliveryMan,
+            Address pickupAddress,
+            Address deliveryAddress,
+            double distanceKm,
+            List<OrderDeliveryEvent> events
+    ) {
+        this.id = id;
+        this.statusOrder = statusOrder;
+        this.customer = customer;
+        this.deliveryMan = deliveryMan;
+        this.pickupAddress = pickupAddress;
+        this.deliveryAddress = deliveryAddress;
+        this.distanceKm = distanceKm;
+        this.orderEvents = new ArrayList<>(events);
     }
+
+    public static OrderDelivery reconstitute(
+            UUID id,
+            StatusOrder statusOrder,
+            Customer customer,
+            DeliveryMan deliveryMan,
+            Address pickupAddress,
+            Address deliveryAddress,
+            double distanceKm,
+            List<OrderDeliveryEvent> events
+    ) {
+        return new OrderDelivery(
+                id,
+                statusOrder,
+                customer,
+                deliveryMan,
+                pickupAddress,
+                deliveryAddress,
+                distanceKm,
+                events
+        );
+    }
+
 
     public StatusOrder getStatus() {
         return statusOrder;
