@@ -1,7 +1,9 @@
 package br.ifsp.demo.application.UseCases;
 
+import br.ifsp.demo.annotation.Structural;
 import br.ifsp.demo.annotation.TDD;
 import br.ifsp.demo.domain.aggregate.Customer;
+import br.ifsp.demo.domain.aggregate.DeliveryMan;
 import br.ifsp.demo.domain.aggregate.OrderDelivery;
 import br.ifsp.demo.domain.valueObject.Address;
 import br.ifsp.demo.domain.valueObject.Cep;
@@ -58,6 +60,39 @@ class GetPriorityQueueUseCaseTest {
         List<OrderDelivery> result = sut.execute(List.of(normal, normalHigher, urgent, critical), score);
 
         assertThat(result).containsExactly(critical, urgent, normalHigher, normal);
+    }
+
+    @Structural
+    @Test
+    @DisplayName("Should test orders with status different than 'Created'")
+    void shouldTestOrdersWithDifferentStatus(){
+
+        OrderDelivery normal = new OrderDelivery(regularCustomer, pickupAddress, deliveryAddress, 10.0);
+        OrderDelivery normalHigher = new OrderDelivery(regularCustomer, pickupAddress, deliveryAddress, 20.0);
+        OrderDelivery urgent = new OrderDelivery(businessCustomer, pickupAddress, deliveryAddress, 5.0);
+        OrderDelivery critical = new OrderDelivery(premiumCustomer, pickupAddress, deliveryAddress, 2.0);
+
+        normal.dispatch(
+                new DeliveryMan("John Joe", 10)
+                );
+
+        normalHigher.dispatch(
+                new DeliveryMan("John Joe", 10)
+        );
+
+        normalHigher.startRoute();
+
+        urgent.cancel();
+
+        Map<OrderDelivery, LogisticScore> score = Map.of(
+                normal, new LogisticScore(10),
+                normalHigher, new LogisticScore(20),
+                urgent, new LogisticScore(40),
+                critical, new LogisticScore(70));
+
+        List<OrderDelivery> result = sut.execute(List.of(normal, normalHigher, urgent, critical), score);
+
+        assertThat(result).containsExactly(critical);
     }
 
 }
