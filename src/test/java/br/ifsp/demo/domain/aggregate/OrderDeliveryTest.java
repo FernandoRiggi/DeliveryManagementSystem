@@ -3,6 +3,7 @@ package br.ifsp.demo.domain.aggregate;
 import br.ifsp.demo.annotation.Functional;
 import br.ifsp.demo.annotation.Structural;
 import br.ifsp.demo.annotation.TDD;
+import br.ifsp.demo.annotation.UnitTest;
 import br.ifsp.demo.domain.event.EventType;
 import br.ifsp.demo.domain.event.OrderDeliveryEvent;
 import br.ifsp.demo.domain.valueObject.Address;
@@ -14,10 +15,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.UUID;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
 
@@ -441,6 +441,34 @@ public class OrderDeliveryTest {
             order.cancelRoute();
 
             assertThat(deliveryMan.getCapacity()).isEqualTo(initialCapacity);
+        }
+
+        @Structural
+        @UnitTest
+        @Test
+        void shouldCancelRouteWhenOrderDoesNotHaveDeliveryMan() {
+            Customer customer = new Customer("Customer", CustomerType.REGULAR);
+            Address pickupAddress = createValidPickupAddress();
+            Address deliveryAddress = createValidDeliveryAddress();
+
+            OrderDelivery order = OrderDelivery.reconstitute(
+                    UUID.randomUUID(),
+                    StatusOrder.DISPATCHED,
+                    customer,
+                    null,
+                    pickupAddress,
+                    deliveryAddress,
+                    10,
+                    List.of(new OrderDeliveryEvent(EventType.DISPATCHED))
+            );
+
+            order.cancelRoute();
+
+            assertThat(order.getStatus()).isEqualTo(StatusOrder.CREATED);
+            assertThat(order.getDeliveryman()).isNull();
+            assertThat(order.getEvents())
+                    .extracting(OrderDeliveryEvent::getType)
+                    .contains(EventType.ROUTE_CANCELED, EventType.CREATED);
         }
 
         @Functional
