@@ -1,5 +1,6 @@
 package br.ifsp.demo.domain.valueObject;
 
+import br.ifsp.demo.annotation.Structural;
 import br.ifsp.demo.annotation.TDD;
 import br.ifsp.demo.domain.aggregate.PriorityLevel;
 import org.assertj.core.api.SoftAssertions;
