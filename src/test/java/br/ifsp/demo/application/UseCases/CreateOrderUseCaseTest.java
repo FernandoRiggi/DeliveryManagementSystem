@@ -1,6 +1,8 @@
 package br.ifsp.demo.application.UseCases;
 
+import br.ifsp.demo.annotation.Structural;
 import br.ifsp.demo.annotation.TDD;
+import br.ifsp.demo.annotation.UnitTest;
 import br.ifsp.demo.domain.aggregate.Customer;
 import br.ifsp.demo.domain.aggregate.DeliveryMan;
 import br.ifsp.demo.domain.aggregate.OrderDelivery;
@@ -20,7 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -116,6 +118,13 @@ public class CreateOrderUseCaseTest {
         verify(repo, never()).save(any(OrderDelivery.class));
     }
 
+    @Structural
+    @UnitTest
+    @Test
+    @DisplayName("[Structural] should throw nullPointer when request is null")
+    void shouldThrowNullPointerExceptionWhenRequestIsNull(){
+        assertThatNullPointerException().isThrownBy(()->sut.create(null));
+    }
     private DeliveryMan createValidDeliveryMan(){
         return new DeliveryMan("John Doe", 10);
     }
