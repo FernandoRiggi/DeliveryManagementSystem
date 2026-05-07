@@ -6,5 +6,5 @@ import org.junit.platform.suite.api.Suite;
 
 @Suite
 @SelectPackages("br.ifsp.demo")
-@IncludeTags("UnitTest")
+@IncludeTags("MutationTest")
 public class MutationTestSuite {}
