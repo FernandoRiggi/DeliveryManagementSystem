@@ -1,8 +1,10 @@
 package br.ifsp.demo.application.UseCases;
+import br.ifsp.demo.annotation.Mutation;
 import br.ifsp.demo.annotation.TDD;
 import br.ifsp.demo.domain.aggregate.Customer;
 import br.ifsp.demo.domain.aggregate.DeliveryMan;
 import br.ifsp.demo.domain.aggregate.OrderDelivery;
+import br.ifsp.demo.domain.aggregate.StatusOrder;
 import br.ifsp.demo.domain.repository.DeliveryManRepository;
 import br.ifsp.demo.domain.repository.OrderDeliveryRepository;
 import br.ifsp.demo.domain.valueObject.Address;
@@ -20,7 +22,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.util.Optional;
 import java.util.UUID;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class DispatchOrderUseCaseTest {
@@ -77,5 +79,23 @@ public class DispatchOrderUseCaseTest {
 
     private DeliveryMan createValidDeliveryMan(){
         return new DeliveryMan("John Doe", 10);
+    }
+
+    @Mutation
+    @Test
+    @DisplayName("[Mutation] Should dispatch order and save when order and deliveryman exist")
+    void shouldDispatchOrderAndSaveWhenBothExist() {
+        UUID orderId = UUID.randomUUID();
+        UUID deliverymanId = UUID.randomUUID();
+        OrderDelivery order = createValidOrder();
+        DeliveryMan deliveryman = createValidDeliveryMan();
+
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+        when(deliverymanRepository.findById(deliverymanId)).thenReturn(Optional.of(deliveryman));
+
+        useCase.dispatch(orderId, deliverymanId);
+
+        assertThat(order.getStatus()).isEqualTo(StatusOrder.DISPATCHED);
+        verify(orderRepository, times(1)).save(order);
     }
 }
