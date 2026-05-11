@@ -154,8 +154,8 @@ public class ListCustomerOrdersUseCaseTest {
 
     @Mutation
     @Test
-    @DisplayName("[Mutation] Should not find the customer and thorw a exception")
-    void shouldNotFindTheCustomerAndThorwAExceptionInCreatedOrders() {
+    @DisplayName("[Mutation] Should not find the customer and throw a exception")
+    void shouldNotFindTheCustomerAndThrowAExceptionInCreatedOrders() {
         when(customerRepository.findById(customerId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> sut.listAllCreatedOrders(customerId)).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("Customer not found");
@@ -163,8 +163,8 @@ public class ListCustomerOrdersUseCaseTest {
 
     @Mutation
     @Test
-    @DisplayName("[Mutation] Should not find the customer and thorw a exception")
-    void shouldNotFindTheCustomerAndThorwAExceptionInAllOrders() {
+    @DisplayName("[Mutation] Should not find the customer and throw a exception")
+    void shouldNotFindTheCustomerAndThrowAExceptionInAllOrders() {
         when(customerRepository.findById(customerId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> sut.listAll(customerId)).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("Customer not found");
@@ -172,8 +172,8 @@ public class ListCustomerOrdersUseCaseTest {
 
     @Mutation
     @Test
-    @DisplayName("[Mutation] Should not find the customer and thorw a exception")
-    void shouldNotFindTheCustomerAndThorwAExceptionInAllActiveOrders() {
+    @DisplayName("[Mutation] Should not find the customer and throw a exception")
+    void shouldNotFindTheCustomerAndThrowAExceptionInAllActiveOrders() {
         when(customerRepository.findById(customerId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> sut.listActiveOrders(customerId)).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("Customer not found");
@@ -181,8 +181,8 @@ public class ListCustomerOrdersUseCaseTest {
 
     @Mutation
     @Test
-    @DisplayName("[Mutation] Should not find the customer and thorw a exception")
-    void shouldNotFindTheCustomerAndThorwAExceptionInAllInactiveOrders() {
+    @DisplayName("[Mutation] Should not find the customer and throw a exception")
+    void shouldNotFindTheCustomerAndThrowAExceptionInAllInactiveOrders() {
         when(customerRepository.findById(customerId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> sut.listInactiveOrders(customerId)).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("Customer not found");

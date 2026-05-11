@@ -1,9 +1,11 @@
 package br.ifsp.demo.domain.valueObject;
 
+import br.ifsp.demo.annotation.Mutation;
 import br.ifsp.demo.annotation.Structural;
 import br.ifsp.demo.annotation.TDD;
 import br.ifsp.demo.domain.aggregate.PriorityLevel;
 import org.assertj.core.api.SoftAssertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -116,4 +118,14 @@ class LogisticScoreTest {
 
         assertThat(score2.isHigherThan(score1)).isTrue();
     }
+
+    @Mutation
+    @Test
+    @DisplayName("[Mutation] Using limit values to distance and time")
+    void testingLimitValuesToKillRemainingMutants(){
+        LogisticScore score = LogisticScore.calculate(CustomerType.REGULAR, 0, 8.0, 15);
+
+        assertThat(score).isEqualTo(new LogisticScore(20));
+    }
+
 }
