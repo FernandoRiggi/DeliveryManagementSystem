@@ -1,5 +1,6 @@
 package br.ifsp.demo.application.UseCases;
 
+import br.ifsp.demo.annotation.Mutation;
 import br.ifsp.demo.annotation.TDD;
 import br.ifsp.demo.domain.aggregate.Customer;
 import br.ifsp.demo.domain.aggregate.DeliveryMan;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -148,5 +150,41 @@ public class ListCustomerOrdersUseCaseTest {
         assertThat(result)
                 .isNotEmpty()
                 .containsExactly(orderDelivery);
+    }
+
+    @Mutation
+    @Test
+    @DisplayName("[Mutation] Should not find the customer and thorw a exception")
+    void shouldNotFindTheCustomerAndThorwAExceptionInCreatedOrders() {
+        when(customerRepository.findById(customerId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> sut.listAllCreatedOrders(customerId)).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("Customer not found");
+    }
+
+    @Mutation
+    @Test
+    @DisplayName("[Mutation] Should not find the customer and thorw a exception")
+    void shouldNotFindTheCustomerAndThorwAExceptionInAllOrders() {
+        when(customerRepository.findById(customerId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> sut.listAll(customerId)).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("Customer not found");
+    }
+
+    @Mutation
+    @Test
+    @DisplayName("[Mutation] Should not find the customer and thorw a exception")
+    void shouldNotFindTheCustomerAndThorwAExceptionInAllActiveOrders() {
+        when(customerRepository.findById(customerId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> sut.listActiveOrders(customerId)).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("Customer not found");
+    }
+
+    @Mutation
+    @Test
+    @DisplayName("[Mutation] Should not find the customer and thorw a exception")
+    void shouldNotFindTheCustomerAndThorwAExceptionInAllInactiveOrders() {
+        when(customerRepository.findById(customerId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> sut.listInactiveOrders(customerId)).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("Customer not found");
     }
 }
