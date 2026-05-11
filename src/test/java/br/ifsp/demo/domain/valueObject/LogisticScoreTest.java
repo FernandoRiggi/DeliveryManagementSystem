@@ -143,9 +143,9 @@ class LogisticScoreTest {
     @Test
     @DisplayName("[Mutation] Using activeOrders equal to 2 to verify changing behavior")
     void testingActiveOrdersEqualTwo(){
-        LogisticScore score = LogisticScore.calculate(PREMIUM, 2, 8.0, 60);
+        LogisticScore score = LogisticScore.calculate(PREMIUM, 2, 8.0, 30);
 
-        assertThat(score.value()).isEqualTo(50);
+        assertThat(score.value()).isEqualTo(40);
     }
 
     @Mutation
@@ -156,5 +156,4 @@ class LogisticScoreTest {
 
         assertThat(score.value()).isEqualTo(40);
     }
-
 }
