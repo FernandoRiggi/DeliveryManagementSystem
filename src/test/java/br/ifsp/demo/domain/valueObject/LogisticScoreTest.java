@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static br.ifsp.demo.domain.valueObject.CustomerType.PREMIUM;
 import static br.ifsp.demo.domain.valueObject.CustomerType.REGULAR;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -137,4 +138,14 @@ class LogisticScoreTest {
 
         assertThat(score.isHigherThan(score2)).isFalse();
     }
+
+    @Mutation
+    @Test
+    @DisplayName("[Mutation] Using activeOrders equal to 2 to verify changing behavior")
+    void testingActiveOrdersEqualTwo(){
+        LogisticScore score = LogisticScore.calculate(PREMIUM, 2, 8.0, 60);
+
+        assertThat(score.value()).isEqualTo(50);
+    }
+
 }
