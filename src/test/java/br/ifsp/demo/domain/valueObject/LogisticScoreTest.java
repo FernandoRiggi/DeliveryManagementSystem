@@ -123,7 +123,7 @@ class LogisticScoreTest {
     @Test
     @DisplayName("[Mutation] Using limit values to distance and time")
     void testingLimitValuesToKillRemainingMutants(){
-        LogisticScore score = LogisticScore.calculate(CustomerType.REGULAR, 0, 8.0, 15);
+        LogisticScore score = LogisticScore.calculate(CustomerType.REGULAR, 1, 8.0, 15);
 
         assertThat(score).isEqualTo(new LogisticScore(20));
     }
