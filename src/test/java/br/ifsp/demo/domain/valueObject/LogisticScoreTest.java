@@ -125,7 +125,16 @@ class LogisticScoreTest {
     void testingLimitValuesToKillRemainingMutants(){
         LogisticScore score = LogisticScore.calculate(CustomerType.REGULAR, 1, 8.0, 15);
 
-        assertThat(score).isEqualTo(new LogisticScore(20));
+        assertThat(score.value()).isEqualTo(20);
     }
 
+    @Mutation
+    @Test
+    @DisplayName("[Mutation] Comparing equal scores")
+    void testingEqualScores(){
+        LogisticScore score = LogisticScore.calculate(REGULAR, 2, 9.0, 30);
+        LogisticScore score2 = LogisticScore.calculate(REGULAR, 3, 15.0, 60);
+
+        assertThat(score.isHigherThan(score2)).isFalse();
+    }
 }
