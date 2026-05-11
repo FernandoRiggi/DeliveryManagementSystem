@@ -141,6 +141,14 @@ public class OrderDelivery {
     }
 
     public void dispatch(DeliveryMan deliveryMan) {
+        validateDispatchable(deliveryMan);
+        this.statusOrder = StatusOrder.DISPATCHED;
+        this.deliveryMan = deliveryMan;
+        deliveryMan.decreaseCapacity();
+        orderEvents.add(new OrderDeliveryEvent(EventType.DISPATCHED));
+    }
+
+    private void validateDispatchable(DeliveryMan deliveryMan) {
         if (deliveryMan == null)
             throw new IllegalStateException("[Deliveryman null]");
         if (this.statusOrder == StatusOrder.CANCELED)
@@ -151,11 +159,6 @@ public class OrderDelivery {
             throw new IllegalStateException("[Order already concluded]");
         if (deliveryMan.getCapacity() <= 0)
             throw new IllegalStateException(String.format("[%s] is not enough capacity", deliveryMan.getName()));
-
-        this.statusOrder = StatusOrder.DISPATCHED;
-        this.deliveryMan = deliveryMan;
-        deliveryMan.decreaseCapacity();
-        orderEvents.add(new OrderDeliveryEvent(EventType.DISPATCHED));
     }
 
     public void cancelRoute() {
