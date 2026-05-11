@@ -125,7 +125,7 @@ public class OrderDeliveryController {
             Customer customer = customerRepository.findById(customerId)
                     .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
 
-            return ResponseEntity.ok(listCustomerOrdersUseCase.listAll(customer));
+            return ResponseEntity.ok(listCustomerOrdersUseCase.listAll(customerId));
 
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));

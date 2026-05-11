@@ -1,12 +1,15 @@
 package br.ifsp.demo.domain.valueObject;
 
+import br.ifsp.demo.annotation.Mutation;
 import br.ifsp.demo.annotation.Structural;
 import br.ifsp.demo.annotation.TDD;
 import br.ifsp.demo.domain.aggregate.PriorityLevel;
 import org.assertj.core.api.SoftAssertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static br.ifsp.demo.domain.valueObject.CustomerType.PREMIUM;
 import static br.ifsp.demo.domain.valueObject.CustomerType.REGULAR;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -115,5 +118,42 @@ class LogisticScoreTest {
         LogisticScore score2 = LogisticScore.calculate(CustomerType.PREMIUM, 0, 8.0, 10);
 
         assertThat(score2.isHigherThan(score1)).isTrue();
+    }
+
+    @Mutation
+    @Test
+    @DisplayName("[Mutation] Using limit values to distance and time")
+    void testingLimitValuesToKillRemainingMutants(){
+        LogisticScore score = LogisticScore.calculate(CustomerType.REGULAR, 1, 8.0, 15);
+
+        assertThat(score.value()).isEqualTo(20);
+    }
+
+    @Mutation
+    @Test
+    @DisplayName("[Mutation] Comparing equal scores")
+    void testingEqualScores(){
+        LogisticScore score = LogisticScore.calculate(REGULAR, 2, 9.0, 30);
+        LogisticScore score2 = LogisticScore.calculate(REGULAR, 3, 15.0, 60);
+
+        assertThat(score.isHigherThan(score2)).isFalse();
+    }
+
+    @Mutation
+    @Test
+    @DisplayName("[Mutation] Using activeOrders equal to 2 to verify changing behavior")
+    void testingActiveOrdersEqualTwo(){
+        LogisticScore score = LogisticScore.calculate(PREMIUM, 2, 8.0, 30);
+
+        assertThat(score.value()).isEqualTo(40);
+    }
+
+    @Mutation
+    @Test
+    @DisplayName("[Mutation] Using activeOrders equal to 3 to verify changing behavior")
+    void testingActiveOrdersEqualThree(){
+        LogisticScore score = LogisticScore.calculate(PREMIUM, 5, 8.0, 60);
+
+        assertThat(score.value()).isEqualTo(40);
     }
 }

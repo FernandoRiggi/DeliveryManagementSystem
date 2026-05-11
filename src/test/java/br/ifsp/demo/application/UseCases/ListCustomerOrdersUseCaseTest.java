@@ -1,5 +1,6 @@
 package br.ifsp.demo.application.UseCases;
 
+import br.ifsp.demo.annotation.Mutation;
 import br.ifsp.demo.annotation.TDD;
 import br.ifsp.demo.domain.aggregate.Customer;
 import br.ifsp.demo.domain.aggregate.DeliveryMan;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -49,9 +51,6 @@ public class ListCustomerOrdersUseCaseTest {
     void setUp() {
         customer = new Customer("John Doe", CustomerType.REGULAR);
         customerId = customer.getCustomerId();
-
-        when(customerRepository.findById(customerId))
-                .thenReturn(Optional.of(customer));
 
         DeliveryMan deliveryMan = new DeliveryMan("John Doe", 10);
 
@@ -84,10 +83,11 @@ public class ListCustomerOrdersUseCaseTest {
     @Test
     @DisplayName("[#52] Should return all the orders from a customer")
     void shouldReturnAllOrdersFromACustomer() {
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
         when(orderDeliveryRepository.findAllByCustomer(customer))
                 .thenReturn(List.of(orderDelivery, orderDispatched, orderEnRoute, orderConcluded, orderCanceled));
 
-        List<OrderDelivery> result = sut.listAll(customer);
+        List<OrderDelivery> result = sut.listAll(customerId);
 
         assertThat(result)
                 .isNotEmpty()
@@ -98,10 +98,11 @@ public class ListCustomerOrdersUseCaseTest {
     @Test
     @DisplayName("[#53] Should return a list with only active orders")
     void shouldReturnOnlyActiveOrders() {
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
         when(orderDeliveryRepository.findAllByCustomer(customer))
                 .thenReturn(List.of(orderDelivery, orderDispatched, orderEnRoute, orderConcluded, orderCanceled));
 
-        List<OrderDelivery> result = sut.listActiveOrders(customer);
+        List<OrderDelivery> result = sut.listActiveOrders(customerId);
 
         assertThat(result)
                 .isNotEmpty()
@@ -112,10 +113,11 @@ public class ListCustomerOrdersUseCaseTest {
     @Test
     @DisplayName("[#54] Should return a empty list when the customer doesn't have any orders")
     void shouldReturnEmptyListWhenCustomerHasNoOrders() {
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
         when(orderDeliveryRepository.findAllByCustomer(customer))
                 .thenReturn(Collections.emptyList());
 
-        List<OrderDelivery> result = sut.listAll(customer);
+        List<OrderDelivery> result = sut.listAll(customerId);
 
         assertThat(result).isEmpty();
     }
@@ -124,10 +126,11 @@ public class ListCustomerOrdersUseCaseTest {
     @Test
     @DisplayName("[#55] Should return the concluded and canceled orders from a customer")
     void shouldReturnInactiveOrdersFromACustomer() {
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
         when(orderDeliveryRepository.findAllByCustomer(customer))
                 .thenReturn(List.of(orderDelivery, orderDispatched, orderEnRoute, orderConcluded, orderCanceled));
 
-        List<OrderDelivery> result = sut.listInactiveOrders(customer);
+        List<OrderDelivery> result = sut.listInactiveOrders(customerId);
 
         assertThat(result)
                 .isNotEmpty()
@@ -138,13 +141,50 @@ public class ListCustomerOrdersUseCaseTest {
     @Test
     @DisplayName("[#61] Should return orders that are not dispatch yet from a customer")
     void shouldReturnNonDispatchedOrdersFromACustomer() {
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
         when(orderDeliveryRepository.findAllByCustomer(customer))
                 .thenReturn(List.of(orderDelivery, orderDispatched, orderEnRoute, orderConcluded, orderCanceled));
 
-        List<OrderDelivery> result = sut.listAllCreatedOrders(customer);
+        List<OrderDelivery> result = sut.listAllCreatedOrders(customerId);
 
         assertThat(result)
                 .isNotEmpty()
                 .containsExactly(orderDelivery);
+    }
+
+    @Mutation
+    @Test
+    @DisplayName("[Mutation] Should not find the customer and throw a exception")
+    void shouldNotFindTheCustomerAndThrowAExceptionInCreatedOrders() {
+        when(customerRepository.findById(customerId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> sut.listAllCreatedOrders(customerId)).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("Customer not found");
+    }
+
+    @Mutation
+    @Test
+    @DisplayName("[Mutation] Should not find the customer and throw a exception")
+    void shouldNotFindTheCustomerAndThrowAExceptionInAllOrders() {
+        when(customerRepository.findById(customerId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> sut.listAll(customerId)).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("Customer not found");
+    }
+
+    @Mutation
+    @Test
+    @DisplayName("[Mutation] Should not find the customer and throw a exception")
+    void shouldNotFindTheCustomerAndThrowAExceptionInAllActiveOrders() {
+        when(customerRepository.findById(customerId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> sut.listActiveOrders(customerId)).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("Customer not found");
+    }
+
+    @Mutation
+    @Test
+    @DisplayName("[Mutation] Should not find the customer and throw a exception")
+    void shouldNotFindTheCustomerAndThrowAExceptionInAllInactiveOrders() {
+        when(customerRepository.findById(customerId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> sut.listInactiveOrders(customerId)).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("Customer not found");
     }
 }

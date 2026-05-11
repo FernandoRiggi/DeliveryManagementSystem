@@ -8,6 +8,7 @@ import br.ifsp.demo.domain.repository.OrderDeliveryRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class ListCustomerOrdersUseCase {
@@ -19,15 +20,15 @@ public class ListCustomerOrdersUseCase {
         this.customerRepository = customerRepository;
     }
 
-    public List<OrderDelivery> listAll(Customer customer){
-        customerRepository.findById(customer.getCustomerId())
+    public List<OrderDelivery> listAll(UUID id_customer){
+        Customer customer = customerRepository.findById(id_customer)
                 .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
 
         return orderDeliveryRepository.findAllByCustomer(customer);
     }
 
-    List<OrderDelivery> listActiveOrders(Customer customer){
-        customerRepository.findById(customer.getCustomerId())
+    List<OrderDelivery> listActiveOrders(UUID id_customer){
+        Customer customer = customerRepository.findById(id_customer)
                 .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
 
         return orderDeliveryRepository.findAllByCustomer(customer)
@@ -36,8 +37,8 @@ public class ListCustomerOrdersUseCase {
                 .toList();
     }
 
-    List<OrderDelivery> listInactiveOrders(Customer customer){
-        customerRepository.findById(customer.getCustomerId())
+    List<OrderDelivery> listInactiveOrders(UUID id_customer){
+        Customer customer = customerRepository.findById(id_customer)
                 .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
 
         return orderDeliveryRepository.findAllByCustomer(customer)
@@ -46,8 +47,8 @@ public class ListCustomerOrdersUseCase {
                 .toList();
     }
 
-    List<OrderDelivery> listAllCreatedOrders(Customer customer){
-        customerRepository.findById(customer.getCustomerId())
+    List<OrderDelivery> listAllCreatedOrders(UUID id_customer){
+        Customer customer = customerRepository.findById(id_customer)
                 .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
 
         return orderDeliveryRepository.findAllByCustomer(customer)
