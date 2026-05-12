@@ -14,8 +14,27 @@ class OrderDeliveryEventTest {
     @DisplayName("[Mutation] Should return non-null when reconstituting an event")
     void shouldReturnEventWhenReconstituted() {
         LocalDateTime dateTime = LocalDateTime.now();
-        OrderDeliveryEvent event = OrderDeliveryEvent.reconstitute(1L, EventType.CREATED, dateTime);
+        Long id = 1L;
+        EventType type = EventType.CREATED;
+
+        OrderDeliveryEvent event = OrderDeliveryEvent.reconstitute(id, type, dateTime);
+
         assertThat(event).isNotNull();
-        assertThat(event.getType()).isEqualTo(EventType.CREATED);
+        assertThat(event.getType()).isEqualTo(type);
+        assertThat(event.getId()).isEqualTo(id);
+        assertThat(event.getDateTime()).isEqualTo(dateTime);
+    }
+
+    @Mutation
+    @Test
+    @DisplayName("[Mutation] Should create event with fixed datetime")
+    void shouldCreateEventWithFixedDateTime() {
+        EventType type = EventType.CREATED;
+        LocalDateTime dateTime = LocalDateTime.of(2026, 5, 11, 10, 30);
+
+        OrderDeliveryEvent event = new OrderDeliveryEvent(type, dateTime);
+
+        assertThat(event.getType()).isEqualTo(type);
+        assertThat(event.getDateTime()).isEqualTo(dateTime);
     }
 }
