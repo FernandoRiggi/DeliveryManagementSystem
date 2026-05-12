@@ -42,6 +42,9 @@ public class OrderDeliveryTest {
             assertThat(sut.getPickupAddress()).isEqualTo(pickupAddress);
             assertThat(sut.getDeliveryAddress()).isEqualTo(deliveryAddress);
             assertThat(sut.getStatus()).isEqualTo(StatusOrder.CREATED);
+            assertThat(sut.getId()).isNotNull();
+            assertThat(sut.getCustomer()).isEqualTo(customer);
+            assertThat(sut.getDistanceKm()).isEqualTo(10.0);
         }
 
         @TDD
