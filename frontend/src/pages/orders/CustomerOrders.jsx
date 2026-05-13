@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import api from "../../services/api";
+import {listOrdersByCustomer} from "../../services/orderService";
 
 function CustomerOrders() {
     const [customerId, setCustomerId] = useState("");
@@ -11,7 +11,7 @@ function CustomerOrders() {
         e.preventDefault();
 
         try {
-            const response = await api.get(`/api/v1/orders/customer/${customerId}`);
+            const response = await listOrdersByCustomer(customerId);
             setOrders(response.data);
             setSearched(true);
         } catch (error) {

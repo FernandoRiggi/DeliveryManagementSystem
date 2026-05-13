@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import api from "../../services/api";
+import {createOrder} from "../../services/orderService.js";
 
 function CreateOrder() {
     const navigate = useNavigate();
@@ -37,7 +37,7 @@ function CreateOrder() {
         e.preventDefault();
 
         try {
-            await api.post("/api/v1/orders", {
+            await createOrder ({
                 ...form,
                 distanceKm: Number(form.distanceKm)
             });

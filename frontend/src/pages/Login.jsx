@@ -19,7 +19,7 @@ function Login() {
             const response = await api.post(
                 "/api/v1/authenticate",
                 {
-                    email,
+                    username: email,
                     password
                 }
             );
@@ -60,6 +60,7 @@ function Login() {
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        required
                     />
 
                     <input
@@ -68,6 +69,7 @@ function Login() {
                         placeholder="Senha"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        required
                     />
 
                     <button

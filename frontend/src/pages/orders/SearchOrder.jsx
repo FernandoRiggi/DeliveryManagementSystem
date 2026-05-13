@@ -1,13 +1,18 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import api from "../../services/api";
+import {
+    getOrderById,
+    cancelOrder,
+    startRoute,
+    concludeOrder
+} from "../../services/orderService";
 
 function SearchOrder() {
     const [orderId, setOrderId] = useState("");
     const [order, setOrder] = useState(null);
 
     async function fetchOrder() {
-        const response = await api.get(`/api/v1/orders/${orderId}`);
+        const response = await getOrderById(orderId);
         setOrder(response.data);
     }
 
@@ -25,7 +30,7 @@ function SearchOrder() {
 
     async function handleCancel() {
         try {
-            await api.patch(`/api/v1/orders/${orderId}/cancel`);
+            await cancelOrder(orderId);
             alert("Pedido cancelado com sucesso!");
             await fetchOrder();
         } catch (error) {
@@ -36,7 +41,7 @@ function SearchOrder() {
 
     async function handleStartRoute() {
         try {
-            await api.patch(`/api/v1/orders/${orderId}/start-route`);
+            await startRoute(orderId);
             alert("Rota iniciada com sucesso!");
             await fetchOrder();
         } catch (error) {
@@ -47,7 +52,7 @@ function SearchOrder() {
 
     async function handleConclude() {
         try {
-            await api.patch(`/api/v1/orders/${orderId}/conclude`);
+            await concludeOrder(orderId);
             alert("Pedido concluído com sucesso!");
             await fetchOrder();
         } catch (error) {
