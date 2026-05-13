@@ -4,7 +4,7 @@ import api from "../services/api";
 
 function Login() {
 
-    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
 
@@ -19,7 +19,7 @@ function Login() {
             const response = await api.post(
                 "/api/v1/authenticate",
                 {
-                    username,
+                    email,
                     password
                 }
             );
@@ -57,8 +57,9 @@ function Login() {
                     <input
                         className="form-control mb-3"
                         placeholder="Email"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                     />
 
                     <input
