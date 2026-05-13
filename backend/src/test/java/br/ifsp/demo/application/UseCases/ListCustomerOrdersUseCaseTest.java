@@ -1,0 +1,190 @@
+package br.ifsp.demo.application.UseCases;
+
+import br.ifsp.demo.annotation.Mutation;
+import br.ifsp.demo.annotation.TDD;
+import br.ifsp.demo.domain.aggregate.Customer;
+import br.ifsp.demo.domain.aggregate.DeliveryMan;
+import br.ifsp.demo.domain.aggregate.OrderDelivery;
+import br.ifsp.demo.domain.repository.CustomerRepository;
+import br.ifsp.demo.domain.repository.OrderDeliveryRepository;
+import br.ifsp.demo.domain.valueObject.Address;
+import br.ifsp.demo.domain.valueObject.Cep;
+import br.ifsp.demo.domain.valueObject.CustomerType;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+public class ListCustomerOrdersUseCaseTest {
+
+    @Mock
+    private CustomerRepository customerRepository;
+
+    @Mock
+    private OrderDeliveryRepository orderDeliveryRepository;
+
+    @InjectMocks
+    private ListCustomerOrdersUseCase sut;
+
+    private Customer customer;
+    private OrderDelivery orderDelivery;
+    private OrderDelivery orderDispatched;
+    private OrderDelivery orderEnRoute;
+    private OrderDelivery orderConcluded;
+    private OrderDelivery orderCanceled;
+    private UUID customerId;
+
+    @BeforeEach
+    void setUp() {
+        customer = new Customer("John Doe", CustomerType.REGULAR);
+        customerId = customer.getCustomerId();
+
+        DeliveryMan deliveryMan = new DeliveryMan("John Doe", 10);
+
+        Address pickupAddress = new Address(
+                "Street A", "10", "Center", "São Carlos", "SP", "Brasil", new Cep("13500-000")
+        );
+        Address deliveryAddress = new Address(
+                "Street B", "11", "Center", "Araraquara", "SP", "Brasil", new Cep("13400-000")
+        );
+
+        orderDelivery = new OrderDelivery(customer, pickupAddress, deliveryAddress, 10.0);
+
+        orderDispatched = new OrderDelivery(customer, pickupAddress, deliveryAddress, 10.0);
+        orderDispatched.dispatch(deliveryMan);
+
+        orderEnRoute = new OrderDelivery(customer, pickupAddress, deliveryAddress, 10.0);
+        orderEnRoute.dispatch(deliveryMan);
+        orderEnRoute.startRoute();
+
+        orderConcluded = new OrderDelivery(customer, pickupAddress, deliveryAddress, 10.0);
+        orderConcluded.dispatch(deliveryMan);
+        orderConcluded.startRoute();
+        orderConcluded.concluded();
+
+        orderCanceled = new OrderDelivery(customer, pickupAddress, deliveryAddress, 10.0);
+        orderCanceled.cancel();
+    }
+
+    @TDD
+    @Test
+    @DisplayName("[#52] Should return all the orders from a customer")
+    void shouldReturnAllOrdersFromACustomer() {
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
+        when(orderDeliveryRepository.findAllByCustomer(customer))
+                .thenReturn(List.of(orderDelivery, orderDispatched, orderEnRoute, orderConcluded, orderCanceled));
+
+        List<OrderDelivery> result = sut.listAll(customerId);
+
+        assertThat(result)
+                .isNotEmpty()
+                .containsExactlyInAnyOrder(orderDelivery, orderDispatched, orderEnRoute, orderConcluded, orderCanceled);
+    }
+
+    @TDD
+    @Test
+    @DisplayName("[#53] Should return a list with only active orders")
+    void shouldReturnOnlyActiveOrders() {
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
+        when(orderDeliveryRepository.findAllByCustomer(customer))
+                .thenReturn(List.of(orderDelivery, orderDispatched, orderEnRoute, orderConcluded, orderCanceled));
+
+        List<OrderDelivery> result = sut.listActiveOrders(customerId);
+
+        assertThat(result)
+                .isNotEmpty()
+                .containsExactlyInAnyOrder(orderDelivery, orderDispatched, orderEnRoute);
+    }
+
+    @TDD
+    @Test
+    @DisplayName("[#54] Should return a empty list when the customer doesn't have any orders")
+    void shouldReturnEmptyListWhenCustomerHasNoOrders() {
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
+        when(orderDeliveryRepository.findAllByCustomer(customer))
+                .thenReturn(Collections.emptyList());
+
+        List<OrderDelivery> result = sut.listAll(customerId);
+
+        assertThat(result).isEmpty();
+    }
+
+    @TDD
+    @Test
+    @DisplayName("[#55] Should return the concluded and canceled orders from a customer")
+    void shouldReturnInactiveOrdersFromACustomer() {
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
+        when(orderDeliveryRepository.findAllByCustomer(customer))
+                .thenReturn(List.of(orderDelivery, orderDispatched, orderEnRoute, orderConcluded, orderCanceled));
+
+        List<OrderDelivery> result = sut.listInactiveOrders(customerId);
+
+        assertThat(result)
+                .isNotEmpty()
+                .containsExactlyInAnyOrder(orderConcluded, orderCanceled);
+    }
+
+    @TDD
+    @Test
+    @DisplayName("[#61] Should return orders that are not dispatch yet from a customer")
+    void shouldReturnNonDispatchedOrdersFromACustomer() {
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
+        when(orderDeliveryRepository.findAllByCustomer(customer))
+                .thenReturn(List.of(orderDelivery, orderDispatched, orderEnRoute, orderConcluded, orderCanceled));
+
+        List<OrderDelivery> result = sut.listAllCreatedOrders(customerId);
+
+        assertThat(result)
+                .isNotEmpty()
+                .containsExactly(orderDelivery);
+    }
+
+    @Mutation
+    @Test
+    @DisplayName("[Mutation] Should not find the customer and throw a exception")
+    void shouldNotFindTheCustomerAndThrowAExceptionInCreatedOrders() {
+        when(customerRepository.findById(customerId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> sut.listAllCreatedOrders(customerId)).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("Customer not found");
+    }
+
+    @Mutation
+    @Test
+    @DisplayName("[Mutation] Should not find the customer and throw a exception")
+    void shouldNotFindTheCustomerAndThrowAExceptionInAllOrders() {
+        when(customerRepository.findById(customerId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> sut.listAll(customerId)).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("Customer not found");
+    }
+
+    @Mutation
+    @Test
+    @DisplayName("[Mutation] Should not find the customer and throw a exception")
+    void shouldNotFindTheCustomerAndThrowAExceptionInAllActiveOrders() {
+        when(customerRepository.findById(customerId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> sut.listActiveOrders(customerId)).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("Customer not found");
+    }
+
+    @Mutation
+    @Test
+    @DisplayName("[Mutation] Should not find the customer and throw a exception")
+    void shouldNotFindTheCustomerAndThrowAExceptionInAllInactiveOrders() {
+        when(customerRepository.findById(customerId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> sut.listInactiveOrders(customerId)).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("Customer not found");
+    }
+}
