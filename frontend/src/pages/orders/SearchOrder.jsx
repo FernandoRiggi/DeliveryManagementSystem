@@ -1,11 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import {
-    getOrderById,
-    cancelOrder,
-    startRoute,
-    concludeOrder
-} from "../../services/orderService";
+import {getOrderById} from "../../services/orderService";
 
 function SearchOrder() {
     const [orderId, setOrderId] = useState("");
@@ -25,39 +20,6 @@ function SearchOrder() {
             console.log(error);
             setOrder(null);
             alert(error.response?.data?.message || "Pedido não encontrado");
-        }
-    }
-
-    async function handleCancel() {
-        try {
-            await cancelOrder(orderId);
-            alert("Pedido cancelado com sucesso!");
-            await fetchOrder();
-        } catch (error) {
-            console.log(error);
-            alert(error.response?.data?.message || "Erro ao cancelar pedido");
-        }
-    }
-
-    async function handleStartRoute() {
-        try {
-            await startRoute(orderId);
-            alert("Rota iniciada com sucesso!");
-            await fetchOrder();
-        } catch (error) {
-            console.log(error);
-            alert(error.response?.data?.message || "Erro ao iniciar rota");
-        }
-    }
-
-    async function handleConclude() {
-        try {
-            await concludeOrder(orderId);
-            alert("Pedido concluído com sucesso!");
-            await fetchOrder();
-        } catch (error) {
-            console.log(error);
-            alert(error.response?.data?.message || "Erro ao concluir pedido");
         }
     }
 
@@ -91,18 +53,6 @@ function SearchOrder() {
                         <pre className="bg-light p-3 border rounded">
                             {JSON.stringify(order, null, 2)}
                         </pre>
-
-                        <button className="btn btn-warning me-2" onClick={handleStartRoute}>
-                            Iniciar rota
-                        </button>
-
-                        <button className="btn btn-success me-2" onClick={handleConclude}>
-                            Concluir
-                        </button>
-
-                        <button className="btn btn-danger" onClick={handleCancel}>
-                            Cancelar pedido
-                        </button>
                     </div>
                 )}
             </div>
