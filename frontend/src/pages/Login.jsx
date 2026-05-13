@@ -19,7 +19,7 @@ function Login() {
             const response = await api.post(
                 "/api/v1/authenticate",
                 {
-                    username: email,
+                    email,
                     password
                 }
             );
