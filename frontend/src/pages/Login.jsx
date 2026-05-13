@@ -1,14 +1,18 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
 
 function Login() {
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const navigate = useNavigate();
 
     async function handleLogin(e) {
 
         e.preventDefault();
+
+        console.log("clicou");
 
         try {
 
@@ -20,26 +24,22 @@ function Login() {
                 }
             );
 
+            console.log(response.data);
+
             localStorage.setItem(
                 "token",
                 response.data.token
             );
 
-            alert("Login realizado!");
+            navigate("/dashboard");
 
         } catch(error) {
 
-            if (error.response?.status === 401) {
-                alert("Email ou senha inválidos.");
-                return;
-            }
+            console.log(error);
 
-            if (!error.response) {
-                alert("Não foi possível conectar ao backend. Verifique se ele está rodando na porta 8080.");
-                return;
-            }
+            console.log(error.response);
 
-            alert("Erro no login. Status: " + error.response.status);
+            alert("Erro no login");
 
         }
     }
@@ -77,6 +77,11 @@ function Login() {
                     </button>
 
                 </form>
+
+                <div className="mt-3">
+                    <span>Não tem conta? </span>
+                    <Link to="/register">Cadastrar</Link>
+                </div>
 
             </div>
 

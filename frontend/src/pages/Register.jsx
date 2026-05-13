@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
 
 function Register() {
@@ -7,6 +8,7 @@ function Register() {
     const [lastname, setLastname] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const navigate = useNavigate();
 
     async function handleRegister(e) {
 
@@ -27,6 +29,8 @@ function Register() {
             console.log(response.data);
 
             alert("Usuário criado!");
+
+            navigate("/login");
 
         } catch(error) {
 
@@ -84,6 +88,11 @@ function Register() {
                     </button>
 
                 </form>
+
+                <div className="mt-3">
+                    <span>Já tem conta? </span>
+                    <Link to="/login">Entrar</Link>
+                </div>
 
             </div>
 
