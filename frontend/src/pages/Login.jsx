@@ -1,19 +1,49 @@
-import { useEffect } from "react";
+import { useState } from "react";
 import api from "../services/api";
 
 function Login() {
 
-    useEffect(() => {
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
 
-        api.get("/test")
-            .then(response => {
-                console.log(response.data);
-            })
-            .catch(error => {
-                console.log(error);
-            });
+    async function handleLogin(e) {
 
-    }, []);
+        e.preventDefault();
+
+        try {
+
+            const response = await api.post(
+                "/api/v1/authenticate",
+                {
+                    username,
+                    password
+                }
+            );
+
+            localStorage.setItem(
+                "token",
+                response.data.token
+            );
+
+            alert("Login realizado!");
+
+        } catch(error) {
+
+            if (error.response?.status === 401) {
+                alert("Email ou senha inválidos.");
+                return;
+            }
+
+            if (!error.response) {
+                alert("Não foi possível conectar ao backend. Verifique se ele está rodando na porta 8080.");
+                return;
+            }
+
+            alert("Erro no login. Status: " + error.response.status);
+
+        }
+    }
+
     return (
 
         <div className="container mt-5">
@@ -22,20 +52,31 @@ function Login() {
 
                 <h1>Login</h1>
 
-                <input
-                    className="form-control mb-3"
-                    placeholder="Email"
-                />
+                <form onSubmit={handleLogin}>
 
-                <input
-                    className="form-control mb-3"
-                    type="password"
-                    placeholder="Senha"
-                />
+                    <input
+                        className="form-control mb-3"
+                        placeholder="Email"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                    />
 
-                <button className="btn btn-primary">
-                    Entrar
-                </button>
+                    <input
+                        className="form-control mb-3"
+                        type="password"
+                        placeholder="Senha"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+
+                    <button
+                        className="btn btn-primary"
+                        type="submit"
+                    >
+                        Entrar
+                    </button>
+
+                </form>
 
             </div>
 
