@@ -5,6 +5,7 @@ import api from "../../services/api";
 function CustomerOrders() {
     const [customerId, setCustomerId] = useState("");
     const [orders, setOrders] = useState([]);
+    const [searched, setSearched] = useState(false);
 
     async function handleSearch(e) {
         e.preventDefault();
@@ -12,9 +13,11 @@ function CustomerOrders() {
         try {
             const response = await api.get(`/api/v1/orders/customer/${customerId}`);
             setOrders(response.data);
+            setSearched(true);
         } catch (error) {
             console.log(error);
             setOrders([]);
+            setSearched(true);
             alert(error.response?.data?.message || "Erro ao buscar pedidos do cliente");
         }
     }
@@ -30,6 +33,7 @@ function CustomerOrders() {
                         placeholder="ID do cliente"
                         value={customerId}
                         onChange={(e) => setCustomerId(e.target.value)}
+                        required
                     />
 
                     <button className="btn btn-primary me-2" type="submit">

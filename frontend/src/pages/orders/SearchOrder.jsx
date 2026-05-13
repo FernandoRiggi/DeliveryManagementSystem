@@ -6,12 +6,16 @@ function SearchOrder() {
     const [orderId, setOrderId] = useState("");
     const [order, setOrder] = useState(null);
 
+    async function fetchOrder() {
+        const response = await api.get(`/api/v1/orders/${orderId}`);
+        setOrder(response.data);
+    }
+
     async function handleSearch(e) {
         e.preventDefault();
 
         try {
-            const response = await api.get(`/api/v1/orders/${orderId}`);
-            setOrder(response.data);
+            await fetchOrder();
         } catch (error) {
             console.log(error);
             setOrder(null);
@@ -23,7 +27,7 @@ function SearchOrder() {
         try {
             await api.patch(`/api/v1/orders/${orderId}/cancel`);
             alert("Pedido cancelado com sucesso!");
-            await handleSearch({ preventDefault: () => {} });
+            await fetchOrder();
         } catch (error) {
             console.log(error);
             alert(error.response?.data?.message || "Erro ao cancelar pedido");
@@ -34,7 +38,7 @@ function SearchOrder() {
         try {
             await api.patch(`/api/v1/orders/${orderId}/start-route`);
             alert("Rota iniciada com sucesso!");
-            await handleSearch({ preventDefault: () => {} });
+            await fetchOrder();
         } catch (error) {
             console.log(error);
             alert(error.response?.data?.message || "Erro ao iniciar rota");
@@ -45,7 +49,7 @@ function SearchOrder() {
         try {
             await api.patch(`/api/v1/orders/${orderId}/conclude`);
             alert("Pedido concluído com sucesso!");
-            await handleSearch({ preventDefault: () => {} });
+            await fetchOrder();
         } catch (error) {
             console.log(error);
             alert(error.response?.data?.message || "Erro ao concluir pedido");
@@ -63,6 +67,7 @@ function SearchOrder() {
                         placeholder="ID do pedido"
                         value={orderId}
                         onChange={(e) => setOrderId(e.target.value)}
+                        required
                     />
 
                     <button className="btn btn-primary me-2" type="submit">
