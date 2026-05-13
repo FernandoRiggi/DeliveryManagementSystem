@@ -2,6 +2,9 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
+import CreateOrder from "./pages/orders/CreateOrder.jsx";
+import SearchOrder from "./pages/orders/SearchOrder.jsx";
+import CustomerOrders from "./pages/orders/CustomerOrders.jsx";
 import "./App.css";
 
 function PrivateRoute({ children }) {
@@ -27,6 +30,33 @@ function App() {
               element={
                 <PrivateRoute>
                   <Dashboard />
+                </PrivateRoute>
+              }
+          />
+
+          <Route
+              path="/orders/new"
+              element={
+                <PrivateRoute>
+                  <CreateOrder />
+                </PrivateRoute>
+              }
+          />
+
+          <Route
+              path="/orders/search"
+              element={
+                <PrivateRoute>
+                  <SearchOrder />
+                </PrivateRoute>
+              }
+          />
+
+          <Route
+              path="/orders/customer"
+              element={
+                <PrivateRoute>
+                  <CustomerOrders />
                 </PrivateRoute>
               }
           />
