@@ -5,6 +5,7 @@ import Dashboard from "./pages/Dashboard.jsx";
 import CreateOrder from "./pages/orders/CreateOrder.jsx";
 import SearchOrder from "./pages/orders/SearchOrder.jsx";
 import CustomerOrders from "./pages/orders/CustomerOrders.jsx";
+import DispatchOrder from "./pages/orders/DispatchOrder.jsx";
 import "./App.css";
 
 function PrivateRoute({ children }) {
@@ -57,6 +58,15 @@ function App() {
               element={
                 <PrivateRoute>
                   <CustomerOrders />
+                </PrivateRoute>
+              }
+          />
+
+          <Route
+              path="/orders/dispatch"
+              element={
+                <PrivateRoute>
+                  <DispatchOrder />
                 </PrivateRoute>
               }
           />

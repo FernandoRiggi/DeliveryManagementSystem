@@ -45,6 +45,12 @@ function CustomerOrders() {
                     </Link>
                 </form>
 
+                {searched && orders.length === 0 && (
+                    <div className="alert alert-info mt-4">
+                        Nenhum pedido encontrado para este cliente.
+                    </div>
+                )}
+
                 {orders.length > 0 && (
                     <div className="mt-4">
                         <h3>Pedidos encontrados</h3>

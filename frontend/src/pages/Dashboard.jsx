@@ -65,6 +65,21 @@ function Dashboard() {
                         </div>
                     </div>
                 </div>
+
+                <div className="col-md-6">
+                    <div className="card h-100">
+                        <div className="card-body">
+                            <h5 className="card-title">Despachar pedido</h5>
+                            <p className="card-text">
+                                Associe um entregador a um pedido existente.
+                            </p>
+
+                            <Link to="/orders/dispatch" className="btn btn-info">
+                                Despachar pedido
+                            </Link>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );
