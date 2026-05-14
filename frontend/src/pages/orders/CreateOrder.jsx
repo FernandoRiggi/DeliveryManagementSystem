@@ -37,12 +37,13 @@ function CreateOrder() {
         e.preventDefault();
 
         try {
-            await createOrder ({
+            const response = await createOrder({
                 ...form,
                 distanceKm: Number(form.distanceKm)
             });
 
-            alert("Pedido criado com sucesso!");
+            const orderId = response.data.orderId;
+            alert(`Pedido criado com sucesso!\nID do pedido: ${orderId}`);
             navigate("/dashboard");
         } catch (error) {
             console.log(error);

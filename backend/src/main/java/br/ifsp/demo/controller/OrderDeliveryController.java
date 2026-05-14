@@ -61,9 +61,9 @@ public class OrderDeliveryController {
             Double distanceKm = body.distanceKm();
 
             CreateOrderRequest request = new CreateOrderRequest(customer.getCustomerId(), pickingAddress, deliveryAddress, distanceKm);
-            createOrderUseCase.create(request);
+            OrderDelivery order = createOrderUseCase.create(request);
 
-            return ResponseEntity.status(HttpStatus.CREATED).build();
+            return ResponseEntity.status(HttpStatus.CREATED).body(java.util.Map.of("orderId", order.getId()));
         } catch (IllegalArgumentException e) {
             return ResponseEntity
                     .badRequest()

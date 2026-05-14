@@ -20,7 +20,7 @@ public class CreateOrderUseCase {
         this.customerRepository = customerRepository;
     }
 
-    public void create(CreateOrderRequest request) {
+    public OrderDelivery create(CreateOrderRequest request) {
         if (request == null) {
             throw new NullPointerException("Request cannot be null");
         }
@@ -35,5 +35,6 @@ public class CreateOrderUseCase {
                 request.distanceKm()
         );
         repo.save(order);
+        return order;
     }
 }
