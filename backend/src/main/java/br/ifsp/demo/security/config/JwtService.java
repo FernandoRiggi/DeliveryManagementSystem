@@ -20,6 +20,7 @@ public class JwtService {
 
     @Value("${application.jwt.secretKey}")
     private String secretKey;
+
     @Value("${application.jwt.tokenExpiration}")
     private long jwtExpiration;
 
@@ -33,7 +34,7 @@ public class JwtService {
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {
@@ -42,14 +43,14 @@ public class JwtService {
     }
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-         return Jwts
-                 .builder()
-                 .setClaims(extraClaims)
-                 .setSubject(userDetails.getUsername())
-                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
-                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-                 .compact();
+        return Jwts
+                .builder()
+                .setClaims(extraClaims)
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .compact();
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
