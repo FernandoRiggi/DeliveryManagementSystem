@@ -5,9 +5,10 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
+    const publicRoutes = ["/api/v1/authenticate", "/api/v1/register"];
     const token = localStorage.getItem("token");
 
-    if (token) {
+    if (token && !publicRoutes.includes(config.url)) {
         config.headers.Authorization = `Bearer ${token}`;
     }
 
