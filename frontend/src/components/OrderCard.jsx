@@ -1,3 +1,19 @@
+import { useState } from "react";
+
+function CopyButton({ text }) {
+    const [copied, setCopied] = useState(false);
+    function handleCopy() {
+        navigator.clipboard.writeText(text);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1500);
+    }
+    return (
+        <button className={`btn-copy ${copied ? "btn-copy--ok" : ""}`} onClick={handleCopy} title={text}>
+            {copied ? "✓ copiado" : "⧉ copiar"}
+        </button>
+    );
+}
+
 const STATUS_CONFIG = {
     CREATED:    { label: "Criado",     color: "secondary" },
     DISPATCHED: { label: "Despachado", color: "primary"   },
@@ -48,7 +64,10 @@ function OrderCard({ order }) {
     return (
         <div className="order-card">
             <div className="order-card-head">
-                <span className="order-id" title={order.id}>ID: {shortId}</span>
+                <div className="order-id-group">
+                    <span className="order-id" title={order.id}>ID: {shortId}</span>
+                    {order.id && <CopyButton text={order.id} />}
+                </div>
                 <span className={`badge bg-${status.color}`}>{status.label}</span>
             </div>
 

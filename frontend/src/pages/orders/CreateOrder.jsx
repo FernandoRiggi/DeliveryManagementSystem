@@ -3,6 +3,26 @@ import { Link, useNavigate } from "react-router-dom";
 import { createOrder } from "../../services/orderService.js";
 import { parseApiError } from "../../utils/parseApiError";
 
+function CopyId({ id }) {
+    const [copied, setCopied] = useState(false);
+    function handleCopy() {
+        navigator.clipboard.writeText(id);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1500);
+    }
+    return (
+        <div className="created-order-id">
+            <span className="created-order-label">ID do pedido</span>
+            <div className="created-order-value">
+                <code>{id}</code>
+                <button className={`btn-copy ${copied ? "btn-copy--ok" : ""}`} onClick={handleCopy}>
+                    {copied ? "✓ copiado" : "⧉ copiar"}
+                </button>
+            </div>
+        </div>
+    );
+}
+
 const ADDRESS_FIELDS = [
     { name: "Street",       label: "Rua",    col: "col-md-8" },
     { name: "Number",       label: "Número", col: "col-md-4" },
@@ -39,7 +59,7 @@ function AddressFields({ prefix, form, onChange }) {
 function CreateOrder() {
     const navigate = useNavigate();
     const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");
+    const [createdId, setCreatedId] = useState(null);
 
     const [form, setForm] = useState({
         customerId: "",
@@ -68,13 +88,11 @@ function CreateOrder() {
     async function handleSubmit(e) {
         e.preventDefault();
         setError("");
-        setSuccess("");
+        setCreatedId(null);
 
         try {
             const response = await createOrder({ ...form, distanceKm: Number(form.distanceKm) });
-            const orderId = response.data.orderId;
-            setSuccess(`Pedido criado com sucesso! ID: ${orderId}`);
-            setTimeout(() => navigate("/dashboard"), 2000);
+            setCreatedId(response.data.orderId);
         } catch (err) {
             setError(parseApiError(err, "Erro ao criar pedido. Verifique os dados e tente novamente."));
         }
@@ -91,9 +109,23 @@ function CreateOrder() {
                 </div>
 
                 {error && <div className="alert alert-danger" role="alert">{error}</div>}
-                {success && <div className="alert alert-success" role="alert">{success}</div>}
 
-                <form onSubmit={handleSubmit}>
+                {createdId && (
+                    <div className="created-order-box">
+                        <div className="created-order-header">✅ Pedido criado com sucesso!</div>
+                        <CopyId id={createdId} />
+                        <div className="created-order-actions">
+                            <button className="btn btn-primary btn-sm" onClick={() => { setCreatedId(null); setError(""); setForm({ customerId: "", pickupStreet: "", pickupNumber: "", pickupNeighborhood: "", pickupCity: "", pickupState: "", pickupCountry: "Brasil", pickupCep: "", deliveryStreet: "", deliveryNumber: "", deliveryNeighborhood: "", deliveryCity: "", deliveryState: "", deliveryCountry: "Brasil", deliveryCep: "", distanceKm: "" }); }}>
+                                Criar outro pedido
+                            </button>
+                            <Link to="/dashboard" className="btn btn-outline-secondary btn-sm">
+                                Voltar ao Dashboard
+                            </Link>
+                        </div>
+                    </div>
+                )}
+
+                <form onSubmit={handleSubmit} style={{ display: createdId ? "none" : undefined }}>
                     <p className="section-label">Cliente</p>
                     <div className="row g-3">
                         <div className="col-12">

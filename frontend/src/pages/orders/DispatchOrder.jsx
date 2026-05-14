@@ -1,40 +1,76 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { dispatchOrder } from "../../services/orderService";
+import { getOrderById, dispatchOrder } from "../../services/orderService";
 import { parseApiError } from "../../utils/parseApiError";
+import OrderCard from "../../components/OrderCard";
+
+const DELIVERYMEN = [
+    { id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", name: "Carlos Mendes", capacity: 3 },
+    { id: "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb", name: "Marina Souza",  capacity: 2 },
+    { id: "cccccccc-cccc-cccc-cccc-cccccccccccc", name: "Felipe Ramos",  capacity: 4 },
+    { id: "dddddddd-dddd-dddd-dddd-dddddddddddd", name: "Ana Paula",     capacity: 2 },
+    { id: "eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee", name: "João Victor",   capacity: 5 },
+];
+
+function CapacityDots({ value, max = 5 }) {
+    return (
+        <span className="capacity-dots">
+            {Array.from({ length: max }, (_, i) => (
+                <span key={i} className={`dot ${i < value ? "dot--on" : ""}`} />
+            ))}
+            <span className="capacity-number">{value}</span>
+        </span>
+    );
+}
 
 function DispatchOrder() {
-    const [orderId, setOrderId] = useState("");
-    const [deliverymanId, setDeliverymanId] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");
+    const [orderId, setOrderId]       = useState("");
+    const [order, setOrder]           = useState(null);
+    const [searching, setSearching]   = useState(false);
+    const [selected, setSelected]     = useState(null);
+    const [loading, setLoading]       = useState(false);
+    const [error, setError]           = useState("");
+    const [success, setSuccess]       = useState(false);
 
-    async function handleDispatch(e) {
+    async function handleSearchOrder(e) {
         e.preventDefault();
         setError("");
-        setSuccess("");
+        setOrder(null);
+        setSelected(null);
+        setSuccess(false);
+        setSearching(true);
 
-        const trimmedOrderId = orderId.trim();
-        const trimmedDeliverymanId = deliverymanId.trim();
-
-        if (!trimmedOrderId || !trimmedDeliverymanId) {
-            setError("Informe o ID do pedido e o ID do entregador.");
-            return;
+        try {
+            const response = await getOrderById(orderId.trim());
+            setOrder(response.data);
+        } catch (err) {
+            setError(parseApiError(err, "Pedido não encontrado."));
+        } finally {
+            setSearching(false);
         }
+    }
 
+    async function handleDispatch() {
+        if (!selected) return;
+        setError("");
         setLoading(true);
 
         try {
-            await dispatchOrder(trimmedOrderId, trimmedDeliverymanId);
-            setSuccess("Pedido despachado com sucesso!");
-            setOrderId("");
-            setDeliverymanId("");
+            await dispatchOrder(order.id, selected);
+            setSuccess(true);
         } catch (err) {
             setError(parseApiError(err, "Erro ao despachar pedido."));
         } finally {
             setLoading(false);
         }
+    }
+
+    function handleReset() {
+        setOrderId("");
+        setOrder(null);
+        setSelected(null);
+        setError("");
+        setSuccess(false);
     }
 
     return (
@@ -47,50 +83,83 @@ function DispatchOrder() {
                     <h1>Despachar Pedido</h1>
                 </div>
 
-                <p className="text-muted mb-4">
-                    Informe o ID do pedido e o ID do entregador para despachar a entrega.
-                </p>
-
                 {error && <div className="alert alert-danger" role="alert">{error}</div>}
-                {success && <div className="alert alert-success" role="alert">{success}</div>}
 
-                <form onSubmit={handleDispatch}>
-                    <div className="row g-3">
-                        <div className="col-md-6">
-                            <label className="form-label fw-semibold">ID do pedido</label>
-                            <input
-                                className="form-control"
-                                placeholder="ex: 550e8400-e29b-41d4-a716-446655440000"
-                                value={orderId}
-                                onChange={(e) => setOrderId(e.target.value)}
-                                required
-                            />
-                        </div>
-                        <div className="col-md-6">
-                            <label className="form-label fw-semibold">ID do entregador</label>
-                            <input
-                                className="form-control"
-                                placeholder="ex: 550e8400-e29b-41d4-a716-446655440001"
-                                value={deliverymanId}
-                                onChange={(e) => setDeliverymanId(e.target.value)}
-                                required
-                            />
+                {success ? (
+                    <div className="created-order-box">
+                        <div className="created-order-header">✅ Pedido despachado com sucesso!</div>
+                        <div className="created-order-actions">
+                            <button className="btn btn-primary btn-sm" onClick={handleReset}>
+                                Despachar outro pedido
+                            </button>
+                            <Link to="/dashboard" className="btn btn-outline-secondary btn-sm">
+                                Voltar ao Dashboard
+                            </Link>
                         </div>
                     </div>
+                ) : (
+                    <>
+                        {/* Passo 1 — buscar pedido */}
+                        <p className="section-label">1. Buscar pedido pelo ID</p>
+                        <form onSubmit={handleSearchOrder}>
+                            <div className="row g-3 align-items-end">
+                                <div className="col">
+                                    <input
+                                        className="form-control"
+                                        placeholder="ex: 550e8400-e29b-41d4-a716-446655440000"
+                                        value={orderId}
+                                        onChange={(e) => { setOrderId(e.target.value); setOrder(null); setSelected(null); }}
+                                        required
+                                    />
+                                </div>
+                                <div className="col-auto">
+                                    <button className="btn btn-outline-primary" type="submit" disabled={searching}>
+                                        {searching ? "Buscando..." : "Buscar"}
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
 
-                    <div className="mt-4">
-                        <button
-                            className="btn btn-primary me-2"
-                            type="submit"
-                            disabled={loading}
-                        >
-                            {loading ? "Despachando..." : "Despachar pedido"}
-                        </button>
-                        <Link to="/dashboard" className="btn btn-outline-secondary">
-                            Cancelar
-                        </Link>
-                    </div>
-                </form>
+                        {/* Card do pedido encontrado */}
+                        {order && (
+                            <>
+                                <div className="mt-3">
+                                    <OrderCard order={order} />
+                                </div>
+
+                                {/* Passo 2 — escolher entregador */}
+                                <p className="section-label">2. Escolher entregador</p>
+                                <div className="deliveryman-grid">
+                                    {DELIVERYMEN.map((d) => (
+                                        <button
+                                            key={d.id}
+                                            className={`deliveryman-card ${selected === d.id ? "deliveryman-card--selected" : ""}`}
+                                            onClick={() => setSelected(d.id)}
+                                            type="button"
+                                        >
+                                            <span className="deliveryman-name">{d.name}</span>
+                                            <CapacityDots value={d.capacity} />
+                                        </button>
+                                    ))}
+                                </div>
+
+                                {/* Passo 3 — confirmar */}
+                                <div className="mt-4">
+                                    <button
+                                        className="btn btn-primary me-2"
+                                        onClick={handleDispatch}
+                                        disabled={!selected || loading}
+                                    >
+                                        {loading ? "Despachando..." : "Confirmar despacho"}
+                                    </button>
+                                    <Link to="/dashboard" className="btn btn-outline-secondary">
+                                        Cancelar
+                                    </Link>
+                                </div>
+                            </>
+                        )}
+                    </>
+                )}
             </div>
         </div>
     );
