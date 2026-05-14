@@ -1,21 +1,18 @@
 package br.ifsp.demo.controller;
 
 import br.ifsp.demo.application.UseCases.*;
-import br.ifsp.demo.domain.aggregate.Customer;
 import br.ifsp.demo.domain.aggregate.OrderDelivery;
 import br.ifsp.demo.domain.dto.CreateOrderHttpRequest;
 import br.ifsp.demo.domain.dto.CreateOrderRequest;
 import br.ifsp.demo.domain.dto.ErrorResponse;
-import br.ifsp.demo.domain.repository.CustomerRepository;
 import br.ifsp.demo.domain.valueObject.Address;
 import br.ifsp.demo.domain.valueObject.Cep;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -23,7 +20,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class OrderDeliveryController {
     private final CreateOrderUseCase createOrderUseCase;
-    private final CustomerRepository customerRepository;
     private final CalculateOrderPriorityUseCase calculateOrderPriorityUseCase;
     private final CancelRouteUseCase cancelRouteUseCase;
     private final CancelOrderUseCase cancelOrderUseCase;
@@ -36,9 +32,6 @@ public class OrderDeliveryController {
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody CreateOrderHttpRequest body){
         try {
-            Customer customer = customerRepository.findById(body.customerId())
-                    .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
-
             Address pickingAddress = new Address(
                     body.pickupStreet(),
                     body.pickupNumber(),
@@ -59,9 +52,7 @@ public class OrderDeliveryController {
                     new Cep(body.deliveryCep())
             );
 
-            Double distanceKm = body.distanceKm();
-
-            CreateOrderRequest request = new CreateOrderRequest(customer.getCustomerId(), pickingAddress, deliveryAddress, distanceKm);
+            CreateOrderRequest request = new CreateOrderRequest(body.customerId(), pickingAddress, deliveryAddress, body.distanceKm());
             OrderDelivery order = createOrderUseCase.create(request);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(java.util.Map.of("orderId", order.getId()));
@@ -123,11 +114,7 @@ public class OrderDeliveryController {
     @GetMapping("/customer/{customerId}")
     public ResponseEntity<?> listByCustomer(@PathVariable UUID customerId) {
         try {
-            Customer customer = customerRepository.findById(customerId)
-                    .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
-
             return ResponseEntity.ok(listCustomerOrdersUseCase.listAll(customerId));
-
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
         }
