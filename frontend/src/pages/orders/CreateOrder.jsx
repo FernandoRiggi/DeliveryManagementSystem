@@ -1,9 +1,45 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {createOrder} from "../../services/orderService.js";
+import { createOrder } from "../../services/orderService.js";
+import { parseApiError } from "../../utils/parseApiError";
+
+const ADDRESS_FIELDS = [
+    { name: "Street",       label: "Rua",    col: "col-md-8" },
+    { name: "Number",       label: "Número", col: "col-md-4" },
+    { name: "Neighborhood", label: "Bairro", col: "col-md-6" },
+    { name: "City",         label: "Cidade", col: "col-md-6" },
+    { name: "State",        label: "Estado", col: "col-md-4" },
+    { name: "Country",      label: "País",   col: "col-md-4" },
+    { name: "Cep",          label: "CEP",    col: "col-md-4" },
+];
+
+function AddressFields({ prefix, form, onChange }) {
+    return (
+        <div className="row g-3">
+            {ADDRESS_FIELDS.map(({ name, label, col }) => {
+                const fieldName = prefix + name;
+                return (
+                    <div className={col} key={fieldName}>
+                        <label className="form-label">{label}</label>
+                        <input
+                            className="form-control"
+                            name={fieldName}
+                            placeholder={label}
+                            value={form[fieldName]}
+                            onChange={onChange}
+                            required
+                        />
+                    </div>
+                );
+            })}
+        </div>
+    );
+}
 
 function CreateOrder() {
     const navigate = useNavigate();
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
 
     const [form, setForm] = useState({
         customerId: "",
@@ -21,93 +57,90 @@ function CreateOrder() {
         deliveryState: "",
         deliveryCountry: "Brasil",
         deliveryCep: "",
-        distanceKm: ""
+        distanceKm: "",
     });
 
     function handleChange(e) {
         const { name, value } = e.target;
-
-        setForm({
-            ...form,
-            [name]: value
-        });
+        setForm({ ...form, [name]: value });
     }
 
     async function handleSubmit(e) {
         e.preventDefault();
+        setError("");
+        setSuccess("");
 
         try {
-            const response = await createOrder({
-                ...form,
-                distanceKm: Number(form.distanceKm)
-            });
-
+            const response = await createOrder({ ...form, distanceKm: Number(form.distanceKm) });
             const orderId = response.data.orderId;
-            alert(`Pedido criado com sucesso!\nID do pedido: ${orderId}`);
-            navigate("/dashboard");
-        } catch (error) {
-            console.log(error);
-            alert(error.response?.data?.message || "Erro ao criar pedido");
+            setSuccess(`Pedido criado com sucesso! ID: ${orderId}`);
+            setTimeout(() => navigate("/dashboard"), 2000);
+        } catch (err) {
+            setError(parseApiError(err, "Erro ao criar pedido. Verifique os dados e tente novamente."));
         }
     }
 
     return (
-        <div className="container mt-5">
-            <div className="card p-4">
-                <h1>Criar Pedido</h1>
+        <div className="container page-wrapper">
+            <div className="page-card">
+                <div className="page-header">
+                    <Link to="/dashboard" className="btn btn-outline-secondary btn-sm">
+                        ← Voltar
+                    </Link>
+                    <h1>Criar Pedido</h1>
+                </div>
+
+                {error && <div className="alert alert-danger" role="alert">{error}</div>}
+                {success && <div className="alert alert-success" role="alert">{success}</div>}
 
                 <form onSubmit={handleSubmit}>
-                    <h4 className="mt-3">Cliente</h4>
+                    <p className="section-label">Cliente</p>
+                    <div className="row g-3">
+                        <div className="col-12">
+                            <label className="form-label">ID do cliente</label>
+                            <input
+                                className="form-control"
+                                name="customerId"
+                                placeholder="ex: 550e8400-e29b-41d4-a716-446655440000"
+                                value={form.customerId}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+                    </div>
 
-                    <input
-                        className="form-control mb-3"
-                        name="customerId"
-                        placeholder="ID do cliente"
-                        value={form.customerId}
-                        onChange={handleChange}
-                        required
-                    />
+                    <p className="section-label">Endereço de Coleta</p>
+                    <AddressFields prefix="pickup" form={form} onChange={handleChange} />
 
-                    <h4 className="mt-3">Endereço de coleta</h4>
+                    <p className="section-label">Endereço de Entrega</p>
+                    <AddressFields prefix="delivery" form={form} onChange={handleChange} />
 
-                    <input className="form-control mb-3" name="pickupStreet" placeholder="Rua" value={form.pickupStreet} onChange={handleChange} required/>
-                    <input className="form-control mb-3" name="pickupNumber" placeholder="Número" value={form.pickupNumber} onChange={handleChange} required/>
-                    <input className="form-control mb-3" name="pickupNeighborhood" placeholder="Bairro" value={form.pickupNeighborhood} onChange={handleChange} required/>
-                    <input className="form-control mb-3" name="pickupCity" placeholder="Cidade" value={form.pickupCity} onChange={handleChange}required />
-                    <input className="form-control mb-3" name="pickupState" placeholder="Estado" value={form.pickupState} onChange={handleChange} required/>
-                    <input className="form-control mb-3" name="pickupCountry" placeholder="País" value={form.pickupCountry} onChange={handleChange} required/>
-                    <input className="form-control mb-3" name="pickupCep" placeholder="CEP" value={form.pickupCep} onChange={handleChange} required/>
+                    <p className="section-label">Entrega</p>
+                    <div className="row g-3">
+                        <div className="col-md-4">
+                            <label className="form-label">Distância (km)</label>
+                            <input
+                                className="form-control"
+                                name="distanceKm"
+                                type="number"
+                                step="0.1"
+                                min="0.1"
+                                placeholder="0.0"
+                                value={form.distanceKm}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+                    </div>
 
-                    <h4 className="mt-3">Endereço de entrega</h4>
-
-                    <input className="form-control mb-3" name="deliveryStreet" placeholder="Rua" value={form.deliveryStreet} onChange={handleChange} required/>
-                    <input className="form-control mb-3" name="deliveryNumber" placeholder="Número" value={form.deliveryNumber} onChange={handleChange} required/>
-                    <input className="form-control mb-3" name="deliveryNeighborhood" placeholder="Bairro" value={form.deliveryNeighborhood} onChange={handleChange}required />
-                    <input className="form-control mb-3" name="deliveryCity" placeholder="Cidade" value={form.deliveryCity} onChange={handleChange}required />
-                    <input className="form-control mb-3" name="deliveryState" placeholder="Estado" value={form.deliveryState} onChange={handleChange} required/>
-                    <input className="form-control mb-3" name="deliveryCountry" placeholder="País" value={form.deliveryCountry} onChange={handleChange} required/>
-                    <input className="form-control mb-3" name="deliveryCep" placeholder="CEP" value={form.deliveryCep} onChange={handleChange} required/>
-
-                    <h4 className="mt-3">Entrega</h4>
-
-                    <input
-                        className="form-control mb-3"
-                        name="distanceKm"
-                        type="number"
-                        step="0.1"
-                        placeholder="Distância em KM"
-                        value={form.distanceKm}
-                        onChange={handleChange}
-                        required
-                    />
-
-                    <button className="btn btn-success me-2" type="submit">
-                        Criar pedido
-                    </button>
-
-                    <Link to="/dashboard" className="btn btn-secondary">
-                        Voltar
-                    </Link>
+                    <div className="mt-4">
+                        <button className="btn btn-primary me-2" type="submit">
+                            Criar pedido
+                        </button>
+                        <Link to="/dashboard" className="btn btn-outline-secondary">
+                            Cancelar
+                        </Link>
+                    </div>
                 </form>
             </div>
         </div>

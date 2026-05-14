@@ -1,5 +1,36 @@
 import { Link, useNavigate } from "react-router-dom";
 
+const CARDS = [
+    {
+        to: "/orders/new",
+        icon: "📦",
+        iconClass: "icon-blue",
+        title: "Criar Pedido",
+        description: "Cadastre um novo pedido de entrega.",
+    },
+    {
+        to: "/orders/search",
+        icon: "🔍",
+        iconClass: "icon-violet",
+        title: "Buscar Pedido",
+        description: "Consulte um pedido pelo ID.",
+    },
+    {
+        to: "/orders/customer",
+        icon: "👤",
+        iconClass: "icon-green",
+        title: "Pedidos por Cliente",
+        description: "Liste os pedidos de um cliente específico.",
+    },
+    {
+        to: "/orders/dispatch",
+        icon: "🚚",
+        iconClass: "icon-amber",
+        title: "Despachar Pedido",
+        description: "Associe um entregador a um pedido existente.",
+    },
+];
+
 function Dashboard() {
     const navigate = useNavigate();
 
@@ -9,77 +40,29 @@ function Dashboard() {
     }
 
     return (
-        <div className="container mt-5">
-            <div className="d-flex justify-content-between align-items-center mb-4">
+        <div className="container dashboard-page">
+            <div className="dashboard-banner">
                 <div>
                     <h1>Dashboard</h1>
-                    <p className="text-muted mb-0">
-                        Sistema de gerenciamento de entregas
-                    </p>
+                    <p>Sistema de gerenciamento de entregas</p>
                 </div>
-
-                <button className="btn btn-outline-danger" onClick={handleLogout}>
+                <button className="btn btn-outline-light btn-sm" onClick={handleLogout}>
                     Sair
                 </button>
             </div>
 
             <div className="row g-4">
-                <div className="col-md-4">
-                    <div className="card h-100 shadow-sm">
-                        <div className="card-body">
-                            <h5 className="card-title">Criar Pedido</h5>
-                            <p className="card-text">
-                                Cadastre um novo pedido de entrega.
-                            </p>
-                            <Link to="/orders/new" className="btn btn-primary">
-                                Criar pedido
-                            </Link>
-                        </div>
+                {CARDS.map((card) => (
+                    <div className="col-sm-6 col-lg-3" key={card.to}>
+                        <Link to={card.to} className="nav-card">
+                            <div className={`nav-card-icon ${card.iconClass}`}>
+                                {card.icon}
+                            </div>
+                            <h5>{card.title}</h5>
+                            <p>{card.description}</p>
+                        </Link>
                     </div>
-                </div>
-
-                <div className="col-md-4">
-                    <div className="card h-100 shadow-sm">
-                        <div className="card-body">
-                            <h5 className="card-title">Buscar Pedido</h5>
-                            <p className="card-text">
-                                Consulte um pedido pelo ID.
-                            </p>
-                            <Link to="/orders/search" className="btn btn-primary">
-                                Buscar pedido
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="col-md-4">
-                    <div className="card h-100 shadow-sm">
-                        <div className="card-body">
-                            <h5 className="card-title">Pedidos por Cliente</h5>
-                            <p className="card-text">
-                                Liste os pedidos de um cliente específico.
-                            </p>
-                            <Link to="/orders/customer" className="btn btn-primary">
-                                Listar pedidos
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="col-md-6">
-                    <div className="card h-100">
-                        <div className="card-body">
-                            <h5 className="card-title">Despachar pedido</h5>
-                            <p className="card-text">
-                                Associe um entregador a um pedido existente.
-                            </p>
-
-                            <Link to="/orders/dispatch" className="btn btn-info">
-                                Despachar pedido
-                            </Link>
-                        </div>
-                    </div>
-                </div>
+                ))}
             </div>
         </div>
     );
