@@ -12,6 +12,7 @@ import br.ifsp.demo.domain.valueObject.Cep;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -33,7 +34,7 @@ public class OrderDeliveryController {
     private final ConcludeOrderUseCase concludeOrderUseCase;
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody CreateOrderHttpRequest body){
+    public ResponseEntity<?> create(@Valid @RequestBody CreateOrderHttpRequest body){
         try {
             Customer customer = customerRepository.findById(body.customerId())
                     .orElseThrow(() -> new IllegalArgumentException("Customer not found"));

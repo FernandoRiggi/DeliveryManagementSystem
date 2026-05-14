@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,7 +47,7 @@ public class UserController {
             )
     })
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterUserRequest request) {
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterUserRequest request) {
         final RegisterUserResponse response = authenticationService.register(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -70,7 +71,7 @@ public class UserController {
             )
     })
     @PostMapping("/authenticate")
-    public ResponseEntity<?> register(@RequestBody AuthRequest request) {
+    public ResponseEntity<?> authenticate(@Valid @RequestBody AuthRequest request) {
         final AuthResponse response = authenticationService.authenticate(request);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
