@@ -3,16 +3,32 @@ package br.ifsp.demo.exception;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.*;
 
 @ControllerAdvice
 public class ApiExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<?> handleValidationException(MethodArgumentNotValidException e) {
+        String message = e.getBindingResult().getFieldErrors().stream()
+                .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
+                .collect(Collectors.joining(", "));
+        final ApiException apiException = ApiException.builder()
+                .status(BAD_REQUEST)
+                .message(message)
+                .developerMessage(e.getClass().getName())
+                .timestamp(ZonedDateTime.now(ZoneId.of("Z")))
+                .build();
+        return new ResponseEntity<>(apiException, BAD_REQUEST);
+    }
 
     @ExceptionHandler(value = NullPointerException.class)
     public ResponseEntity<?> handleNullPointerException(NullPointerException e){
