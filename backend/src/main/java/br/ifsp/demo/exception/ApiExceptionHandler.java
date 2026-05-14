@@ -78,6 +78,28 @@ public class ApiExceptionHandler {
         return new ResponseEntity<>(apiException, notFound);
     }
 
+    @ExceptionHandler(value = OrderNotFoundException.class)
+    public ResponseEntity<?> handleOrderNotFoundException(OrderNotFoundException e){
+        final ApiException apiException = ApiException.builder()
+                .status(NOT_FOUND)
+                .message(e.getMessage())
+                .developerMessage(e.getClass().getName())
+                .timestamp(ZonedDateTime.now(ZoneId.of("Z")))
+                .build();
+        return new ResponseEntity<>(apiException, NOT_FOUND);
+    }
+
+    @ExceptionHandler(value = DeliveryManNotFoundException.class)
+    public ResponseEntity<?> handleDeliveryManNotFoundException(DeliveryManNotFoundException e){
+        final ApiException apiException = ApiException.builder()
+                .status(NOT_FOUND)
+                .message(e.getMessage())
+                .developerMessage(e.getClass().getName())
+                .timestamp(ZonedDateTime.now(ZoneId.of("Z")))
+                .build();
+        return new ResponseEntity<>(apiException, NOT_FOUND);
+    }
+
     @ExceptionHandler(value = EntityAlreadyExistsException.class)
     public ResponseEntity<?> handleEntityAlreadyExistsException(EntityAlreadyExistsException e){
         final HttpStatus conflict = CONFLICT;
