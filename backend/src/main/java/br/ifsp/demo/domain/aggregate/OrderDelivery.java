@@ -4,6 +4,7 @@ import br.ifsp.demo.domain.event.EventType;
 import br.ifsp.demo.domain.event.OrderDeliveryEvent;
 import br.ifsp.demo.domain.valueObject.Address;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,6 +33,10 @@ public class OrderDelivery {
 
     @Getter
     private final double distanceKm;
+
+    @Getter
+    @Setter
+    private Integer priorityLevel;
 
     public OrderDelivery(Customer customer, Address pickupAddress, Address deliveryAddress, double distanceKm) {
         if (customer == null)

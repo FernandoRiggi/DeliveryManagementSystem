@@ -1,5 +1,6 @@
 package br.ifsp.demo.infrastructure.persistence.entity;
 
+import br.ifsp.demo.domain.aggregate.PriorityLevel;
 import br.ifsp.demo.domain.aggregate.StatusOrder;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -62,4 +63,7 @@ public class OrderDeliveryEntity {
 
     @Column(nullable = false)
     private double distanceKm;
+
+    @Column(name = "priority")
+    private Integer priorityLevel;
 }

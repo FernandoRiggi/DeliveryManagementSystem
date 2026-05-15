@@ -7,6 +7,7 @@ import SearchOrder from "./pages/orders/SearchOrder.jsx";
 import CustomerOrders from "./pages/orders/CustomerOrders.jsx";
 import DispatchOrder from "./pages/orders/DispatchOrder.jsx";
 import ManageOrder from "./pages/orders/ManageOrder.jsx";
+import CalculatePriority from "./pages/orders/CalculatePriority";
 import "./App.css";
 
 function PrivateRoute({ children }) {
