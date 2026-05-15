@@ -33,3 +33,7 @@ export function startRoute(orderId) {
 export function concludeOrder(orderId) {
     return api.patch(`${ORDER_BASE_URL}/${orderId}/conclude`);
 }
+
+export function getOrderQueue() {
+    return api.get(`${ORDER_BASE_URL}/queue`);
+}

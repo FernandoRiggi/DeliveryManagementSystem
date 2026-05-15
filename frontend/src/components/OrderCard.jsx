@@ -32,8 +32,9 @@ const EVENT_LABELS = {
 };
 
 const CUSTOMER_TYPE_LABELS = {
-    PERSON:   "Pessoa Física",
-    BUSINESS: "Pessoa Jurídica",
+    REGULAR:  "Regular",
+    BUSINESS: "Empresarial",
+    PREMIUM:  "Premium",
 };
 
 function formatAddress(addr) {

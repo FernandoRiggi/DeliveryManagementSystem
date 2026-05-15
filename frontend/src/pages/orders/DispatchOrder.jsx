@@ -1,8 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { getOrderById, dispatchOrder } from "../../services/orderService";
+import { getOrderQueue, getOrderById, dispatchOrder } from "../../services/orderService";
 import { parseApiError } from "../../utils/parseApiError";
 import OrderCard from "../../components/OrderCard";
+
+const PRIORITY_CONFIG = {
+    NORMAL:   { label: "Normal",  color: "secondary" },
+    URGENT:   { label: "Urgente", color: "warning"   },
+    CRITICAL: { label: "Crítico", color: "danger"    },
+};
+
+const CUSTOMER_TYPE_LABELS = {
+    REGULAR:  "Regular",
+    BUSINESS: "Empresarial",
+    PREMIUM:  "Premium",
+};
 
 const DELIVERYMEN = [
     { id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", name: "Carlos Mendes", capacity: 3 },
@@ -24,53 +36,71 @@ function CapacityDots({ value, max = 5 }) {
 }
 
 function DispatchOrder() {
-    const [orderId, setOrderId]       = useState("");
-    const [order, setOrder]           = useState(null);
-    const [searching, setSearching]   = useState(false);
-    const [selected, setSelected]     = useState(null);
-    const [loading, setLoading]       = useState(false);
-    const [error, setError]           = useState("");
-    const [success, setSuccess]       = useState(false);
+    const [queue, setQueue] = useState([]);
+    const [loadingQueue, setLoadingQueue] = useState(true);
+    const [queueError, setQueueError] = useState("");
 
-    async function handleSearchOrder(e) {
-        e.preventDefault();
-        setError("");
-        setOrder(null);
-        setSelected(null);
-        setSuccess(false);
-        setSearching(true);
+    const [selectedItem, setSelectedItem] = useState(null);
+    const [order, setOrder] = useState(null);
+    const [loadingOrder, setLoadingOrder] = useState(false);
+    const [selectedDeliveryman, setSelectedDeliveryman] = useState(null);
 
+    const [dispatching, setDispatching] = useState(false);
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState(false);
+
+    const fetchQueue = useCallback(async () => {
+        setLoadingQueue(true);
+        setQueueError("");
         try {
-            const response = await getOrderById(orderId.trim());
-            setOrder(response.data);
-        } catch (err) {
-            setError(parseApiError(err, "Pedido não encontrado."));
+            const res = await getOrderQueue();
+            setQueue(res.data);
+        } catch {
+            setQueueError("Não foi possível carregar a fila de pedidos.");
         } finally {
-            setSearching(false);
+            setLoadingQueue(false);
+        }
+    }, []);
+
+    useEffect(() => { fetchQueue(); }, [fetchQueue]);
+
+    async function handleSelectOrder(item) {
+        setSelectedItem(item);
+        setOrder(null);
+        setSelectedDeliveryman(null);
+        setError("");
+        setLoadingOrder(true);
+        try {
+            const res = await getOrderById(item.orderId);
+            setOrder(res.data);
+        } catch (err) {
+            setError(parseApiError(err, "Erro ao carregar pedido."));
+        } finally {
+            setLoadingOrder(false);
         }
     }
 
     async function handleDispatch() {
-        if (!selected) return;
+        if (!selectedDeliveryman) return;
         setError("");
-        setLoading(true);
-
+        setDispatching(true);
         try {
-            await dispatchOrder(order.id, selected);
+            await dispatchOrder(order.id, selectedDeliveryman);
             setSuccess(true);
         } catch (err) {
             setError(parseApiError(err, "Erro ao despachar pedido."));
         } finally {
-            setLoading(false);
+            setDispatching(false);
         }
     }
 
     function handleReset() {
-        setOrderId("");
+        setSelectedItem(null);
         setOrder(null);
-        setSelected(null);
+        setSelectedDeliveryman(null);
         setError("");
         setSuccess(false);
+        fetchQueue();
     }
 
     return (
@@ -83,7 +113,13 @@ function DispatchOrder() {
                     <h1>Despachar Pedido</h1>
                 </div>
 
-                {error && <div className="alert alert-danger" role="alert">{error}</div>}
+                <p className="text-muted mb-4">
+                    Pedidos aguardando despacho, ordenados por prioridade logística.
+                </p>
+
+                {error && (
+                    <div className="alert alert-danger" role="alert">{error}</div>
+                )}
 
                 {success ? (
                     <div className="created-order-box">
@@ -99,42 +135,73 @@ function DispatchOrder() {
                     </div>
                 ) : (
                     <>
-                        {/* Passo 1 — buscar pedido */}
-                        <p className="section-label">1. Buscar pedido pelo ID</p>
-                        <form onSubmit={handleSearchOrder}>
-                            <div className="row g-3 align-items-end">
-                                <div className="col">
-                                    <input
-                                        className="form-control"
-                                        placeholder="ex: 550e8400-e29b-41d4-a716-446655440000"
-                                        value={orderId}
-                                        onChange={(e) => { setOrderId(e.target.value); setOrder(null); setSelected(null); }}
-                                        required
-                                    />
-                                </div>
-                                <div className="col-auto">
-                                    <button className="btn btn-outline-primary" type="submit" disabled={searching}>
-                                        {searching ? "Buscando..." : "Buscar"}
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
+                        <p className="section-label" style={{ marginTop: 0 }}>
+                            1. Selecionar pedido da fila
+                        </p>
 
-                        {/* Card do pedido encontrado */}
+                        {loadingQueue ? (
+                            <p className="text-muted">Carregando fila...</p>
+                        ) : queueError ? (
+                            <div className="alert alert-danger">{queueError}</div>
+                        ) : queue.length === 0 ? (
+                            <div className="alert alert-info mb-0">
+                                Nenhum pedido aguardando despacho.
+                            </div>
+                        ) : (
+                            <div className="queue-list">
+                                {queue.map((item, index) => {
+                                    const p = PRIORITY_CONFIG[item.priorityLevel] ?? PRIORITY_CONFIG.NORMAL;
+                                    const isSelected = selectedItem?.orderId === item.orderId;
+                                    return (
+                                        <button
+                                            key={item.orderId}
+                                            type="button"
+                                            className={`queue-item ${isSelected ? "queue-item--selected" : ""}`}
+                                            onClick={() => handleSelectOrder(item)}
+                                        >
+                                            <span className="queue-rank">#{index + 1}</span>
+
+                                            <div className="queue-info">
+                                                <span className="queue-customer">
+                                                    {item.customerName}
+                                                    <span className="queue-type">
+                                                        {CUSTOMER_TYPE_LABELS[item.customerType] ?? item.customerType}
+                                                    </span>
+                                                </span>
+                                                <span className="queue-meta">
+                                                    {item.distanceKm} km
+                                                    {item.waitMinutes > 0 && (
+                                                        <> · aguardando {item.waitMinutes} min</>
+                                                    )}
+                                                </span>
+                                            </div>
+
+                                            <div className="queue-priority">
+                                                <span className={`badge bg-${p.color}`}>{p.label}</span>
+                                                <span className="queue-score">score {item.score}</span>
+                                            </div>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        )}
+
+                        {loadingOrder && (
+                            <p className="text-muted mt-3">Carregando detalhes do pedido...</p>
+                        )}
+
                         {order && (
                             <>
-                                <div className="mt-3">
-                                    <OrderCard order={order} />
-                                </div>
+                                <p className="section-label">Pedido selecionado</p>
+                                <OrderCard order={order} />
 
-                                {/* Passo 2 — escolher entregador */}
                                 <p className="section-label">2. Escolher entregador</p>
                                 <div className="deliveryman-grid">
                                     {DELIVERYMEN.map((d) => (
                                         <button
                                             key={d.id}
-                                            className={`deliveryman-card ${selected === d.id ? "deliveryman-card--selected" : ""}`}
-                                            onClick={() => setSelected(d.id)}
+                                            className={`deliveryman-card ${selectedDeliveryman === d.id ? "deliveryman-card--selected" : ""}`}
+                                            onClick={() => setSelectedDeliveryman(d.id)}
                                             type="button"
                                         >
                                             <span className="deliveryman-name">{d.name}</span>
@@ -143,18 +210,21 @@ function DispatchOrder() {
                                     ))}
                                 </div>
 
-                                {/* Passo 3 — confirmar */}
                                 <div className="mt-4">
                                     <button
                                         className="btn btn-primary me-2"
                                         onClick={handleDispatch}
-                                        disabled={!selected || loading}
+                                        disabled={!selectedDeliveryman || dispatching}
                                     >
-                                        {loading ? "Despachando..." : "Confirmar despacho"}
+                                        {dispatching ? "Despachando..." : "Confirmar despacho"}
                                     </button>
-                                    <Link to="/dashboard" className="btn btn-outline-secondary">
-                                        Cancelar
-                                    </Link>
+                                    <button
+                                        className="btn btn-outline-secondary"
+                                        type="button"
+                                        onClick={() => { setSelectedItem(null); setOrder(null); setSelectedDeliveryman(null); setError(""); }}
+                                    >
+                                        Cancelar seleção
+                                    </button>
                                 </div>
                             </>
                         )}
