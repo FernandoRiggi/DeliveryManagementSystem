@@ -141,4 +141,13 @@ public class OrderDeliveryController {
             return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
         }
     }
+
+    @GetMapping("/queue")
+    public ResponseEntity<?> getPriorityQueue() {
+        try {
+            return ResponseEntity.ok(calculateOrderPriorityUseCase.buildPriorityQueue());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        }
+    }
 }
