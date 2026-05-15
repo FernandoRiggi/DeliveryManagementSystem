@@ -10,15 +10,16 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class CalculateOrderPriorityUseCase {
 
     private final OrderDeliveryRepository repo;
+    private final GetPriorityQueueUseCase getPriorityQueueUseCase = new GetPriorityQueueUseCase();
 
     public CalculateOrderPriorityUseCase(OrderDeliveryRepository repo) {
         this.repo = repo;
@@ -38,12 +39,10 @@ public class CalculateOrderPriorityUseCase {
     }
 
     public List<OrderDelivery> getPriorityQueue(List<OrderDelivery> orders, Map<OrderDelivery, Integer> timeInMinutes) {
-        return orders.stream()
+        Map<OrderDelivery, LogisticScore> scores = orders.stream()
                 .filter(o -> o.getStatus() == StatusOrder.CREATED)
-                .sorted(Comparator.comparingInt(
-                        (OrderDelivery o) -> calculate(o, timeInMinutes.getOrDefault(o, 0)).value()
-                ).reversed())
-                .toList();
+                .collect(Collectors.toMap(o -> o, o -> calculate(o, timeInMinutes.getOrDefault(o, 0))));
+        return getPriorityQueueUseCase.execute(orders, scores);
     }
 
     public List<LogisticScore> recalculateQueue(OrderDelivery triggerOrder, Map<OrderDelivery, Integer> timeInMinutes) {
