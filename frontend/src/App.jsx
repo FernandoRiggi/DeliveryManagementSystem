@@ -81,6 +81,15 @@ function App() {
                 </PrivateRoute>
             }
         />
+        <Route
+            path="/orders/:id/priority"
+            element={
+                <PrivateRoute>
+                    <CalculatePriority />
+                </PrivateRoute>
+            }
+        />
+
         </Routes>
       </BrowserRouter>
   );
