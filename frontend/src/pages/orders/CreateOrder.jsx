@@ -95,6 +95,9 @@ function CreateOrder() {
                 distanceKm: Number(form.distanceKm)
             });
 
+            console.log(response)
+            console.log(response.data);
+
             navigate(
                 `/orders/${response.data.orderId}/priority`
             );

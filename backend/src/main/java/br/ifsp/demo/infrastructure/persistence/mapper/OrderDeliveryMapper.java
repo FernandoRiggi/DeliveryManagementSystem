@@ -10,32 +10,69 @@ import br.ifsp.demo.infrastructure.persistence.entity.OrderDeliveryEntity;
 import java.util.List;
 
 public class OrderDeliveryMapper {
+
     public static OrderDeliveryEntity toEntity(OrderDelivery domain) {
+
         OrderDeliveryEntity entity = new OrderDeliveryEntity();
+
         entity.setId(domain.getId());
+
         entity.setStatusOrder(domain.getStatus());
-        entity.setCustomer(CustomerMapper.toEntity(domain.getCustomer()));
-        if (domain.getDeliveryman() != null)
-            entity.setDeliveryMan(DeliveryManMapper.toEntity(domain.getDeliveryman()));
-        entity.setPickupAddress(AddressMapper.toEmbeddable(domain.getPickupAddress()));
-        entity.setDeliveryAddress(AddressMapper.toEmbeddable(domain.getDeliveryAddress()));
+
+        entity.setCustomer(
+                CustomerMapper.toEntity(domain.getCustomer())
+        );
+
+        if (domain.getDeliveryman() != null) {
+
+            entity.setDeliveryMan(
+                    DeliveryManMapper.toEntity(domain.getDeliveryman())
+            );
+        }
+
+        entity.setPickupAddress(
+                AddressMapper.toEmbeddable(domain.getPickupAddress())
+        );
+
+        entity.setDeliveryAddress(
+                AddressMapper.toEmbeddable(domain.getDeliveryAddress())
+        );
+
         entity.setDistanceKm(domain.getDistanceKm());
-        entity.setOrderEvents(domain.getEvents().stream()
-                .map(OrderDeliveryEventMapper::toEntity)
-                .toList());
+
+        entity.setPriorityLevel(domain.getPriorityLevel());
+
+        entity.setOrderEvents(
+                domain.getEvents()
+                        .stream()
+                        .map(OrderDeliveryEventMapper::toEntity)
+                        .toList()
+        );
+
         return entity;
     }
 
     public static OrderDelivery toDomain(OrderDeliveryEntity entity) {
-        Customer customer = CustomerMapper.toDomain(entity.getCustomer());
-        DeliveryMan deliveryMan = entity.getDeliveryMan() != null
-                ? DeliveryManMapper.toDomain(entity.getDeliveryMan())
-                : null;
-        Address pickupAddress = AddressMapper.toDomain(entity.getPickupAddress());
-        Address deliveryAddress = AddressMapper.toDomain(entity.getDeliveryAddress());
-        List<OrderDeliveryEvent> events = entity.getOrderEvents().stream()
-                .map(OrderDeliveryEventMapper::toDomain)
-                .toList();
+
+        Customer customer =
+                CustomerMapper.toDomain(entity.getCustomer());
+
+        DeliveryMan deliveryMan =
+                entity.getDeliveryMan() != null
+                        ? DeliveryManMapper.toDomain(entity.getDeliveryMan())
+                        : null;
+
+        Address pickupAddress =
+                AddressMapper.toDomain(entity.getPickupAddress());
+
+        Address deliveryAddress =
+                AddressMapper.toDomain(entity.getDeliveryAddress());
+
+        List<OrderDeliveryEvent> events =
+                entity.getOrderEvents()
+                        .stream()
+                        .map(OrderDeliveryEventMapper::toDomain)
+                        .toList();
 
         return OrderDelivery.reconstitute(
                 entity.getId(),
@@ -45,6 +82,7 @@ public class OrderDeliveryMapper {
                 pickupAddress,
                 deliveryAddress,
                 entity.getDistanceKm(),
+                entity.getPriorityLevel(),
                 events
         );
     }
