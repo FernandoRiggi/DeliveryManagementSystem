@@ -30,6 +30,13 @@ const CARDS = [
         title: "Despachar Pedido",
         description: "Associe um entregador a um pedido existente.",
     },
+    {
+        to: "/orders/manage",
+        icon: "🔄",
+        iconClass: "icon-violet",
+        title: "Alterar Status",
+        description: "Atualize o status de um pedido existente.",
+    },
 ];
 
 const CUSTOMERS = [

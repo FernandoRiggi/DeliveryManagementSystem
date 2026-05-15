@@ -6,6 +6,7 @@ import CreateOrder from "./pages/orders/CreateOrder.jsx";
 import SearchOrder from "./pages/orders/SearchOrder.jsx";
 import CustomerOrders from "./pages/orders/CustomerOrders.jsx";
 import DispatchOrder from "./pages/orders/DispatchOrder.jsx";
+import ManageOrder from "./pages/orders/ManageOrder.jsx";
 import "./App.css";
 
 function PrivateRoute({ children }) {
@@ -70,6 +71,15 @@ function App() {
                 </PrivateRoute>
               }
           />
+
+        <Route
+            path="/orders/manage"
+            element={
+                <PrivateRoute>
+                    <ManageOrder />
+                </PrivateRoute>
+            }
+        />
         </Routes>
       </BrowserRouter>
   );
