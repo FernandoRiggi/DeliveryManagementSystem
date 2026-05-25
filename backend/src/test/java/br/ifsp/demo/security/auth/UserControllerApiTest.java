@@ -77,4 +77,20 @@ class UserControllerApiTest extends BaseApiIntegrationTest {
                 .body("status", equalTo("CONFLICT"))
                 .body("message", equalTo("Email already registered: " + existingUser.getEmail()));
     }
+
+    @Test
+    @DisplayName("POST /api/v1/authenticate should return 401 with invalid password")
+    void authenticateShouldReturn401WithInvalidPassword() {
+        User user = registerUser("123password");
+        AuthRequest request = new AuthRequest(user.getEmail(), "wrongPassword");
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .post("/api/v1/authenticate")
+                .then()
+                .log().ifValidationFails(LogDetail.BODY)
+                .statusCode(401);
+    }
 }
