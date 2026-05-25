@@ -2,6 +2,7 @@ package br.ifsp.demo.security.auth;
 
 import br.ifsp.demo.support.BaseApiIntegrationTest;
 import br.ifsp.demo.support.EntityBuilder;
+import br.ifsp.demo.security.user.User;
 import io.restassured.http.ContentType;
 import io.restassured.filter.log.LogDetail;
 import org.junit.jupiter.api.DisplayName;
@@ -33,5 +34,23 @@ class UserControllerApiTest extends BaseApiIntegrationTest {
                 .body("id", matchesPattern(
                         "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
                 ));
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/authenticate should login with valid credentials")
+    void authenticateShouldLoginWithValidCredentials() {
+        String password = "123password";
+        User user = registerUser(password);
+        AuthRequest request = new AuthRequest(user.getEmail(), password);
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .post("/api/v1/authenticate")
+                .then()
+                .log().ifValidationFails(LogDetail.BODY)
+                .statusCode(200)
+                .body("token", notNullValue());
     }
 }
