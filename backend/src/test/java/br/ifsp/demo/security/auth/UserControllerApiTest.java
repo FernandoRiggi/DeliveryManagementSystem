@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.notNullValue;
 
@@ -52,5 +53,28 @@ class UserControllerApiTest extends BaseApiIntegrationTest {
                 .log().ifValidationFails(LogDetail.BODY)
                 .statusCode(200)
                 .body("token", notNullValue());
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/register should return 409 when email is already registered")
+    void registerShouldReturn409WhenEmailIsAlreadyRegistered() {
+        User existingUser = registerUser("123password");
+        RegisterUserRequest request = new RegisterUserRequest(
+                existingUser.getName(),
+                existingUser.getLastname(),
+                existingUser.getEmail(),
+                "anotherPassword"
+        );
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .post("/api/v1/register")
+                .then()
+                .log().ifValidationFails(LogDetail.BODY)
+                .statusCode(409)
+                .body("status", equalTo("CONFLICT"))
+                .body("message", equalTo("Email already registered: " + existingUser.getEmail()));
     }
 }
