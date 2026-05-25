@@ -93,4 +93,20 @@ class UserControllerApiTest extends BaseApiIntegrationTest {
                 .log().ifValidationFails(LogDetail.BODY)
                 .statusCode(401);
     }
+
+    @Test
+    @DisplayName("POST /api/v1/authenticate should return 401 when email is not registered")
+    void authenticateShouldReturn401WhenEmailIsNotRegistered() {
+        RegisterUserRequest randomUser = EntityBuilder.createRandomRegisterUserRequest("123password");
+        AuthRequest request = new AuthRequest(randomUser.email(), "123password");
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .post("/api/v1/authenticate")
+                .then()
+                .log().ifValidationFails(LogDetail.BODY)
+                .statusCode(401);
+    }
 }
