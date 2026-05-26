@@ -30,4 +30,15 @@ class TransactionControllerApiTest extends BaseApiIntegrationTest {
                 .statusCode(200)
                 .body(equalTo("Hello: " + user.getId()));
     }
+
+    @Test
+    @DisplayName("GET /api/v1/hello should return 401 without authentication")
+    void helloShouldReturn401WithoutAuthentication() {
+        given()
+                .when()
+                .get("/api/v1/hello")
+                .then()
+                .log().ifValidationFails(LogDetail.BODY)
+                .statusCode(401);
+    }
 }
