@@ -100,6 +100,26 @@ class OrderDeliveryControllerApiTest extends BaseApiIntegrationTest {
     }
 
     @Test
+    @DisplayName("POST /api/v1/orders should return 400 when distance is not positive")
+    void createOrderShouldReturn400WhenDistanceIsNotPositive() {
+        String password = "123password";
+        User user = registerUser(password);
+        String token = authenticate(user.getEmail(), password);
+        CreateOrderHttpRequest request = EntityBuilder.createRandomCreateOrderRequest(SEEDED_CUSTOMER_ID, 0.0);
+
+        given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + token)
+                .body(request)
+                .when()
+                .post("/api/v1/orders")
+                .then()
+                .log().ifValidationFails(LogDetail.BODY)
+                .statusCode(400)
+                .body("message", equalTo("Distance cannot be zero or negative"));
+    }
+
+    @Test
     @DisplayName("GET /api/v1/orders/{orderId} should return order payload when order exists")
     void getOrderByIdShouldReturnOrderPayloadWhenOrderExists() {
         String password = "123password";
@@ -201,6 +221,53 @@ class OrderDeliveryControllerApiTest extends BaseApiIntegrationTest {
     }
 
     @Test
+    @DisplayName("PATCH /api/v1/orders/{orderId}/dispatch/{deliverymanId} should return 400 when deliveryman does not exist")
+    void dispatchOrderShouldReturn400WhenDeliveryManDoesNotExist() {
+        String password = "123password";
+        User user = registerUser(password);
+        String token = authenticate(user.getEmail(), password);
+        CreateOrderHttpRequest request = EntityBuilder.createRandomCreateOrderRequest(SEEDED_CUSTOMER_ID, 11.0);
+        String orderId = createOrder(token, request);
+        UUID unknownDeliveryManId = UUID.randomUUID();
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .patch("/api/v1/orders/{orderId}/dispatch/{deliverymanId}", orderId, unknownDeliveryManId)
+                .then()
+                .log().ifValidationFails(LogDetail.BODY)
+                .statusCode(400)
+                .body("message", equalTo("Delivery Man not found"));
+    }
+
+    @Test
+    @DisplayName("PATCH /api/v1/orders/{orderId}/dispatch/{deliverymanId} should return 400 when order is canceled")
+    void dispatchOrderShouldReturn400WhenOrderIsCanceled() {
+        String password = "123password";
+        User user = registerUser(password);
+        String token = authenticate(user.getEmail(), password);
+        CreateOrderHttpRequest request = EntityBuilder.createRandomCreateOrderRequest(SEEDED_CUSTOMER_ID, 11.0);
+        String orderId = createOrder(token, request);
+        UUID deliveryManId = createDeliveryMan();
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .patch("/api/v1/orders/{orderId}/cancel", orderId)
+                .then()
+                .statusCode(204);
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .patch("/api/v1/orders/{orderId}/dispatch/{deliverymanId}", orderId, deliveryManId)
+                .then()
+                .log().ifValidationFails(LogDetail.BODY)
+                .statusCode(400)
+                .body("message", equalTo("[Order already cancelled]"));
+    }
+
+    @Test
     @DisplayName("PATCH /api/v1/orders/{orderId}/cancel-route should cancel route and return 204")
     void cancelRouteShouldReturn204AndUpdateOrderStatus() {
         String password = "123password";
@@ -264,6 +331,24 @@ class OrderDeliveryControllerApiTest extends BaseApiIntegrationTest {
     }
 
     @Test
+    @DisplayName("GET /api/v1/orders/customer/{customerId} should return 400 when customer does not exist")
+    void listByCustomerShouldReturn400WhenCustomerDoesNotExist() {
+        String password = "123password";
+        User user = registerUser(password);
+        String token = authenticate(user.getEmail(), password);
+        UUID unknownCustomerId = UUID.randomUUID();
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .get("/api/v1/orders/customer/{customerId}", unknownCustomerId)
+                .then()
+                .log().ifValidationFails(LogDetail.BODY)
+                .statusCode(400)
+                .body("message", equalTo("Customer not found"));
+    }
+
+    @Test
     @DisplayName("PATCH /api/v1/orders/{orderId}/start-route should start route and return 204")
     void startRouteShouldReturn204AndUpdateOrderStatus() {
         String password = "123password";
@@ -298,6 +383,25 @@ class OrderDeliveryControllerApiTest extends BaseApiIntegrationTest {
                 .body("id", equalTo(orderId))
                 .body("status", equalTo("EN_ROUTE"))
                 .body("deliveryman.id", equalTo(deliveryManId.toString()));
+    }
+
+    @Test
+    @DisplayName("PATCH /api/v1/orders/{orderId}/start-route should return 400 when order is not dispatched")
+    void startRouteShouldReturn400WhenOrderIsNotDispatched() {
+        String password = "123password";
+        User user = registerUser(password);
+        String token = authenticate(user.getEmail(), password);
+        CreateOrderHttpRequest request = EntityBuilder.createRandomCreateOrderRequest(SEEDED_CUSTOMER_ID, 14.0);
+        String orderId = createOrder(token, request);
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .patch("/api/v1/orders/{orderId}/start-route", orderId)
+                .then()
+                .log().ifValidationFails(LogDetail.BODY)
+                .statusCode(400)
+                .body("message", equalTo("[OrderStatus is not DISPATCHED]"));
     }
 
     @Test
@@ -342,6 +446,25 @@ class OrderDeliveryControllerApiTest extends BaseApiIntegrationTest {
                 .body("id", equalTo(orderId))
                 .body("status", equalTo("CONCLUDED"))
                 .body("deliveryman.id", equalTo(deliveryManId.toString()));
+    }
+
+    @Test
+    @DisplayName("PATCH /api/v1/orders/{orderId}/conclude should return 400 when order is not en route")
+    void concludeOrderShouldReturn400WhenOrderIsNotEnRoute() {
+        String password = "123password";
+        User user = registerUser(password);
+        String token = authenticate(user.getEmail(), password);
+        CreateOrderHttpRequest request = EntityBuilder.createRandomCreateOrderRequest(SEEDED_CUSTOMER_ID, 16.0);
+        String orderId = createOrder(token, request);
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .patch("/api/v1/orders/{orderId}/conclude", orderId)
+                .then()
+                .log().ifValidationFails(LogDetail.BODY)
+                .statusCode(400)
+                .body("message", equalTo("[OrderStatus is not EN_ROUTE]"));
     }
 
     @Test
