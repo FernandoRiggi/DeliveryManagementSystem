@@ -23,6 +23,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 
 @Tag("ApiTest")
 @Tag("IntegrationTest")
@@ -193,6 +194,43 @@ class OrderDeliveryControllerApiTest extends BaseApiIntegrationTest {
                 .body("id", equalTo(orderId))
                 .body("status", equalTo("DISPATCHED"))
                 .body("deliveryman.id", equalTo(deliveryManId.toString()));
+    }
+
+    @Test
+    @DisplayName("PATCH /api/v1/orders/{orderId}/cancel-route should cancel route and return 204")
+    void cancelRouteShouldReturn204AndUpdateOrderStatus() {
+        String password = "123password";
+        User user = registerUser(password);
+        String token = authenticate(user.getEmail(), password);
+        CreateOrderHttpRequest request = EntityBuilder.createRandomCreateOrderRequest(SEEDED_CUSTOMER_ID, 13.0);
+        String orderId = createOrder(token, request);
+        UUID deliveryManId = createDeliveryMan();
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .patch("/api/v1/orders/{orderId}/dispatch/{deliverymanId}", orderId, deliveryManId)
+                .then()
+                .statusCode(204);
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .patch("/api/v1/orders/{orderId}/cancel-route", orderId)
+                .then()
+                .log().ifValidationFails(LogDetail.BODY)
+                .statusCode(204);
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .get("/api/v1/orders/{orderId}", orderId)
+                .then()
+                .log().ifValidationFails(LogDetail.BODY)
+                .statusCode(200)
+                .body("id", equalTo(orderId))
+                .body("status", equalTo("CREATED"))
+                .body("deliveryman", nullValue());
     }
 
     private String createOrder(String token, CreateOrderHttpRequest request) {
