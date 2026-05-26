@@ -22,10 +22,12 @@ import java.util.UUID;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.everyItem;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.oneOf;
 
 @Tag("ApiTest")
 @Tag("IntegrationTest")
@@ -340,6 +342,36 @@ class OrderDeliveryControllerApiTest extends BaseApiIntegrationTest {
                 .body("id", equalTo(orderId))
                 .body("status", equalTo("CONCLUDED"))
                 .body("deliveryman.id", equalTo(deliveryManId.toString()));
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/orders/queue should return priority queue with created orders")
+    void getPriorityQueueShouldReturnCreatedOrders() {
+        String password = "123password";
+        User user = registerUser(password);
+        String token = authenticate(user.getEmail(), password);
+        String firstOrderId = createOrder(
+                token,
+                EntityBuilder.createRandomCreateOrderRequest(SEEDED_CUSTOMER_ID, 6.0)
+        );
+        String secondOrderId = createOrder(
+                token,
+                EntityBuilder.createRandomCreateOrderRequest(SEEDED_CUSTOMER_ID, 15.0)
+        );
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .get("/api/v1/orders/queue")
+                .then()
+                .log().ifValidationFails(LogDetail.BODY)
+                .statusCode(200)
+                .body("orderId", hasItems(firstOrderId, secondOrderId))
+                .body("customerName", everyItem(equalTo("Acme Corp")))
+                .body("customerType", everyItem(equalTo("BUSINESS")))
+                .body("score", everyItem(greaterThanOrEqualTo(0)))
+                .body("priorityLevel", everyItem(oneOf("NORMAL", "CRITICAL", "URGENT")))
+                .body("waitMinutes", everyItem(greaterThanOrEqualTo(0)));
     }
 
     private String createOrder(String token, CreateOrderHttpRequest request) {
