@@ -1,5 +1,6 @@
 package br.ifsp.demo.support;
 
+import br.ifsp.demo.domain.dto.CreateOrderHttpRequest;
 import br.ifsp.demo.security.auth.RegisterUserRequest;
 import br.ifsp.demo.security.user.Role;
 import br.ifsp.demo.security.user.User;
@@ -32,6 +33,27 @@ public class EntityBuilder {
                 .password(encryptedPassword)
                 .role(Role.USER)
                 .build();
+    }
+
+    public static CreateOrderHttpRequest createRandomCreateOrderRequest(UUID customerId, double distanceKm) {
+        return new CreateOrderHttpRequest(
+                customerId,
+                faker.address().streetName(),
+                faker.address().buildingNumber(),
+                faker.address().cityName(),
+                faker.address().city(),
+                faker.address().stateAbbr(),
+                "Brasil",
+                faker.number().digits(8),
+                faker.address().streetName(),
+                faker.address().buildingNumber(),
+                faker.address().cityName(),
+                faker.address().city(),
+                faker.address().stateAbbr(),
+                "Brasil",
+                faker.number().digits(8),
+                distanceKm
+        );
     }
 
     private static String uniqueEmail() {
