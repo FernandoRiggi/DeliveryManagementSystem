@@ -1,6 +1,8 @@
 package br.ifsp.demo.controller;
 
 import br.ifsp.demo.domain.dto.CreateOrderHttpRequest;
+import br.ifsp.demo.infrastructure.persistence.entity.DeliveryManEntity;
+import br.ifsp.demo.infrastructure.persistence.repository.DeliveryManJpaRepository;
 import br.ifsp.demo.infrastructure.persistence.repository.OrderDeliveryJpaRepository;
 import br.ifsp.demo.security.user.User;
 import br.ifsp.demo.support.BaseApiIntegrationTest;
@@ -31,12 +33,18 @@ class OrderDeliveryControllerApiTest extends BaseApiIntegrationTest {
     @Autowired
     private OrderDeliveryJpaRepository orderRepository;
 
+    @Autowired
+    private DeliveryManJpaRepository deliveryManRepository;
+
     private final List<UUID> createdOrderIds = new ArrayList<>();
+    private final List<UUID> createdDeliveryManIds = new ArrayList<>();
 
     @AfterEach
     void cleanOrders() {
         createdOrderIds.forEach(orderRepository::deleteById);
         createdOrderIds.clear();
+        createdDeliveryManIds.forEach(deliveryManRepository::deleteById);
+        createdDeliveryManIds.clear();
     }
 
     @Test
@@ -157,6 +165,36 @@ class OrderDeliveryControllerApiTest extends BaseApiIntegrationTest {
                 .body("status", equalTo("CANCELED"));
     }
 
+    @Test
+    @DisplayName("PATCH /api/v1/orders/{orderId}/dispatch/{deliverymanId} should dispatch order and return 204")
+    void dispatchOrderShouldReturn204AndUpdateOrderStatus() {
+        String password = "123password";
+        User user = registerUser(password);
+        String token = authenticate(user.getEmail(), password);
+        CreateOrderHttpRequest request = EntityBuilder.createRandomCreateOrderRequest(SEEDED_CUSTOMER_ID, 11.0);
+        String orderId = createOrder(token, request);
+        UUID deliveryManId = createDeliveryMan();
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .patch("/api/v1/orders/{orderId}/dispatch/{deliverymanId}", orderId, deliveryManId)
+                .then()
+                .log().ifValidationFails(LogDetail.BODY)
+                .statusCode(204);
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .get("/api/v1/orders/{orderId}", orderId)
+                .then()
+                .log().ifValidationFails(LogDetail.BODY)
+                .statusCode(200)
+                .body("id", equalTo(orderId))
+                .body("status", equalTo("DISPATCHED"))
+                .body("deliveryman.id", equalTo(deliveryManId.toString()));
+    }
+
     private String createOrder(String token, CreateOrderHttpRequest request) {
         String orderId = given()
                 .contentType(ContentType.JSON)
@@ -171,5 +209,16 @@ class OrderDeliveryControllerApiTest extends BaseApiIntegrationTest {
 
         createdOrderIds.add(UUID.fromString(orderId));
         return orderId;
+    }
+
+    private UUID createDeliveryMan() {
+        DeliveryManEntity deliveryMan = new DeliveryManEntity();
+        deliveryMan.setId(UUID.randomUUID());
+        deliveryMan.setName("API Test Deliveryman");
+        deliveryMan.setCapacity(10);
+
+        deliveryManRepository.save(deliveryMan);
+        createdDeliveryManIds.add(deliveryMan.getId());
+        return deliveryMan.getId();
     }
 }
