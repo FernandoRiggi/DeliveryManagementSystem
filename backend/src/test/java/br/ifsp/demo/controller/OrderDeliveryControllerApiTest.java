@@ -129,6 +129,34 @@ class OrderDeliveryControllerApiTest extends BaseApiIntegrationTest {
                 .body("message", equalTo("[OrderDelivery Not Found]"));
     }
 
+    @Test
+    @DisplayName("PATCH /api/v1/orders/{orderId}/cancel should cancel order and return 204")
+    void cancelOrderShouldReturn204AndUpdateOrderStatus() {
+        String password = "123password";
+        User user = registerUser(password);
+        String token = authenticate(user.getEmail(), password);
+        CreateOrderHttpRequest request = EntityBuilder.createRandomCreateOrderRequest(SEEDED_CUSTOMER_ID, 9.0);
+        String orderId = createOrder(token, request);
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .patch("/api/v1/orders/{orderId}/cancel", orderId)
+                .then()
+                .log().ifValidationFails(LogDetail.BODY)
+                .statusCode(204);
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .get("/api/v1/orders/{orderId}", orderId)
+                .then()
+                .log().ifValidationFails(LogDetail.BODY)
+                .statusCode(200)
+                .body("id", equalTo(orderId))
+                .body("status", equalTo("CANCELED"));
+    }
+
     private String createOrder(String token, CreateOrderHttpRequest request) {
         String orderId = given()
                 .contentType(ContentType.JSON)
