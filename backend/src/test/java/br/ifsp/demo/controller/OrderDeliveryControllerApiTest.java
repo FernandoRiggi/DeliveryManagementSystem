@@ -298,6 +298,50 @@ class OrderDeliveryControllerApiTest extends BaseApiIntegrationTest {
                 .body("deliveryman.id", equalTo(deliveryManId.toString()));
     }
 
+    @Test
+    @DisplayName("PATCH /api/v1/orders/{orderId}/conclude should conclude order and return 204")
+    void concludeOrderShouldReturn204AndUpdateOrderStatus() {
+        String password = "123password";
+        User user = registerUser(password);
+        String token = authenticate(user.getEmail(), password);
+        CreateOrderHttpRequest request = EntityBuilder.createRandomCreateOrderRequest(SEEDED_CUSTOMER_ID, 16.0);
+        String orderId = createOrder(token, request);
+        UUID deliveryManId = createDeliveryMan();
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .patch("/api/v1/orders/{orderId}/dispatch/{deliverymanId}", orderId, deliveryManId)
+                .then()
+                .statusCode(204);
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .patch("/api/v1/orders/{orderId}/start-route", orderId)
+                .then()
+                .statusCode(204);
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .patch("/api/v1/orders/{orderId}/conclude", orderId)
+                .then()
+                .log().ifValidationFails(LogDetail.BODY)
+                .statusCode(204);
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .get("/api/v1/orders/{orderId}", orderId)
+                .then()
+                .log().ifValidationFails(LogDetail.BODY)
+                .statusCode(200)
+                .body("id", equalTo(orderId))
+                .body("status", equalTo("CONCLUDED"))
+                .body("deliveryman.id", equalTo(deliveryManId.toString()));
+    }
+
     private String createOrder(String token, CreateOrderHttpRequest request) {
         String orderId = given()
                 .contentType(ContentType.JSON)
