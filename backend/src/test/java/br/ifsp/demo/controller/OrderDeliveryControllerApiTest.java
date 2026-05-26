@@ -21,6 +21,8 @@ import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.everyItem;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -231,6 +233,32 @@ class OrderDeliveryControllerApiTest extends BaseApiIntegrationTest {
                 .body("id", equalTo(orderId))
                 .body("status", equalTo("CREATED"))
                 .body("deliveryman", nullValue());
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/orders/customer/{customerId} should return customer orders")
+    void listByCustomerShouldReturnCustomerOrders() {
+        String password = "123password";
+        User user = registerUser(password);
+        String token = authenticate(user.getEmail(), password);
+        String firstOrderId = createOrder(
+                token,
+                EntityBuilder.createRandomCreateOrderRequest(SEEDED_CUSTOMER_ID, 5.0)
+        );
+        String secondOrderId = createOrder(
+                token,
+                EntityBuilder.createRandomCreateOrderRequest(SEEDED_CUSTOMER_ID, 8.0)
+        );
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .get("/api/v1/orders/customer/{customerId}", SEEDED_CUSTOMER_ID)
+                .then()
+                .log().ifValidationFails(LogDetail.BODY)
+                .statusCode(200)
+                .body("id", hasItems(firstOrderId, secondOrderId))
+                .body("customer.customerId", everyItem(equalTo(SEEDED_CUSTOMER_ID.toString())));
     }
 
     private String createOrder(String token, CreateOrderHttpRequest request) {
