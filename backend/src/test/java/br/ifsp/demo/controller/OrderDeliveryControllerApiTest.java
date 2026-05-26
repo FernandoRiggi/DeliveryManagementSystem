@@ -85,4 +85,63 @@ class OrderDeliveryControllerApiTest extends BaseApiIntegrationTest {
                 .statusCode(400)
                 .body("message", equalTo("Customer not found"));
     }
+
+    @Test
+    @DisplayName("GET /api/v1/orders/{orderId} should return order payload when order exists")
+    void getOrderByIdShouldReturnOrderPayloadWhenOrderExists() {
+        String password = "123password";
+        User user = registerUser(password);
+        String token = authenticate(user.getEmail(), password);
+        double distanceKm = 7.5;
+        CreateOrderHttpRequest request = EntityBuilder.createRandomCreateOrderRequest(SEEDED_CUSTOMER_ID, distanceKm);
+        String orderId = createOrder(token, request);
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .get("/api/v1/orders/{orderId}", orderId)
+                .then()
+                .log().ifValidationFails(LogDetail.BODY)
+                .statusCode(200)
+                .body("id", equalTo(orderId))
+                .body("status", equalTo("CREATED"))
+                .body("customer.customerId", equalTo(SEEDED_CUSTOMER_ID.toString()))
+                .body("distanceKm", equalTo((float) distanceKm))
+                .body("pickupAddress.cep", equalTo(request.pickupCep()))
+                .body("deliveryAddress.cep", equalTo(request.deliveryCep()));
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/orders/{orderId} should return 404 when order does not exist")
+    void getOrderByIdShouldReturn404WhenOrderDoesNotExist() {
+        String password = "123password";
+        User user = registerUser(password);
+        String token = authenticate(user.getEmail(), password);
+        UUID unknownOrderId = UUID.randomUUID();
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .get("/api/v1/orders/{orderId}", unknownOrderId)
+                .then()
+                .log().ifValidationFails(LogDetail.BODY)
+                .statusCode(404)
+                .body("message", equalTo("[OrderDelivery Not Found]"));
+    }
+
+    private String createOrder(String token, CreateOrderHttpRequest request) {
+        String orderId = given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + token)
+                .body(request)
+                .when()
+                .post("/api/v1/orders")
+                .then()
+                .statusCode(201)
+                .extract()
+                .path("orderId");
+
+        createdOrderIds.add(UUID.fromString(orderId));
+        return orderId;
+    }
 }
