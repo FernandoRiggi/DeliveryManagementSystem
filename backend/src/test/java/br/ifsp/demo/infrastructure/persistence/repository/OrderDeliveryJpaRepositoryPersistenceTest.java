@@ -1,19 +1,23 @@
 package br.ifsp.demo.infrastructure.persistence.repository;
 
 import br.ifsp.demo.domain.aggregate.StatusOrder;
+import br.ifsp.demo.domain.event.EventType;
 import br.ifsp.demo.infrastructure.persistence.entity.AddressEmbeddable;
 import br.ifsp.demo.infrastructure.persistence.entity.CustomerEntity;
 import br.ifsp.demo.infrastructure.persistence.entity.OrderDeliveryEntity;
+import br.ifsp.demo.infrastructure.persistence.entity.OrderDeliveryEventEntity;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -65,7 +69,34 @@ class OrderDeliveryJpaRepositoryPersistenceTest {
                 .doesNotContain(StatusOrder.CANCELED, StatusOrder.CONCLUDED);
     }
 
+    @Test
+    @Transactional
+    @DisplayName("save should persist order events by cascade")
+    void saveShouldPersistOrderEventsByCascade() {
+        CustomerEntity customer = customerRepository.findById(SEEDED_CUSTOMER_ID).orElseThrow();
+        OrderDeliveryEntity order = validOrder(customer, StatusOrder.CREATED);
+        OrderDeliveryEventEntity createdEvent = event(EventType.CREATED);
+
+        order.setOrderEvents(List.of(createdEvent));
+        OrderDeliveryEntity savedOrder = orderRepository.save(order);
+        createdOrderIds.add(savedOrder.getId());
+
+        OrderDeliveryEntity foundOrder = orderRepository.findById(savedOrder.getId()).orElseThrow();
+
+        assertThat(foundOrder.getOrderEvents())
+                .hasSize(1)
+                .extracting(OrderDeliveryEventEntity::getType)
+                .containsExactly(EventType.CREATED);
+    }
+
     private OrderDeliveryEntity saveOrder(CustomerEntity customer, StatusOrder status) {
+        OrderDeliveryEntity order = validOrder(customer, status);
+        OrderDeliveryEntity savedOrder = orderRepository.save(order);
+        createdOrderIds.add(savedOrder.getId());
+        return savedOrder;
+    }
+
+    private OrderDeliveryEntity validOrder(CustomerEntity customer, StatusOrder status) {
         OrderDeliveryEntity order = new OrderDeliveryEntity();
         order.setId(UUID.randomUUID());
         order.setCustomer(customer);
@@ -73,10 +104,14 @@ class OrderDeliveryJpaRepositoryPersistenceTest {
         order.setDistanceKm(10.0);
         order.setPickupAddress(address());
         order.setDeliveryAddress(address());
+        return order;
+    }
 
-        OrderDeliveryEntity savedOrder = orderRepository.save(order);
-        createdOrderIds.add(savedOrder.getId());
-        return savedOrder;
+    private OrderDeliveryEventEntity event(EventType type) {
+        OrderDeliveryEventEntity event = new OrderDeliveryEventEntity();
+        event.setType(type);
+        event.setDateTime(LocalDateTime.now());
+        return event;
     }
 
     private AddressEmbeddable address() {
