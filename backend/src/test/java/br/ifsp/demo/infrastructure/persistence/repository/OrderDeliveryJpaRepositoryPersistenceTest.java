@@ -20,6 +20,7 @@ import java.util.UUID;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @Tag("PersistenceTest")
@@ -87,6 +88,16 @@ class OrderDeliveryJpaRepositoryPersistenceTest {
                 .hasSize(1)
                 .extracting(OrderDeliveryEventEntity::getType)
                 .containsExactly(EventType.CREATED);
+    }
+
+    @Test
+    @DisplayName("save should fail when order has no customer")
+    void saveShouldFailWhenOrderHasNoCustomer() {
+        OrderDeliveryEntity order = validOrder(null, StatusOrder.CREATED);
+
+        assertThatThrownBy(() -> orderRepository.saveAndFlush(order))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("customer");
     }
 
     private OrderDeliveryEntity saveOrder(CustomerEntity customer, StatusOrder status) {
