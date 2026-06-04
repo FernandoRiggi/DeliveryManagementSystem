@@ -76,6 +76,12 @@ public class LoginPage {
         passwordInput().sendKeys(password);
     }
 
+    public void login(String email, String password) {
+        fillEmail(email);
+        fillPassword(password);
+        submit();
+    }
+
     public boolean isEmailValid() {
         return isValid(emailInput());
     }
@@ -94,6 +100,10 @@ public class LoginPage {
 
     public boolean isErrorAlertVisible() {
         return driver.findElements(errorAlert).stream().anyMatch(WebElement::isDisplayed);
+    }
+
+    public String waitForErrorAlertText() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(errorAlert)).getText();
     }
 
     private boolean isValid(WebElement element) {

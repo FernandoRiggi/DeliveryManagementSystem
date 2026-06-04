@@ -1,15 +1,20 @@
 package br.ifsp.demo.ui;
 
 import br.ifsp.demo.ui.pages.LoginPage;
+import com.github.javafaker.Faker;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Tag("UiTest")
 class LoginUiTest extends BaseUiTest {
+
+    private static final Faker faker = Faker.instance();
 
     @Test
     @DisplayName("Should render login page with its main elements")
@@ -76,5 +81,28 @@ class LoginUiTest extends BaseUiTest {
         wait.until(ExpectedConditions.urlContains("/register"));
 
         assertThat(driver.getCurrentUrl()).contains("/register");
+    }
+
+    @Test
+    @DisplayName("Should show error when login credentials do not exist")
+    void shouldShowErrorWhenLoginCredentialsDoNotExist() {
+        LoginPage loginPage = new LoginPage(driver, wait, baseUrl);
+        String nonexistentEmail = nonexistentEmail();
+
+        loginPage.open();
+        loginPage.waitUntilLoaded();
+        loginPage.login(nonexistentEmail, "senhaValida123");
+
+        String errorMessage = loginPage.waitForErrorAlertText();
+
+        assertThat(driver.getCurrentUrl()).contains("/login");
+        assertThat(errorMessage).isNotBlank();
+        assertThat(errorMessage).containsIgnoringCase("senha");
+    }
+
+    private String nonexistentEmail() {
+        String[] emailParts = faker.internet().emailAddress().split("@", 2);
+
+        return emailParts[0] + "-" + UUID.randomUUID() + "@" + emailParts[1];
     }
 }
