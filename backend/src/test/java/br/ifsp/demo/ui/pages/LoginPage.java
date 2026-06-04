@@ -66,6 +66,16 @@ public class LoginPage {
         submitButton().click();
     }
 
+    public void fillEmail(String email) {
+        emailInput().clear();
+        emailInput().sendKeys(email);
+    }
+
+    public void fillPassword(String password) {
+        passwordInput().clear();
+        passwordInput().sendKeys(password);
+    }
+
     public boolean isEmailValid() {
         return isValid(emailInput());
     }
@@ -76,6 +86,10 @@ public class LoginPage {
 
     public String emailValidationMessage() {
         return emailInput().getDomProperty("validationMessage");
+    }
+
+    public String passwordValidationMessage() {
+        return passwordInput().getDomProperty("validationMessage");
     }
 
     public boolean isErrorAlertVisible() {

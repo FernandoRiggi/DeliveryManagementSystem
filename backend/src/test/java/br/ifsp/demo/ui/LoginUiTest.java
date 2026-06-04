@@ -44,4 +44,22 @@ class LoginUiTest extends BaseUiTest {
         assertThat(loginPage.emailValidationMessage()).isNotBlank();
         assertThat(loginPage.isErrorAlertVisible()).isFalse();
     }
+
+    @Test
+    @DisplayName("Should block login submission when email format is invalid")
+    void shouldBlockLoginSubmissionWhenEmailFormatIsInvalid() {
+        LoginPage loginPage = new LoginPage(driver, wait, baseUrl);
+
+        loginPage.open();
+        loginPage.waitUntilLoaded();
+        loginPage.fillEmail("email-invalido");
+        loginPage.fillPassword("senhaValida123");
+        loginPage.submit();
+
+        assertThat(driver.getCurrentUrl()).contains("/login");
+        assertThat(loginPage.isEmailValid()).isFalse();
+        assertThat(loginPage.isPasswordValid()).isTrue();
+        assertThat(loginPage.emailValidationMessage()).isNotBlank();
+        assertThat(loginPage.isErrorAlertVisible()).isFalse();
+    }
 }
