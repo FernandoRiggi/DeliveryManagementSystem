@@ -5,6 +5,8 @@ import com.github.javafaker.Faker;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.UUID;
@@ -100,9 +102,35 @@ class LoginUiTest extends BaseUiTest {
         assertThat(errorMessage).containsIgnoringCase("senha");
     }
 
+    @Test
+    @DisplayName("Should keep login page usable on mobile viewport")
+    void shouldKeepLoginPageUsableOnMobileViewport() {
+        driver.manage().window().setSize(new Dimension(390, 844));
+        LoginPage loginPage = new LoginPage(driver, wait, baseUrl);
+
+        loginPage.open();
+        loginPage.waitUntilLoaded();
+
+        assertThat(loginPage.title().isDisplayed()).isTrue();
+        assertThat(loginPage.emailInput().isDisplayed()).isTrue();
+        assertThat(loginPage.passwordInput().isDisplayed()).isTrue();
+        assertThat(loginPage.submitButton().isDisplayed()).isTrue();
+        assertThat(loginPage.registerLink().isDisplayed()).isTrue();
+        assertThat(hasHorizontalOverflow()).isFalse();
+    }
+
     private String nonexistentEmail() {
         String[] emailParts = faker.internet().emailAddress().split("@", 2);
 
         return emailParts[0] + "-" + UUID.randomUUID() + "@" + emailParts[1];
+    }
+
+    private boolean hasHorizontalOverflow() {
+        Long scrollWidth = (Long) ((JavascriptExecutor) driver)
+                .executeScript("return document.documentElement.scrollWidth;");
+        Long clientWidth = (Long) ((JavascriptExecutor) driver)
+                .executeScript("return document.documentElement.clientWidth;");
+
+        return scrollWidth > clientWidth;
     }
 }
