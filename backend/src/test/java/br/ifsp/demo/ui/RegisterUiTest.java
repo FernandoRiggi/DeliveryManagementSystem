@@ -32,4 +32,21 @@ class RegisterUiTest extends BaseUiTest {
         assertThat(registerPage.submitButton().isEnabled()).isTrue();
         assertThat(registerPage.loginLink().isDisplayed()).isTrue();
     }
+
+    @Test
+    @DisplayName("Should block register submission when required fields are empty")
+    void shouldBlockRegisterSubmissionWhenRequiredFieldsAreEmpty() {
+        RegisterPage registerPage = new RegisterPage(driver, wait, baseUrl);
+
+        registerPage.open();
+        registerPage.waitUntilLoaded();
+        registerPage.submit();
+
+        assertThat(driver.getCurrentUrl()).contains("/register");
+        assertThat(registerPage.isNameValid()).isFalse();
+        assertThat(registerPage.isLastnameValid()).isFalse();
+        assertThat(registerPage.isEmailValid()).isFalse();
+        assertThat(registerPage.isPasswordValid()).isFalse();
+        assertThat(registerPage.nameValidationMessage()).isNotBlank();
+    }
 }

@@ -1,6 +1,7 @@
 package br.ifsp.demo.ui.pages;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -70,5 +71,33 @@ public class RegisterPage {
 
     public WebElement loginLink() {
         return wait.until(ExpectedConditions.elementToBeClickable(loginLink));
+    }
+
+    public void submit() {
+        submitButton().click();
+    }
+
+    public boolean isNameValid() {
+        return isValid(nameInput());
+    }
+
+    public boolean isLastnameValid() {
+        return isValid(lastnameInput());
+    }
+
+    public boolean isEmailValid() {
+        return isValid(emailInput());
+    }
+
+    public boolean isPasswordValid() {
+        return isValid(passwordInput());
+    }
+
+    public String nameValidationMessage() {
+        return nameInput().getDomProperty("validationMessage");
+    }
+
+    private boolean isValid(WebElement element) {
+        return (Boolean) ((JavascriptExecutor) driver).executeScript("return arguments[0].checkValidity();", element);
     }
 }
