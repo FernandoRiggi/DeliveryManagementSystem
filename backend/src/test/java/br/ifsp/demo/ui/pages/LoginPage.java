@@ -1,6 +1,7 @@
 package br.ifsp.demo.ui.pages;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -18,6 +19,7 @@ public class LoginPage {
     private final By passwordInput = By.cssSelector("input[type='password']");
     private final By submitButton = By.xpath("//button[normalize-space()='Entrar']");
     private final By registerLink = By.linkText("Cadastrar");
+    private final By errorAlert = By.cssSelector(".alert-danger");
 
     public LoginPage(WebDriver driver, WebDriverWait wait, String baseUrl) {
         this.driver = driver;
@@ -58,5 +60,29 @@ public class LoginPage {
 
     public WebElement registerLink() {
         return wait.until(ExpectedConditions.elementToBeClickable(registerLink));
+    }
+
+    public void submit() {
+        submitButton().click();
+    }
+
+    public boolean isEmailValid() {
+        return isValid(emailInput());
+    }
+
+    public boolean isPasswordValid() {
+        return isValid(passwordInput());
+    }
+
+    public String emailValidationMessage() {
+        return emailInput().getDomProperty("validationMessage");
+    }
+
+    public boolean isErrorAlertVisible() {
+        return driver.findElements(errorAlert).stream().anyMatch(WebElement::isDisplayed);
+    }
+
+    private boolean isValid(WebElement element) {
+        return (Boolean) ((JavascriptExecutor) driver).executeScript("return arguments[0].checkValidity();", element);
     }
 }

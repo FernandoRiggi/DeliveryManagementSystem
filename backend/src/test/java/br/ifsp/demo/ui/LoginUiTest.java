@@ -28,4 +28,20 @@ class LoginUiTest extends BaseUiTest {
         assertThat(loginPage.submitButton().isEnabled()).isTrue();
         assertThat(loginPage.registerLink().isDisplayed()).isTrue();
     }
+
+    @Test
+    @DisplayName("Should block login submission when required fields are empty")
+    void shouldBlockLoginSubmissionWhenRequiredFieldsAreEmpty() {
+        LoginPage loginPage = new LoginPage(driver, wait, baseUrl);
+
+        loginPage.open();
+        loginPage.waitUntilLoaded();
+        loginPage.submit();
+
+        assertThat(driver.getCurrentUrl()).contains("/login");
+        assertThat(loginPage.isEmailValid()).isFalse();
+        assertThat(loginPage.isPasswordValid()).isFalse();
+        assertThat(loginPage.emailValidationMessage()).isNotBlank();
+        assertThat(loginPage.isErrorAlertVisible()).isFalse();
+    }
 }
