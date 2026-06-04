@@ -14,10 +14,12 @@ abstract class BaseUiTest {
     protected WebDriver driver;
     protected WebDriverWait wait;
     protected String baseUrl;
+    protected String apiBaseUrl;
 
     @BeforeEach
     void setUp() {
         baseUrl = System.getProperty("ui.baseUrl", "http://localhost:5173");
+        apiBaseUrl = System.getProperty("ui.apiBaseUrl", "http://localhost:8080");
 
         ChromeOptions options = new ChromeOptions();
         if (Boolean.parseBoolean(System.getProperty("ui.headless", "true"))) {
