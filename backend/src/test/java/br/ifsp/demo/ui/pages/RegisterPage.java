@@ -21,6 +21,7 @@ public class RegisterPage {
     private final By passwordInput = By.cssSelector("input[type='password']");
     private final By submitButton = By.xpath("//button[normalize-space()='Criar conta']");
     private final By loginLink = By.linkText("Entrar");
+    private final By errorAlert = By.cssSelector(".alert-danger");
 
     public RegisterPage(WebDriver driver, WebDriverWait wait, String baseUrl) {
         this.driver = driver;
@@ -77,6 +78,34 @@ public class RegisterPage {
         submitButton().click();
     }
 
+    public void fillName(String name) {
+        nameInput().clear();
+        nameInput().sendKeys(name);
+    }
+
+    public void fillLastname(String lastname) {
+        lastnameInput().clear();
+        lastnameInput().sendKeys(lastname);
+    }
+
+    public void fillEmail(String email) {
+        emailInput().clear();
+        emailInput().sendKeys(email);
+    }
+
+    public void fillPassword(String password) {
+        passwordInput().clear();
+        passwordInput().sendKeys(password);
+    }
+
+    public void register(String name, String lastname, String email, String password) {
+        fillName(name);
+        fillLastname(lastname);
+        fillEmail(email);
+        fillPassword(password);
+        submit();
+    }
+
     public boolean isNameValid() {
         return isValid(nameInput());
     }
@@ -95,6 +124,10 @@ public class RegisterPage {
 
     public String nameValidationMessage() {
         return nameInput().getDomProperty("validationMessage");
+    }
+
+    public String waitForErrorAlertText() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(errorAlert)).getText();
     }
 
     private boolean isValid(WebElement element) {
