@@ -8,6 +8,8 @@ import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.UUID;
@@ -143,6 +145,25 @@ class RegisterUiTest extends BaseUiTest {
         assertThat(errorMessage).containsIgnoringCase("cadastrado");
     }
 
+    @Test
+    @DisplayName("Should keep register page usable on mobile viewport")
+    void shouldKeepRegisterPageUsableOnMobileViewport() {
+        driver.manage().window().setSize(new Dimension(390, 844));
+        RegisterPage registerPage = new RegisterPage(driver, wait, baseUrl);
+
+        registerPage.open();
+        registerPage.waitUntilLoaded();
+
+        assertThat(registerPage.title().isDisplayed()).isTrue();
+        assertThat(registerPage.nameInput().isDisplayed()).isTrue();
+        assertThat(registerPage.lastnameInput().isDisplayed()).isTrue();
+        assertThat(registerPage.emailInput().isDisplayed()).isTrue();
+        assertThat(registerPage.passwordInput().isDisplayed()).isTrue();
+        assertThat(registerPage.submitButton().isDisplayed()).isTrue();
+        assertThat(registerPage.loginLink().isDisplayed()).isTrue();
+        assertThat(hasHorizontalOverflow()).isFalse();
+    }
+
     private void registerUser(RegisterUserRequest user) {
         given()
                 .baseUri(apiBaseUrl)
@@ -152,5 +173,14 @@ class RegisterUiTest extends BaseUiTest {
                 .post("/api/v1/register")
                 .then()
                 .statusCode(201);
+    }
+
+    private boolean hasHorizontalOverflow() {
+        Long scrollWidth = (Long) ((JavascriptExecutor) driver)
+                .executeScript("return document.documentElement.scrollWidth;");
+        Long clientWidth = (Long) ((JavascriptExecutor) driver)
+                .executeScript("return document.documentElement.clientWidth;");
+
+        return scrollWidth > clientWidth;
     }
 }
