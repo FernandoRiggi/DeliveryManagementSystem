@@ -70,4 +70,21 @@ class RegisterUiTest extends BaseUiTest {
         assertThat(driver.getCurrentUrl()).contains("/register");
         assertThat(errorMessage).isNotBlank();
     }
+
+    @Test
+    @DisplayName("Should block register submission when email format is invalid")
+    void shouldBlockRegisterSubmissionWhenEmailFormatIsInvalid() {
+        RegisterPage registerPage = new RegisterPage(driver, wait, baseUrl);
+
+        registerPage.open();
+        registerPage.waitUntilLoaded();
+        registerPage.register("Joao", "Silva", "email-invalido", "senhaValida123");
+
+        assertThat(driver.getCurrentUrl()).contains("/register");
+        assertThat(registerPage.isNameValid()).isTrue();
+        assertThat(registerPage.isLastnameValid()).isTrue();
+        assertThat(registerPage.isEmailValid()).isFalse();
+        assertThat(registerPage.isPasswordValid()).isTrue();
+        assertThat(registerPage.emailValidationMessage()).isNotBlank();
+    }
 }

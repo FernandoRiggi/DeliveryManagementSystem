@@ -126,6 +126,10 @@ public class RegisterPage {
         return nameInput().getDomProperty("validationMessage");
     }
 
+    public String emailValidationMessage() {
+        return emailInput().getDomProperty("validationMessage");
+    }
+
     public String waitForErrorAlertText() {
         return wait.until(ExpectedConditions.visibilityOfElementLocated(errorAlert)).getText();
     }
