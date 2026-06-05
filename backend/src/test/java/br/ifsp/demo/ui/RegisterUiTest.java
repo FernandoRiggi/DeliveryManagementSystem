@@ -5,6 +5,7 @@ import com.github.javafaker.Faker;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.UUID;
 
@@ -86,5 +87,19 @@ class RegisterUiTest extends BaseUiTest {
         assertThat(registerPage.isEmailValid()).isFalse();
         assertThat(registerPage.isPasswordValid()).isTrue();
         assertThat(registerPage.emailValidationMessage()).isNotBlank();
+    }
+
+    @Test
+    @DisplayName("Should navigate to login page when clicking login link")
+    void shouldNavigateToLoginPageWhenClickingLoginLink() {
+        RegisterPage registerPage = new RegisterPage(driver, wait, baseUrl);
+
+        registerPage.open();
+        registerPage.waitUntilLoaded();
+        registerPage.loginLink().click();
+
+        wait.until(ExpectedConditions.urlContains("/login"));
+
+        assertThat(driver.getCurrentUrl()).contains("/login");
     }
 }
