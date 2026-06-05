@@ -1,7 +1,10 @@
 package br.ifsp.demo.ui;
 
+import br.ifsp.demo.security.auth.RegisterUserRequest;
 import br.ifsp.demo.ui.pages.RegisterPage;
+import br.ifsp.demo.support.EntityBuilder;
 import com.github.javafaker.Faker;
+import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -9,6 +12,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.UUID;
 
+import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Tag("UiTest")
@@ -101,5 +105,52 @@ class RegisterUiTest extends BaseUiTest {
         wait.until(ExpectedConditions.urlContains("/login"));
 
         assertThat(driver.getCurrentUrl()).contains("/login");
+    }
+
+    @Test
+    @DisplayName("Should register user with valid data and redirect to login")
+    void shouldRegisterUserWithValidDataAndRedirectToLogin() {
+        RegisterPage registerPage = new RegisterPage(driver, wait, baseUrl);
+        String email = EntityBuilder.TEST_EMAIL_PREFIX + UUID.randomUUID() + "@" + faker.internet().domainName();
+
+        registerPage.open();
+        registerPage.waitUntilLoaded();
+        registerPage.register(faker.name().firstName(), faker.name().lastName(), email, "senhaValida123");
+
+        String successMessage = registerPage.waitForSuccessAlertText();
+        wait.until(ExpectedConditions.urlContains("/login"));
+
+        assertThat(successMessage).isNotBlank();
+        assertThat(driver.getCurrentUrl()).contains("/login");
+    }
+
+    @Test
+    @DisplayName("Should show error when registering with duplicated email")
+    void shouldShowErrorWhenRegisteringWithDuplicatedEmail() {
+        RegisterPage registerPage = new RegisterPage(driver, wait, baseUrl);
+        String password = "senhaValida123";
+        String email = EntityBuilder.TEST_EMAIL_PREFIX + UUID.randomUUID() + "@" + faker.internet().domainName();
+        registerUser(new RegisterUserRequest(faker.name().firstName(), faker.name().lastName(), email, password));
+
+        registerPage.open();
+        registerPage.waitUntilLoaded();
+        registerPage.register(faker.name().firstName(), faker.name().lastName(), email, password);
+
+        String errorMessage = registerPage.waitForErrorAlertText();
+
+        assertThat(driver.getCurrentUrl()).contains("/register");
+        assertThat(errorMessage).isNotBlank();
+        assertThat(errorMessage).containsIgnoringCase("cadastrado");
+    }
+
+    private void registerUser(RegisterUserRequest user) {
+        given()
+                .baseUri(apiBaseUrl)
+                .contentType(ContentType.JSON)
+                .body(user)
+                .when()
+                .post("/api/v1/register")
+                .then()
+                .statusCode(201);
     }
 }
