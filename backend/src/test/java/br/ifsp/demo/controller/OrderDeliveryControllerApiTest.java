@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
@@ -80,8 +81,8 @@ class OrderDeliveryControllerApiTest extends BaseApiIntegrationTest {
     }
 
     @Test
-    @DisplayName("POST /api/v1/orders should return 400 when customer does not exist")
-    void createOrderShouldReturn400WhenCustomerDoesNotExist() {
+    @DisplayName("POST /api/v1/orders should return 404 when customer does not exist")
+    void createOrderShouldReturn404WhenCustomerDoesNotExist() {
         String password = "123password";
         User user = registerUser(password);
         String token = authenticate(user.getEmail(), password);
@@ -95,7 +96,7 @@ class OrderDeliveryControllerApiTest extends BaseApiIntegrationTest {
                 .post("/api/v1/orders")
                 .then()
                 .log().ifValidationFails(LogDetail.BODY)
-                .statusCode(400)
+                .statusCode(404)
                 .body("message", equalTo("Customer not found"));
     }
 
@@ -117,6 +118,45 @@ class OrderDeliveryControllerApiTest extends BaseApiIntegrationTest {
                 .log().ifValidationFails(LogDetail.BODY)
                 .statusCode(400)
                 .body("message", equalTo("Distance cannot be zero or negative"));
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/orders should return 400 when customer id is missing")
+    void createOrderShouldReturn400WhenCustomerIdIsMissing() {
+        String password = "123password";
+        User user = registerUser(password);
+        String token = authenticate(user.getEmail(), password);
+        String request = """
+                {
+                  "pickupStreet": "Rua A",
+                  "pickupNumber": "100",
+                  "pickupNeighborhood": "Centro",
+                  "pickupCity": "Sao Carlos",
+                  "pickupState": "SP",
+                  "pickupCountry": "Brasil",
+                  "pickupCep": "13500000",
+                  "deliveryStreet": "Rua B",
+                  "deliveryNumber": "200",
+                  "deliveryNeighborhood": "Jardim",
+                  "deliveryCity": "Araraquara",
+                  "deliveryState": "SP",
+                  "deliveryCountry": "Brasil",
+                  "deliveryCep": "14800000",
+                  "distanceKm": 12.5
+                }
+                """;
+
+        given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + token)
+                .body(request)
+                .when()
+                .post("/api/v1/orders")
+                .then()
+                .log().ifValidationFails(LogDetail.BODY)
+                .statusCode(400)
+                .body("status", equalTo("BAD_REQUEST"))
+                .body("message", containsString("customerId: Customer ID is required"));
     }
 
     @Test
@@ -221,8 +261,8 @@ class OrderDeliveryControllerApiTest extends BaseApiIntegrationTest {
     }
 
     @Test
-    @DisplayName("PATCH /api/v1/orders/{orderId}/dispatch/{deliverymanId} should return 400 when deliveryman does not exist")
-    void dispatchOrderShouldReturn400WhenDeliveryManDoesNotExist() {
+    @DisplayName("PATCH /api/v1/orders/{orderId}/dispatch/{deliverymanId} should return 404 when deliveryman does not exist")
+    void dispatchOrderShouldReturn404WhenDeliveryManDoesNotExist() {
         String password = "123password";
         User user = registerUser(password);
         String token = authenticate(user.getEmail(), password);
@@ -236,7 +276,7 @@ class OrderDeliveryControllerApiTest extends BaseApiIntegrationTest {
                 .patch("/api/v1/orders/{orderId}/dispatch/{deliverymanId}", orderId, unknownDeliveryManId)
                 .then()
                 .log().ifValidationFails(LogDetail.BODY)
-                .statusCode(400)
+                .statusCode(404)
                 .body("message", equalTo("Delivery Man not found"));
     }
 
@@ -331,8 +371,8 @@ class OrderDeliveryControllerApiTest extends BaseApiIntegrationTest {
     }
 
     @Test
-    @DisplayName("GET /api/v1/orders/customer/{customerId} should return 400 when customer does not exist")
-    void listByCustomerShouldReturn400WhenCustomerDoesNotExist() {
+    @DisplayName("GET /api/v1/orders/customer/{customerId} should return 404 when customer does not exist")
+    void listByCustomerShouldReturn404WhenCustomerDoesNotExist() {
         String password = "123password";
         User user = registerUser(password);
         String token = authenticate(user.getEmail(), password);
@@ -344,7 +384,7 @@ class OrderDeliveryControllerApiTest extends BaseApiIntegrationTest {
                 .get("/api/v1/orders/customer/{customerId}", unknownCustomerId)
                 .then()
                 .log().ifValidationFails(LogDetail.BODY)
-                .statusCode(400)
+                .statusCode(404)
                 .body("message", equalTo("Customer not found"));
     }
 
