@@ -22,6 +22,7 @@ public class RegisterPage {
     private final By submitButton = By.xpath("//button[normalize-space()='Criar conta']");
     private final By loginLink = By.linkText("Entrar");
     private final By errorAlert = By.cssSelector(".alert-danger");
+    private final By successAlert = By.cssSelector(".alert-success");
 
     public RegisterPage(WebDriver driver, WebDriverWait wait, String baseUrl) {
         this.driver = driver;
@@ -132,6 +133,10 @@ public class RegisterPage {
 
     public String waitForErrorAlertText() {
         return wait.until(ExpectedConditions.visibilityOfElementLocated(errorAlert)).getText();
+    }
+
+    public String waitForSuccessAlertText() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(successAlert)).getText();
     }
 
     private boolean isValid(WebElement element) {
