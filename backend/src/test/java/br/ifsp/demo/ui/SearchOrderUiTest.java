@@ -51,16 +51,18 @@ class SearchOrderUiTest extends BaseUiTest {
     }
 
     @Test
-    @DisplayName("Should block search submission when order id format is invalid")
-    void shouldBlockSearchSubmissionWhenOrderIdFormatIsInvalid() {
+    @DisplayName("Should show validation error when order id format is invalid")
+    void shouldShowValidationErrorWhenOrderIdFormatIsInvalid() {
         SearchOrderPage searchOrderPage = openAuthenticatedSearchOrderPage();
 
-        searchOrderPage.fillOrderId("pedido-invalido");
+        searchOrderPage.search("pedido-invalido");
+
+        String errorMessage = searchOrderPage.waitForErrorAlertText();
 
         assertThat(driver.getCurrentUrl()).contains("/orders/search");
-        assertThat(searchOrderPage.isOrderIdValid()).isFalse();
-        assertThat(searchOrderPage.orderIdValidationMessage()).isNotBlank();
-        assertThat(searchOrderPage.isErrorAlertVisible()).isFalse();
+        assertThat(errorMessage).containsIgnoringCase("ID inválido");
+        assertThat(errorMessage).containsIgnoringCase("UUID válido");
+        assertThat(searchOrderPage.isOrderCardVisible()).isFalse();
     }
 
     @Test
