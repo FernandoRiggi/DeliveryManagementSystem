@@ -231,6 +231,24 @@ class OrderDeliveryControllerApiTest extends BaseApiIntegrationTest {
     }
 
     @Test
+    @DisplayName("PATCH /api/v1/orders/{orderId}/cancel should return 404 when order does not exist")
+    void cancelOrderShouldReturn404WhenOrderDoesNotExist() {
+        String password = "123password";
+        User user = registerUser(password);
+        String token = authenticate(user.getEmail(), password);
+        UUID unknownOrderId = UUID.randomUUID();
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .patch("/api/v1/orders/{orderId}/cancel", unknownOrderId)
+                .then()
+                .log().ifValidationFails(LogDetail.BODY)
+                .statusCode(404)
+                .body("message", equalTo("[OrderDelivery Not Found]"));
+    }
+
+    @Test
     @DisplayName("PATCH /api/v1/orders/{orderId}/dispatch/{deliverymanId} should dispatch order and return 204")
     void dispatchOrderShouldReturn204AndUpdateOrderStatus() {
         String password = "123password";
@@ -278,6 +296,25 @@ class OrderDeliveryControllerApiTest extends BaseApiIntegrationTest {
                 .log().ifValidationFails(LogDetail.BODY)
                 .statusCode(404)
                 .body("message", equalTo("Delivery Man not found"));
+    }
+
+    @Test
+    @DisplayName("PATCH /api/v1/orders/{orderId}/dispatch/{deliverymanId} should return 404 when order does not exist")
+    void dispatchOrderShouldReturn404WhenOrderDoesNotExist() {
+        String password = "123password";
+        User user = registerUser(password);
+        String token = authenticate(user.getEmail(), password);
+        UUID unknownOrderId = UUID.randomUUID();
+        UUID deliveryManId = createDeliveryMan();
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .patch("/api/v1/orders/{orderId}/dispatch/{deliverymanId}", unknownOrderId, deliveryManId)
+                .then()
+                .log().ifValidationFails(LogDetail.BODY)
+                .statusCode(404)
+                .body("message", equalTo("Order not found"));
     }
 
     @Test
@@ -342,6 +379,24 @@ class OrderDeliveryControllerApiTest extends BaseApiIntegrationTest {
                 .body("id", equalTo(orderId))
                 .body("status", equalTo("CREATED"))
                 .body("deliveryman", nullValue());
+    }
+
+    @Test
+    @DisplayName("PATCH /api/v1/orders/{orderId}/cancel-route should return 404 when order does not exist")
+    void cancelRouteShouldReturn404WhenOrderDoesNotExist() {
+        String password = "123password";
+        User user = registerUser(password);
+        String token = authenticate(user.getEmail(), password);
+        UUID unknownOrderId = UUID.randomUUID();
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .patch("/api/v1/orders/{orderId}/cancel-route", unknownOrderId)
+                .then()
+                .log().ifValidationFails(LogDetail.BODY)
+                .statusCode(404)
+                .body("message", equalTo("[OrderDelivery Not Found]"));
     }
 
     @Test
@@ -426,6 +481,24 @@ class OrderDeliveryControllerApiTest extends BaseApiIntegrationTest {
     }
 
     @Test
+    @DisplayName("PATCH /api/v1/orders/{orderId}/start-route should return 404 when order does not exist")
+    void startRouteShouldReturn404WhenOrderDoesNotExist() {
+        String password = "123password";
+        User user = registerUser(password);
+        String token = authenticate(user.getEmail(), password);
+        UUID unknownOrderId = UUID.randomUUID();
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .patch("/api/v1/orders/{orderId}/start-route", unknownOrderId)
+                .then()
+                .log().ifValidationFails(LogDetail.BODY)
+                .statusCode(404)
+                .body("message", equalTo("[OrderDelivery Not Found]"));
+    }
+
+    @Test
     @DisplayName("PATCH /api/v1/orders/{orderId}/start-route should return 400 when order is not dispatched")
     void startRouteShouldReturn400WhenOrderIsNotDispatched() {
         String password = "123password";
@@ -486,6 +559,24 @@ class OrderDeliveryControllerApiTest extends BaseApiIntegrationTest {
                 .body("id", equalTo(orderId))
                 .body("status", equalTo("CONCLUDED"))
                 .body("deliveryman.id", equalTo(deliveryManId.toString()));
+    }
+
+    @Test
+    @DisplayName("PATCH /api/v1/orders/{orderId}/conclude should return 404 when order does not exist")
+    void concludeOrderShouldReturn404WhenOrderDoesNotExist() {
+        String password = "123password";
+        User user = registerUser(password);
+        String token = authenticate(user.getEmail(), password);
+        UUID unknownOrderId = UUID.randomUUID();
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .patch("/api/v1/orders/{orderId}/conclude", unknownOrderId)
+                .then()
+                .log().ifValidationFails(LogDetail.BODY)
+                .statusCode(404)
+                .body("message", equalTo("[OrderDelivery Not Found]"));
     }
 
     @Test
