@@ -1,9 +1,12 @@
 package br.ifsp.demo.infrastructure.persistence.repository;
 
 import br.ifsp.demo.domain.aggregate.StatusOrder;
+import br.ifsp.demo.domain.event.EventType;
 import br.ifsp.demo.infrastructure.persistence.entity.AddressEmbeddable;
 import br.ifsp.demo.infrastructure.persistence.entity.CustomerEntity;
 import br.ifsp.demo.infrastructure.persistence.entity.OrderDeliveryEntity;
+import br.ifsp.demo.infrastructure.persistence.entity.OrderDeliveryEventEntity;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -11,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -30,6 +34,9 @@ class OrderDeliveryJpaRepositoryPersistenceTest {
 
     @Autowired
     private CustomerJpaRepository customerRepository;
+
+    @Autowired
+    private EntityManager entityManager;
 
     private final List<UUID> createdOrderIds = new ArrayList<>();
 
@@ -74,6 +81,39 @@ class OrderDeliveryJpaRepositoryPersistenceTest {
         assertThatThrownBy(() -> orderRepository.saveAndFlush(order))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("customer");
+    }
+
+    @Test
+    @DisplayName("save should fail when required pickup address field is missing")
+    void saveShouldFailWhenRequiredPickupAddressFieldIsMissing() {
+        CustomerEntity customer = customerRepository.findById(SEEDED_CUSTOMER_ID).orElseThrow();
+        OrderDeliveryEntity order = validOrder(customer, StatusOrder.CREATED);
+        order.getPickupAddress().setStreet(null);
+
+        assertThatThrownBy(() -> orderRepository.saveAndFlush(order))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("pickup");
+    }
+
+    @Test
+    @DisplayName("save should cascade order events")
+    void saveShouldCascadeOrderEvents() {
+        CustomerEntity customer = customerRepository.findById(SEEDED_CUSTOMER_ID).orElseThrow();
+        OrderDeliveryEntity order = validOrder(customer, StatusOrder.CREATED);
+        OrderDeliveryEventEntity event = new OrderDeliveryEventEntity();
+        event.setType(EventType.CREATED);
+        event.setDateTime(LocalDateTime.now());
+        order.getOrderEvents().add(event);
+
+        OrderDeliveryEntity savedOrder = orderRepository.saveAndFlush(order);
+        createdOrderIds.add(savedOrder.getId());
+
+        Number eventCount = (Number) entityManager
+                .createNativeQuery("select count(*) from order_delivery_event where order_delivery_id = :orderId")
+                .setParameter("orderId", savedOrder.getId())
+                .getSingleResult();
+
+        assertThat(eventCount.longValue()).isEqualTo(1L);
     }
 
     private OrderDeliveryEntity saveOrder(CustomerEntity customer, StatusOrder status) {
